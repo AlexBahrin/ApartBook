@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 
 
@@ -15,10 +16,10 @@ class Apartment(models.Model):
     country = models.CharField(max_length=100)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    capacity = models.PositiveIntegerField(help_text="Maximum number of guests")
+    capacity = models.PositiveIntegerField(help_text=_("Maximum number of guests"))
     bedrooms = models.PositiveIntegerField(default=1)
     bathrooms = models.PositiveIntegerField(default=1)
-    amenities = models.JSONField(default=list, blank=True, help_text="List of amenities")
+    amenities = models.JSONField(default=list, blank=True, help_text=_("List of amenities"))
     base_price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -81,20 +82,20 @@ class Availability(models.Model):
     class Meta:
         ordering = ['date']
         unique_together = ['apartment', 'date']
-        verbose_name_plural = 'Availabilities'
+        verbose_name_plural = _('Availabilities')
 
     def __str__(self):
-        status = "Available" if self.is_available else "Unavailable"
+        status = _("Available") if self.is_available else _("Unavailable")
         return f"{self.apartment.title} - {self.date} ({status})"
 
 
 class PricingRule(models.Model):
     """Dynamic pricing rules for apartments."""
     RULE_TYPES = [
-        ('SEASONAL', 'Seasonal'),
-        ('WEEKEND', 'Weekend'),
-        ('DISCOUNT', 'Discount'),
-        ('HOLIDAY', 'Holiday'),
+        ('SEASONAL', _('Seasonal')),
+        ('WEEKEND', _('Weekend')),
+        ('DISCOUNT', _('Discount')),
+        ('HOLIDAY', _('Holiday')),
     ]
 
     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='pricing_rules')
@@ -103,11 +104,11 @@ class PricingRule(models.Model):
     weekday = models.IntegerField(
         null=True, blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(6)],
-        help_text="0=Monday, 6=Sunday. Leave blank to apply to all days."
+        help_text=_("0=Monday, 6=Sunday. Leave blank to apply to all days.")
     )
     rule_type = models.CharField(max_length=20, choices=RULE_TYPES)
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
-    priority = models.PositiveIntegerField(default=0, help_text="Higher priority rules override lower ones")
+    priority = models.PositiveIntegerField(default=0, help_text=_("Higher priority rules override lower ones"))
 
     class Meta:
         ordering = ['-priority', 'start_date']
@@ -119,18 +120,18 @@ class PricingRule(models.Model):
 class Booking(models.Model):
     """Represents a booking request/reservation."""
     STATUS_CHOICES = [
-        ('PENDING', 'Pending'),
-        ('CONFIRMED', 'Confirmed'),
-        ('CANCELLED_BY_USER', 'Cancelled by User'),
-        ('CANCELLED_BY_ADMIN', 'Cancelled by Admin'),
-        ('COMPLETED', 'Completed'),
+        ('PENDING', _('Pending')),
+        ('CONFIRMED', _('Confirmed')),
+        ('CANCELLED_BY_USER', _('Cancelled by User')),
+        ('CANCELLED_BY_ADMIN', _('Cancelled by Admin')),
+        ('COMPLETED', _('Completed')),
     ]
 
     PAYMENT_STATUS_CHOICES = [
-        ('NOT_REQUIRED', 'Not Required'),
-        ('UNPAID', 'Unpaid'),
-        ('PAID', 'Paid'),
-        ('REFUNDED', 'Refunded'),
+        ('NOT_REQUIRED', _('Not Required')),
+        ('UNPAID', _('Unpaid')),
+        ('PAID', _('Paid')),
+        ('REFUNDED', _('Refunded')),
     ]
 
     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='bookings')
@@ -140,11 +141,11 @@ class Booking(models.Model):
     guests_count = models.PositiveIntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     total_discount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    price_breakdown = models.JSONField(default=list, blank=True, help_text="Detailed price breakdown per day")
+    price_breakdown = models.JSONField(default=list, blank=True, help_text=_("Detailed price breakdown per day"))
     currency = models.CharField(max_length=3, default='EUR')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='NOT_REQUIRED')
-    notes = models.TextField(blank=True, help_text="Message from guest to owner")
+    notes = models.TextField(blank=True, help_text=_("Message from guest to owner"))
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -226,12 +227,14 @@ class Booking(models.Model):
         errors = {}
         
         if self.check_out and self.check_in and self.check_out <= self.check_in:
-            errors['check_out'] = 'Check-out date must be after check-in date.'
+            errors['check_out'] = _('Check-out date must be after check-in date.')
         
         # Use apartment_id to avoid RelatedObjectDoesNotExist when apartment not yet set
         if self.apartment_id and self.guests_count:
             if self.guests_count > self.apartment.capacity:
-                errors['guests_count'] = f'Guests count exceeds apartment capacity ({self.apartment.capacity}).'
+                errors['guests_count'] = _('Guests count exceeds apartment capacity (%(capacity)s).') % {
+                    'capacity': self.apartment.capacity
+                }
         
         if errors:
             raise ValidationError(errors)
@@ -299,12 +302,12 @@ class Message(models.Model):
 class DiscountPeriod(models.Model):
     """Staff-defined discount periods for apartments."""
     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='discount_periods')
-    name = models.CharField(max_length=100, help_text="e.g., 'Winter Sale', 'Early Bird'")
+    name = models.CharField(max_length=100, help_text=_("e.g., 'Winter Sale', 'Early Bird'"))
     discount_percentage = models.DecimalField(
         max_digits=5, 
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(Decimal('100.00'))],
-        help_text="Percentage discount (1-100)"
+        help_text=_("Percentage discount (1-100)")
     )
     start_date = models.DateField()
     end_date = models.DateField()
@@ -320,4 +323,4 @@ class DiscountPeriod(models.Model):
     def clean(self):
         from django.core.exceptions import ValidationError
         if self.end_date and self.start_date and self.end_date < self.start_date:
-            raise ValidationError({'end_date': 'End date must be after or equal to start date.'})
+            raise ValidationError({'end_date': _('End date must be after or equal to start date.')})

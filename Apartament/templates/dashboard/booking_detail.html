@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
+{% load i18n %}
+{% load currency_tags %}
 
-{% block title %}Booking #{{ booking.pk }} - ApartBook{% endblock %}
+{% block title %}{% trans "Booking" %} #{{ booking.pk }} - ApartBook{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'my_bookings' %}">My Bookings</a></li>
-            <li class="breadcrumb-item active">Booking #{{ booking.pk }}</li>
+            <li class="breadcrumb-item"><a href="{% url 'my_bookings' %}">{% trans "My Bookings" %}</a></li>
+            <li class="breadcrumb-item active">{% trans "Booking" %} #{{ booking.pk }}</li>
         </ol>
     </nav>
     
@@ -15,21 +17,21 @@
         <div class="col-lg-8">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Booking Details</h5>
+                    <h5 class="mb-0">{% trans "Booking Details" %}</h5>tails" %}</h5>
                     {% if booking.status == 'PENDING' %}
-                        <span class="badge badge-pending fs-6">Pending</span>
+                        <span class="badge badge-pending fs-6">{% trans "Pending" %}</span>
                     {% elif booking.status == 'CONFIRMED' %}
-                        <span class="badge badge-confirmed fs-6">Confirmed</span>
+                        <span class="badge badge-confirmed fs-6">{% trans "Confirmed" %}</span>
                     {% elif booking.status == 'COMPLETED' %}
-                        <span class="badge badge-completed fs-6">Completed</span>
+                        <span class="badge badge-completed fs-6">{% trans "Completed" %}</span>
                     {% else %}
-                        <span class="badge badge-cancelled fs-6">Cancelled</span>
+                        <span class="badge badge-cancelled fs-6">{% trans "Cancelled" %}</span>
                     {% endif %}
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <h6 class="text-muted">Apartment</h6>
+                            <h6 class="text-muted">{% trans "Apartment" %}</h6>
                             <p class="fs-5 mb-0">
                                 <a href="{% url 'apartment_detail' booking.apartment.slug %}">
                                     {{ booking.apartment.title }}
@@ -38,7 +40,7 @@
                             <small class="text-muted">{{ booking.apartment.city }}, {{ booking.apartment.country }}</small>
                         </div>
                         <div class="col-md-6">
-                            <h6 class="text-muted">Booking Created</h6>
+                            <h6 class="text-muted">{% trans "Booking Created" %}</h6>
                             <p class="fs-5 mb-0">{{ booking.created_at|date:"M d, Y" }}</p>
                             <small class="text-muted">{{ booking.created_at|time:"H:i" }}</small>
                         </div>
@@ -48,42 +50,42 @@
                     
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            <h6 class="text-muted">Check-in</h6>
+                            <h6 class="text-muted">{% trans "Check-in" %}</h6>
                             <p class="fs-5 mb-0">{{ booking.check_in|date:"M d, Y" }}</p>
                         </div>
                         <div class="col-md-4">
-                            <h6 class="text-muted">Check-out</h6>
+                            <h6 class="text-muted">{% trans "Check-out" %}</h6>
                             <p class="fs-5 mb-0">{{ booking.check_out|date:"M d, Y" }}</p>
                         </div>
                         <div class="col-md-4">
-                            <h6 class="text-muted">Duration</h6>
-                            <p class="fs-5 mb-0">{{ booking.get_nights }} nights</p>
+                            <h6 class="text-muted">{% trans "Duration" %}</h6>
+                            <p class="fs-5 mb-0">{{ booking.get_nights }} {% trans "nights" %}</p>
                         </div>
                     </div>
                     
                     <div class="row mb-4">
                         <div class="col-md-4">
-                            <h6 class="text-muted">Guests</h6>
+                            <h6 class="text-muted">{% trans "Guests" %}</h6>
                             <p class="fs-5 mb-0">{{ booking.guests_count }}</p>
                         </div>
                         <div class="col-md-4">
-                            <h6 class="text-muted">Total Price</h6>
-                            <p class="fs-5 mb-0 text-primary fw-bold">€{{ booking.total_price }}</p>
+                            <h6 class="text-muted">{% trans "Total Price" %}</h6>
+                            <p class="fs-5 mb-0 text-primary fw-bold">{% price booking.total_price %}</p>
                             {% if booking.total_discount > 0 %}
                                 <small class="text-success">
-                                    <i class="bi bi-tag"></i> Discount applied: -€{{ booking.total_discount }}
+                                    <i class="bi bi-tag"></i> {% trans "Discount applied" %}: -{% price booking.total_discount %}
                                 </small>
                             {% endif %}
                         </div>
                         <div class="col-md-4">
-                            <h6 class="text-muted">Payment Status</h6>
+                            <h6 class="text-muted">{% trans "Payment Status" %}</h6>
                             <p class="fs-5 mb-0">{{ booking.get_payment_status_display }}</p>
                         </div>
                     </div>
                     
                     {% if booking.notes %}
                         <hr>
-                        <h6 class="text-muted">Your Notes</h6>
+                        <h6 class="text-muted">{% trans "Your Notes" %}</h6>
                         <p>{{ booking.notes }}</p>
                     {% endif %}
                 </div>
@@ -93,14 +95,14 @@
                 <div class="card border-warning">
                     <div class="card-body">
                         <h5 class="card-title text-warning">
-                            <i class="bi bi-clock"></i> Awaiting Confirmation
+                            <i class="bi bi-clock"></i> {% trans "Awaiting Confirmation" %}
                         </h5>
-                        <p class="mb-3">Your booking request is being reviewed by the owner. You'll receive a notification once it's confirmed.</p>
+                        <p class="mb-3">{% trans "Your booking request is being reviewed by the owner. You'll receive a notification once it's confirmed." %}</p>
                         <form method="post" action="{% url 'cancel_booking' booking.pk %}" 
-                              onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                              onsubmit="return confirm('{% trans 'Are you sure you want to cancel this booking?' %}');">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-outline-danger">
-                                Cancel Booking
+                                {% trans "Cancel Booking" %}
                             </button>
                         </form>
                     </div>
@@ -109,9 +111,9 @@
                 <div class="card border-success">
                     <div class="card-body">
                         <h5 class="card-title text-success">
-                            <i class="bi bi-check-circle"></i> Booking Confirmed!
+                            <i class="bi bi-check-circle"></i> {% trans "Booking Confirmed!" %}
                         </h5>
-                        <p class="mb-0">Your booking has been confirmed. We look forward to hosting you!</p>
+                        <p class="mb-0">{% trans "Your booking has been confirmed. We look forward to hosting you!" %}</p>
                     </div>
                 </div>
             {% endif %}
@@ -129,10 +131,10 @@
                         <i class="bi bi-geo-alt"></i> {{ booking.apartment.city }}
                     </p>
                     <p class="text-muted mb-2">
-                        <i class="bi bi-people"></i> {{ booking.apartment.capacity }} guests max
+                        <i class="bi bi-people"></i> {{ booking.apartment.capacity }} {% trans "guests max" %}
                     </p>
                     <a href="{% url 'apartment_detail' booking.apartment.slug %}" class="btn btn-outline-primary w-100">
-                        View Apartment
+                        {% trans "View Apartment" %}
                     </a>
                 </div>
             </div>
@@ -140,10 +142,10 @@
             <!-- Message Owner -->
             <div class="card">
                 <div class="card-body">
-                    <h6><i class="bi bi-chat-dots"></i> Need Help?</h6>
-                    <p class="text-muted small mb-3">Send a message to the property owner</p>
+                    <h6><i class="bi bi-chat-dots"></i> {% trans "Need Help?" %}</h6>
+                    <p class="text-muted small mb-3">{% trans "Send a message to the property owner" %}</p>
                     <a href="{% url 'start_conversation' booking.pk %}" class="btn btn-outline-secondary w-100">
-                        <i class="bi bi-envelope"></i> Message Owner
+                        <i class="bi bi-envelope"></i> {% trans "Message Owner" %}
                     </a>
                 </div>
             </div>

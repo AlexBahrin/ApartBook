@@ -1,12 +1,13 @@
 {% extends 'staff/base_staff.html' %}
+{% load i18n %}
 
-{% block title %}{% if object %}Edit{% else %}Create{% endif %} Apartment - Staff{% endblock %}
+{% block title %}{% if object %}{% trans "Edit" %}{% else %}{% trans "Create" %}{% endif %} {% trans "Apartment" %} - {% trans "Staff" %}{% endblock %}
 
 {% block staff_content %}
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'staff_apartments' %}">Apartments</a></li>
-        <li class="breadcrumb-item active">{% if object %}Edit{% else %}Create{% endif %}</li>
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartments' %}">{% trans "Apartments" %}</a></li>
+        <li class="breadcrumb-item active">{% if object %}{% trans "Edit" %}{% else %}{% trans "Create" %}{% endif %}</li>
     </ol>
 </nav>
 
@@ -14,14 +15,14 @@
     <div class="col-lg-8">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">{% if object %}Edit Apartment{% else %}New Apartment{% endif %}</h5>
+                <h5 class="mb-0">{% if object %}{% trans "Edit Apartment" %}{% else %}{% trans "New Apartment" %}{% endif %}</h5>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
                     
                     <div class="mb-3">
-                        <label class="form-label">Title</label>
+                        <label class="form-label">{% trans "Title" %}</label>
                         {{ form.title }}
                         {% if form.title.errors %}
                             <div class="text-danger">{{ form.title.errors }}</div>
@@ -29,24 +30,24 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
+                        <label class="form-label">{% trans "Description" %}</label>
                         {{ form.description }}
                     </div>
                     
                     <div class="row">
                         <div class="col-md-12 mb-3">
-                            <label class="form-label">Address</label>
+                            <label class="form-label">{% trans "Address" %}</label>
                             {{ form.address }}
                         </div>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">City</label>
+                            <label class="form-label">{% trans "City" %}</label>
                             {{ form.city }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Country</label>
+                            <label class="form-label">{% trans "Country" %}</label>
                             {{ form.country }}
                         </div>
                     </div>

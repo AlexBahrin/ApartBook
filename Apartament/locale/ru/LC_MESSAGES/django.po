@@ -1,313 +1,298 @@
-# ApartBook Translations
-# Copyright (C) 2025 ApartBook
-# This file is distributed under the same license as the ApartBook package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ApartBook 1.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-03 13:52+0000\n"
-"PO-Revision-Date: 2025-12-03 13:10+0000\n"
-"Last-Translator: ApartBook Team\n"
-"Language-Team: Romanian\n"
-"Language: ro\n"
+"POT-Creation-Date: 2025-12-03 13:57+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
-"2:1));\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: Apartament/settings.py:120
 msgid "English"
-msgstr "Engleză"
+msgstr "Английский"
 
 #: Apartament/settings.py:121
 msgid "Romanian"
-msgstr "Română"
+msgstr "Румынский"
 
 #: Apartament/settings.py:122
 msgid "Russian"
-msgstr "Rusă"
+msgstr "Русский"
 
 #: Apartament/settings.py:123
 msgid "Ukrainian"
-msgstr "Ucraineană"
+msgstr "Украинский"
 
 #: Apartament/settings.py:124
 msgid "German"
-msgstr "Germană"
+msgstr "Немецкий"
 
 #: Apartament/settings.py:125
 msgid "French"
-msgstr "Franceză"
+msgstr "Французский"
 
 #: Apartament/settings.py:126
 msgid "Spanish"
-msgstr "Spaniolă"
+msgstr "Испанский"
 
 #: app/models.py:19
-#, fuzzy
-#| msgid "Number of guests"
 msgid "Maximum number of guests"
-msgstr "Număr de oaspeți"
+msgstr "Максимальное количество гостей"
 
 #: app/models.py:22
-#, fuzzy
-#| msgid "Amenities"
 msgid "List of amenities"
-msgstr "Facilități"
+msgstr "Список удобств"
 
 #: app/models.py:85
-#, fuzzy
-#| msgid "All Cities"
 msgid "Availabilities"
-msgstr "Toate Orașele"
+msgstr "Доступность"
 
 #: app/models.py:88
 msgid "Available"
-msgstr "Disponibil"
+msgstr "Доступно"
 
 #: app/models.py:88
 msgid "Unavailable"
-msgstr "Indisponibil"
+msgstr "Недоступно"
 
 #: app/models.py:95
 msgid "Seasonal"
-msgstr "Sezonier"
+msgstr "Сезонный"
 
 #: app/models.py:96
 msgid "Weekend"
-msgstr "Weekend"
+msgstr "Выходные"
 
 #: app/models.py:97
-#, fuzzy
-#| msgid "Discount savings"
 msgid "Discount"
-msgstr "Reducere"
+msgstr "Скидка"
 
 #: app/models.py:98
 msgid "Holiday"
-msgstr "Sărbătoare"
+msgstr "Праздник"
 
 #: app/models.py:107
 msgid "0=Monday, 6=Sunday. Leave blank to apply to all days."
-msgstr "0=Luni, 6=Duminică. Lasați gol pentru toate zilele."
+msgstr "0=Понедельник, 6=Воскресенье. Оставьте пустым для всех дней."
 
 #: app/models.py:111
 msgid "Higher priority rules override lower ones"
-msgstr "Regulile cu prioritate mai mare suprascriu pe cele mai mici"
+msgstr "Правила с более высоким приоритетом переопределяют нижние"
 
 #: app/models.py:123 templates/dashboard/booking_detail.html:22
 #: templates/dashboard/bookings_list.html:43
 #: templates/staff/booking_detail.html:21
 msgid "Pending"
-msgstr "În așteptare"
+msgstr "Ожидание"
 
 #: app/models.py:124 templates/dashboard/booking_detail.html:24
 #: templates/dashboard/bookings_list.html:45
 #: templates/staff/booking_detail.html:23
 msgid "Confirmed"
-msgstr "Confirmat"
+msgstr "Подтверждено"
 
 #: app/models.py:125
 msgid "Cancelled by User"
-msgstr "Anulat de utilizator"
+msgstr "Отменено пользователем"
 
 #: app/models.py:126
 msgid "Cancelled by Admin"
-msgstr "Anulat de administrator"
+msgstr "Отменено администратором"
 
 #: app/models.py:127 templates/dashboard/booking_detail.html:26
 #: templates/dashboard/bookings_list.html:47
 #: templates/staff/booking_detail.html:25
 msgid "Completed"
-msgstr "Completat"
+msgstr "Завершено"
 
 #: app/models.py:131
 msgid "Not Required"
-msgstr "Nu este necesar"
+msgstr "Не требуется"
 
 #: app/models.py:132
 msgid "Unpaid"
-msgstr "Neplătit"
+msgstr "Неоплачено"
 
 #: app/models.py:133
 msgid "Paid"
-msgstr "Plătit"
+msgstr "Оплачено"
 
 #: app/models.py:134
 msgid "Refunded"
-msgstr "Rambursat"
+msgstr "Возвращено"
 
 #: app/models.py:144
 msgid "Detailed price breakdown per day"
-msgstr "Defalcare detaliată a prețului pe zi"
+msgstr "Подробная разбивка цены по дням"
 
 #: app/models.py:148
 msgid "Message from guest to owner"
-msgstr "Mesaj de la oaspete către proprietar"
+msgstr "Сообщение от гостя владельцу"
 
 #: app/models.py:230
 msgid "Check-out date must be after check-in date."
-msgstr "Data de check-out trebuie să fie după data de check-in."
+msgstr "Дата выезда должна быть после даты заезда."
 
 #: app/models.py:235
 #, python-format
 msgid "Guests count exceeds apartment capacity (%(capacity)s)."
-msgstr ""
-"Numărul de oaspeți depășește capacitatea apartamentului (%(capacity)s)."
+msgstr "Количество гостей превышает вместимость квартиры (%(capacity)s)."
 
 #: app/models.py:305
 msgid "e.g., 'Winter Sale', 'Early Bird'"
-msgstr "de ex., 'Reducere de iarnă', 'Early Bird'"
+msgstr "например, 'Зимняя распродажа', 'Раннее бронирование'"
 
 #: app/models.py:310
 msgid "Percentage discount (1-100)"
-msgstr "Reducere procentuală (1-100)"
+msgstr "Процентная скидка (1-100)"
 
 #: app/models.py:326
 msgid "End date must be after or equal to start date."
-msgstr "Data de sfârșit trebuie să fie după sau egală cu data de început."
+msgstr "Дата окончания должна быть после или равна дате начала."
 
 #: app/views.py:149
 msgid "The apartment is not available for the selected dates."
-msgstr "Apartamentul nu este disponibil pentru datele selectate."
+msgstr "Квартира недоступна на выбранные даты."
 
 #: app/views.py:168
 msgid ""
 "Your booking request has been submitted! The owner will review it shortly."
-msgstr ""
-"Cererea dvs. de rezervare a fost trimisă! Proprietarul o va examina în "
-"curând."
+msgstr "Ваш запрос на бронирование отправлен! Владелец скоро его рассмотрит."
 
 #: app/views.py:385
 msgid "Your booking has been cancelled."
-msgstr "Rezervarea dvs. a fost anulată."
+msgstr "Ваше бронирование отменено."
 
 #: app/views.py:387
 msgid "Only pending bookings can be cancelled."
-msgstr "Doar rezervările în așteptare pot fi anulate."
+msgstr "Можно отменить только ожидающие бронирования."
 
 #: app/views.py:420
 msgid "Apartment created successfully!"
-msgstr "Apartament creat cu succes!"
+msgstr "Квартира успешно создана!"
 
 #: app/views.py:432
 msgid "Apartment updated successfully!"
-msgstr "Apartament actualizat cu succes!"
+msgstr "Квартира успешно обновлена!"
 
 #: app/views.py:443
 msgid "Apartment deleted successfully!"
-msgstr "Apartament șters cu succes!"
+msgstr "Квартира успешно удалена!"
 
 #: app/views.py:458
 msgid "Image uploaded successfully!"
-msgstr "Imagine încărcată cu succes!"
+msgstr "Изображение успешно загружено!"
 
 #: app/views.py:477
 msgid "Image deleted successfully!"
-msgstr "Imagine ștearsă cu succes!"
+msgstr "Изображение успешно удалено!"
 
 #: app/views.py:529
 #, python-format
 msgid "Booking status updated to %(status)s!"
-msgstr "Statusul rezervării actualizat la %(status)s!"
+msgstr "Статус бронирования обновлен на %(status)s!"
 
 #: app/views.py:563
 msgid "Availability updated!"
-msgstr "Disponibilitate actualizată!"
+msgstr "Доступность обновлена!"
 
 #: app/views.py:641
 msgid "Blocked"
-msgstr "Blocat"
+msgstr "Заблокировано"
 
 #: app/views.py:665
 msgid "Pricing rule added!"
-msgstr "Regulă de preț adăugată!"
+msgstr "Правило цены добавлено!"
 
 #: app/views.py:685
 msgid "Pricing rule deleted!"
-msgstr "Regulă de preț ștearsă!"
+msgstr "Правило цены удалено!"
 
 #: app/views.py:695
 msgid "Availability entry deleted!"
-msgstr "Înregistrare de disponibilitate ștearsă!"
+msgstr "Запись о доступности удалена!"
 
 #: app/views.py:735 app/views.py:798
-#, fuzzy
-#| msgid "Messages"
 msgid "Message sent!"
-msgstr "Mesaje"
+msgstr "Сообщение отправлено!"
 
 #: app/views.py:833
 #, python-format
 msgid "Discount period \"%(name)s\" created successfully!"
-msgstr "Perioada de reducere \"%(name)s\" creată cu succes!"
+msgstr "Период скидки \"%(name)s\" успешно создан!"
 
 #: app/views.py:847
 #, python-format
 msgid "Discount period \"%(name)s\" updated successfully!"
-msgstr "Perioada de reducere \"%(name)s\" actualizată cu succes!"
+msgstr "Период скидки \"%(name)s\" успешно обновлен!"
 
 #: app/views.py:860
 msgid "Discount period deleted successfully!"
-msgstr "Perioada de reducere ștearsă cu succes!"
+msgstr "Период скидки успешно удален!"
 
 #: templates/base.html:88 templates/dashboard/bookings_list.html:68
 #: templates/public/landing.html:18
 msgid "Browse Apartments"
-msgstr "Căutați Apartamente"
+msgstr "Просмотр квартир"
 
 #: templates/base.html:136 templates/dashboard/booking_detail.html:11
 #: templates/dashboard/bookings_list.html:5
 #: templates/dashboard/bookings_list.html:9
 msgid "My Bookings"
-msgstr "Rezervările Mele"
+msgstr "Мои бронирования"
 
 #: templates/base.html:141 templates/staff/base_staff.html:43
 msgid "Messages"
-msgstr "Mesaje"
+msgstr "Сообщения"
 
 #: templates/base.html:147 templates/staff/base_staff.html:4
 msgid "Staff Dashboard"
-msgstr "Panou Administrare"
+msgstr "Панель персонала"
 
 #: templates/base.html:160
 msgid "Logout"
-msgstr "Deconectare"
+msgstr "Выйти"
 
 #: templates/base.html:168
 msgid "Login"
-msgstr "Autentificare"
+msgstr "Войти"
 
 #: templates/base.html:171
 msgid "Sign Up"
-msgstr "Înregistrare"
+msgstr "Зарегистрироваться"
 
 #: templates/base.html:202
 msgid "Find your perfect stay."
-msgstr "Găsește cazarea perfectă."
+msgstr "Найдите свое идеальное проживание."
 
 #: templates/base.html:205
 msgid "All rights reserved."
-msgstr "Toate drepturile rezervate."
+msgstr "Все права защищены."
 
 #: templates/dashboard/booking_detail.html:5
 #: templates/dashboard/booking_detail.html:12
 #: templates/dashboard/messages_list.html:45
 #: templates/staff/booking_detail.html:5 templates/staff/booking_detail.html:11
 #: templates/staff/booking_detail.html:19
-#, fuzzy
-#| msgid "My Bookings"
 msgid "Booking"
-msgstr "Rezervările Mele"
+msgstr "Бронирование"
 
 #: templates/dashboard/booking_detail.html:20
-#, fuzzy
-#| msgid "View Details"
 msgid "Booking Details"
-msgstr "Vezi Detalii"
+msgstr "Детали бронирования"
 
 #: templates/dashboard/booking_detail.html:28
 #: templates/dashboard/bookings_list.html:49
@@ -315,71 +300,67 @@ msgstr "Vezi Detalii"
 #, fuzzy
 #| msgid "Cancelled by User"
 msgid "Cancelled"
-msgstr "Anulat de utilizator"
+msgstr "Отменено пользователем"
 
 #: templates/dashboard/booking_detail.html:34
 #: templates/dashboard/bookings_list.html:16 templates/public/landing.html:23
 #: templates/staff/apartment_form.html:4 templates/staff/booking_detail.html:38
 msgid "Apartment"
-msgstr "Apartament"
+msgstr "Квартира"
 
 #: templates/dashboard/booking_detail.html:43
 msgid "Booking Created"
-msgstr ""
+msgstr "Бронирование создано"
 
 #: templates/dashboard/booking_detail.html:53
 #: templates/public/apartment_detail.html:138
 #: templates/staff/booking_detail.html:52
 msgid "Check-in"
-msgstr "Check-in"
+msgstr "Заезд"
 
 #: templates/dashboard/booking_detail.html:57
 #: templates/public/apartment_detail.html:143
 msgid "Check-out"
-msgstr "Check-out"
+msgstr "Выезд"
 
 #: templates/dashboard/booking_detail.html:61
-#, fuzzy
-#| msgid "Location"
 msgid "Duration"
-msgstr "Locație"
+msgstr "Продолжительность"
 
 #: templates/dashboard/booking_detail.html:62
 #: templates/dashboard/bookings_list.html:37
 #: templates/public/apartment_detail.html:164
 msgid "nights"
-msgstr "nopți"
+msgstr "ночей"
 
 #: templates/dashboard/booking_detail.html:68
 #: templates/dashboard/bookings_list.html:18
 #: templates/public/apartment_detail.html:148
 #: templates/public/apartment_list.html:83
 msgid "Guests"
-msgstr "Oaspeți"
+msgstr "Гости"
 
 #: templates/dashboard/booking_detail.html:72
-#, fuzzy
-#| msgid "Total"
 msgid "Total Price"
-msgstr "Total"
+msgstr "Общая стоимость"
 
 #: templates/dashboard/booking_detail.html:76
 #, fuzzy
-#| msgid "Discount savings"
+#| msgid "Discount"
 msgid "Discount applied"
-msgstr "Reducere"
+msgstr "Скидка"
 
 #: templates/dashboard/booking_detail.html:81
 msgid "Payment Status"
-msgstr "Status Plată"
+msgstr "Статус оплаты"
 
 #: templates/dashboard/booking_detail.html:88
 msgid "Your Notes"
-msgstr "Notele Dvs."
+msgstr "Ваши заметки"
 
 #: templates/dashboard/booking_detail.html:98
 msgid "Awaiting Confirmation"
-msgstr "În Așteptarea Confirmării"
+msgstr "Ожидает подтверждения"
 
 #: templates/dashboard/booking_detail.html:100
 #, fuzzy
@@ -388,454 +369,418 @@ msgstr "În Așteptarea Confirmării"
 msgid ""
 "Your booking request is being reviewed by the owner. You'll receive a "
 "notification once it's confirmed."
-msgstr ""
-"Cererea dvs. de rezervare a fost trimisă! Proprietarul o va examina în "
-"curând."
+msgstr "Ваш запрос на бронирование отправлен! Владелец скоро его рассмотрит."
 
 #: templates/dashboard/booking_detail.html:102
 msgid "Are you sure you want to cancel this booking?"
-msgstr "Sigur doriți să anulați această rezervare?"
+msgstr "Вы уверены, что хотите отменить это бронирование?"
 
 #: templates/dashboard/booking_detail.html:105
-#, fuzzy
-#| msgid "My Bookings"
 msgid "Cancel Booking"
-msgstr "Rezervările Mele"
+msgstr "Отменить бронирование"
 
 #: templates/dashboard/booking_detail.html:114
 #, fuzzy
 #| msgid "Confirmed"
 msgid "Booking Confirmed!"
-msgstr "Confirmat"
+msgstr "Подтверждено"
 
 #: templates/dashboard/booking_detail.html:116
 msgid "Your booking has been confirmed. We look forward to hosting you!"
-msgstr "Rezervarea dvs. a fost confirmată. Ne bucurăm să vă găzduim!"
+msgstr "Ваше бронирование подтверждено. Мы с нетерпением ждем вас!"
 
 #: templates/dashboard/booking_detail.html:134
-#, fuzzy
-#| msgid "guests"
 msgid "guests max"
-msgstr "oaspeți"
+msgstr "гостей макс"
 
 #: templates/dashboard/booking_detail.html:137
-#, fuzzy
-#| msgid "View All Apartments"
 msgid "View Apartment"
-msgstr "Vezi Toate Apartamentele"
+msgstr "Посмотреть квартиру"
 
 #: templates/dashboard/booking_detail.html:145
 msgid "Need Help?"
-msgstr "Aveți nevoie de ajutor?"
+msgstr "Нужна помощь?"
 
 #: templates/dashboard/booking_detail.html:146
 msgid "Send a message to the property owner"
-msgstr "Trimiteți un mesaj proprietarului"
+msgstr "Отправить сообщение владельцу"
 
 #: templates/dashboard/booking_detail.html:148
 #, fuzzy
-#| msgid "Messages"
+#| msgid "Message sent!"
 msgid "Message Owner"
-msgstr "Mesaje"
+msgstr "Сообщение отправлено!"
 
 #: templates/dashboard/bookings_list.html:17
 msgid "Dates"
-msgstr "Date"
+msgstr "Даты"
 
 #: templates/dashboard/bookings_list.html:19
 #: templates/public/apartment_detail.html:173
 msgid "Total"
-msgstr "Total"
+msgstr "Итого"
 
 #: templates/dashboard/bookings_list.html:20
 #: templates/staff/apartments_list.html:25
 msgid "Status"
-msgstr "Status"
+msgstr "Статус"
 
 #: templates/dashboard/bookings_list.html:21
 #: templates/staff/apartments_list.html:26
-#, fuzzy
-#| msgid "Location"
 msgid "Actions"
-msgstr "Locație"
+msgstr "Действия"
 
 #: templates/dashboard/bookings_list.html:54
 #: templates/public/apartment_list.html:162
 msgid "View"
-msgstr "Vezi"
+msgstr "Посмотреть"
 
 #: templates/dashboard/bookings_list.html:65
-#, fuzzy
-#| msgid "My Bookings"
 msgid "No bookings yet"
-msgstr "Rezervările Mele"
+msgstr "Пока нет бронирований"
 
 #: templates/dashboard/bookings_list.html:66
 msgid "Start exploring apartments to make your first booking!"
-msgstr "Începeți să explorați apartamente pentru a face prima rezervare!"
+msgstr "Начните изучать квартиры, чтобы сделать первое бронирование!"
 
 #: templates/dashboard/conversation_detail.html:4
-#, fuzzy
-#| msgid "Location"
 msgid "Conversation"
-msgstr "Locație"
+msgstr "Беседа"
 
 #: templates/dashboard/conversation_detail.html:49
 #: templates/dashboard/messages_list.html:27
 msgid "General Inquiry"
-msgstr "Întrebare Generală"
+msgstr "Общий запрос"
 
 #: templates/dashboard/conversation_detail.html:60
 #, fuzzy
-#| msgid "Messages"
+#| msgid "Message sent!"
 msgid "All Messages"
-msgstr "Mesaje"
+msgstr "Сообщение отправлено!"
 
 #: templates/dashboard/conversation_detail.html:83
 msgid "No messages yet. Start the conversation!"
-msgstr "Încă nu există mesaje. Începeți conversația!"
+msgstr "Пока нет сообщений. Начните беседу!"
 
 #: templates/dashboard/conversation_detail.html:95
 msgid "Send"
-msgstr "Trimite"
+msgstr "Отправить"
 
 #: templates/dashboard/messages_list.html:4
 #: templates/dashboard/messages_list.html:11
 #, fuzzy
-#| msgid "Messages"
+#| msgid "Message sent!"
 msgid "My Messages"
-msgstr "Mesaje"
+msgstr "Сообщение отправлено!"
 
 #: templates/dashboard/messages_list.html:13
-#, fuzzy
-#| msgid "My Bookings"
 msgid "Back to Bookings"
-msgstr "Rezervările Mele"
+msgstr "Вернуться к бронированиям"
 
 #: templates/dashboard/messages_list.html:30
 msgid "new"
-msgstr "nou"
+msgstr "новое"
 
 #: templates/dashboard/messages_list.html:33
 msgid "ago"
-msgstr "în urmă"
+msgstr "назад"
 
 #: templates/dashboard/messages_list.html:54
 #, fuzzy
-#| msgid "Messages"
+#| msgid "Message sent!"
 msgid "No messages yet"
-msgstr "Mesaje"
+msgstr "Сообщение отправлено!"
 
 #: templates/dashboard/messages_list.html:55
 msgid "Start a conversation from one of your bookings"
-msgstr "Începeți o conversație de la una dintre rezervările dvs."
+msgstr "Начните беседу из одного из ваших бронирований"
 
 #: templates/dashboard/messages_list.html:56
-#, fuzzy
-#| msgid "My Bookings"
 msgid "View My Bookings"
-msgstr "Rezervările Mele"
+msgstr "Посмотреть мои бронирования"
 
 #: templates/public/apartment_detail.html:75
 #: templates/public/apartment_detail.html:150 templates/public/landing.html:52
 msgid "guests"
-msgstr "oaspeți"
+msgstr "гости"
 
 #: templates/public/apartment_detail.html:80 templates/public/landing.html:54
 msgid "bedrooms"
-msgstr "dormitoare"
+msgstr "спальни"
 
 #: templates/public/apartment_detail.html:85
 msgid "bathrooms"
-msgstr "băi"
+msgstr "ванные комнаты"
 
 #: templates/public/apartment_detail.html:92
 msgid "About this place"
-msgstr "Despre această locuință"
+msgstr "Об этом месте"
 
 #: templates/public/apartment_detail.html:99
 msgid "Amenities"
-msgstr "Facilități"
+msgstr "Удобства"
 
 #: templates/public/apartment_detail.html:115
 #: templates/staff/apartments_list.html:22
 msgid "Location"
-msgstr "Locație"
+msgstr "Местоположение"
 
 #: templates/public/apartment_detail.html:130
 #: templates/public/apartment_list.html:160 templates/public/landing.html:57
 msgid "night"
-msgstr "noapte"
+msgstr "ночь"
 
 #: templates/public/apartment_detail.html:150
 msgid "Max"
-msgstr "Max"
+msgstr "Макс"
 
 #: templates/public/apartment_detail.html:154
 msgid "Notes for the owner (optional)"
-msgstr "Note pentru proprietar (opțional)"
+msgstr "Заметки для владельца (необязательно)"
 
 #: templates/public/apartment_detail.html:168
 msgid "Discount savings"
-msgstr "Reducere"
+msgstr "Экономия по скидке"
 
 #: templates/public/apartment_detail.html:183
 msgid "Request to Book"
-msgstr "Solicită Rezervare"
+msgstr "Запросить бронирование"
 
 #: templates/public/apartment_detail.html:189
 msgid "You won't be charged yet"
-msgstr "Nu vei fi taxat încă"
+msgstr "Вы еще не будете списаны"
 
 #: templates/public/apartment_detail.html:193
 msgid "Sign in to book this apartment"
-msgstr "Autentifică-te pentru a rezerva acest apartament"
+msgstr "Войдите, чтобы забронировать эту квартиру"
 
 #: templates/public/apartment_detail.html:195
 msgid "Login to Book"
-msgstr "Autentifică-te pentru a rezerva"
+msgstr "Войти для бронирования"
 
 #: templates/public/apartment_detail.html:198
 msgid "Don't have an account?"
-msgstr "Nu ai cont?"
+msgstr "Нет аккаунта?"
 
 #: templates/public/apartment_detail.html:198
 msgid "Sign up"
-msgstr "Înregistrează-te"
+msgstr "Зарегистрироваться"
 
 #: templates/public/apartment_list.html:5
 #: templates/public/apartment_list.html:112
 #: templates/staff/apartment_form.html:9 templates/staff/apartments_list.html:9
 #: templates/staff/base_staff.html:40
 msgid "Apartments"
-msgstr "Apartamente"
+msgstr "Квартиры"
 
 #: templates/public/apartment_list.html:66
 msgid "Filters"
-msgstr "Filtre"
+msgstr "Фильтры"
 
 #: templates/public/apartment_list.html:71
 #: templates/staff/apartment_form.html:46
 msgid "City"
-msgstr "Oraș"
+msgstr "Город"
 
 #: templates/public/apartment_list.html:73
 msgid "All Cities"
-msgstr "Toate Orașele"
+msgstr "Все города"
 
 #: templates/public/apartment_list.html:85
 msgid "Number of guests"
-msgstr "Număr de oaspeți"
+msgstr "Количество гостей"
 
 #: templates/public/apartment_list.html:89
 msgid "Price Range"
-msgstr "Interval de Preț"
+msgstr "Диапазон цен"
 
 #: templates/public/apartment_list.html:102
 msgid "Apply Filters"
-msgstr "Aplică Filtre"
+msgstr "Применить фильтры"
 
 #: templates/public/apartment_list.html:103
 msgid "Clear"
-msgstr "Șterge"
+msgstr "Очистить"
 
 #: templates/public/apartment_list.html:114
 msgid "results"
-msgstr "rezultate"
+msgstr "результаты"
 
 #: templates/public/apartment_list.html:117
 msgid "List"
-msgstr "Listă"
+msgstr "Список"
 
 #: templates/public/apartment_list.html:120
 msgid "Map"
-msgstr "Hartă"
+msgstr "Карта"
 
 #: templates/public/apartment_list.html:123
 msgid "Split"
-msgstr "Împărțit"
+msgstr "Разделить"
 
 #: templates/public/apartment_list.html:177
 msgid "Previous"
-msgstr "Anterior"
+msgstr "Предыдущий"
 
 #: templates/public/apartment_list.html:189
 msgid "Next"
-msgstr "Următor"
+msgstr "Следующий"
 
 #: templates/public/apartment_list.html:198
 msgid "No apartments found"
-msgstr "Niciun apartament găsit"
+msgstr "Квартиры не найдены"
 
 #: templates/public/apartment_list.html:199
 msgid "Try adjusting your filters"
-msgstr "Încearcă să modifici filtrele"
+msgstr "Попробуйте изменить фильтры"
 
 #: templates/public/landing.html:5
 msgid "Find Your Perfect Stay"
-msgstr "Găsește Cazarea Perfectă"
+msgstr "Найдите свое идеальное проживание"
 
 #: templates/public/landing.html:13
 msgid "Find Your Perfect Apartment"
-msgstr "Găsește Apartamentul Perfect"
+msgstr "Найдите свою идеальную квартиру"
 
 #: templates/public/landing.html:15
 msgid ""
 "Discover beautiful apartments for your next trip. Book directly with the "
 "owner for the best experience."
 msgstr ""
-"Descoperă apartamente frumoase pentru următoarea ta călătorie. Rezervă "
-"direct cu proprietarul pentru cea mai bună experiență."
 
 #: templates/public/landing.html:32
 msgid "Featured Apartments"
-msgstr "Apartamente Recomandate"
+msgstr "Избранные квартиры"
 
 #: templates/public/landing.html:44
 msgid "No image"
-msgstr "Fără imagine"
+msgstr "Нет изображения"
 
 #: templates/public/landing.html:52
 msgid "Up to"
-msgstr "Până la"
+msgstr "До"
 
 #: templates/public/landing.html:59
 msgid "View Details"
-msgstr "Vezi Detalii"
+msgstr "Посмотреть детали"
 
 #: templates/public/landing.html:70
 msgid "View All Apartments"
-msgstr "Vezi Toate Apartamentele"
+msgstr "Посмотреть все квартиры"
 
 #: templates/public/landing.html:76
 msgid "No apartments available yet"
-msgstr "Încă nu există apartamente disponibile"
+msgstr "Пока нет доступных квартир"
 
 #: templates/public/landing.html:77
 msgid "Check back soon for new listings!"
-msgstr "Revino în curând pentru noi anunțuri!"
+msgstr "Скоро появятся новые объявления!"
 
 #: templates/public/landing.html:86
 msgid "How It Works"
-msgstr "Cum Funcționează"
+msgstr "Как это работает"
 
 #: templates/public/landing.html:92
 msgid "1. Browse"
-msgstr "1. Caută"
+msgstr "1. Просмотр"
 
 #: templates/public/landing.html:93
 msgid "Explore our selection of beautiful apartments"
-msgstr "Explorează selecția noastră de apartamente frumoase"
+msgstr "Изучите нашу подборку красивых квартир"
 
 #: templates/public/landing.html:99
 msgid "2. Book"
-msgstr "2. Rezervă"
+msgstr "2. Бронирование"
 
 #: templates/public/landing.html:100
 msgid "Select your dates and submit a booking request"
-msgstr "Selectează datele și trimite o cerere de rezervare"
+msgstr "Выберите даты и отправьте запрос на бронирование"
 
 #: templates/public/landing.html:106
 msgid "3. Enjoy"
-msgstr "3. Bucură-te"
+msgstr "3. Наслаждайтесь"
 
 #: templates/public/landing.html:107
 msgid "Get confirmation and enjoy your stay!"
-msgstr "Primește confirmarea și bucură-te de ședere!"
+msgstr "Получите подтверждение и наслаждайтесь проживанием!"
 
 #: templates/staff/apartment_form.html:4 templates/staff/apartment_form.html:10
 msgid "Edit"
-msgstr "Editează"
+msgstr "Редактировать"
 
 #: templates/staff/apartment_form.html:4 templates/staff/apartment_form.html:10
 msgid "Create"
-msgstr "Creează"
+msgstr "Создать"
 
 #: templates/staff/apartment_form.html:4 templates/staff/apartments_list.html:5
 #: templates/staff/booking_detail.html:5 templates/staff/bookings_list.html:5
 msgid "Staff"
-msgstr "Personal"
+msgstr "Персонал"
 
 #: templates/staff/apartment_form.html:18
-#, fuzzy
-#| msgid "Apartment"
 msgid "Edit Apartment"
-msgstr "Apartament"
+msgstr "Редактировать квартиру"
 
 #: templates/staff/apartment_form.html:18
-#, fuzzy
-#| msgid "Apartment"
 msgid "New Apartment"
-msgstr "Apartament"
+msgstr "Новая квартира"
 
 #: templates/staff/apartment_form.html:25
 #: templates/staff/apartments_list.html:21
 msgid "Title"
-msgstr "Titlu"
+msgstr "Название"
 
 #: templates/staff/apartment_form.html:33
 msgid "Description"
-msgstr "Descriere"
+msgstr "Описание"
 
 #: templates/staff/apartment_form.html:39
 msgid "Address"
-msgstr "Adresă"
+msgstr "Адрес"
 
 #: templates/staff/apartment_form.html:50
 msgid "Country"
-msgstr "Țară"
+msgstr "Страна"
 
 #: templates/staff/apartments_list.html:5
-#, fuzzy
-#| msgid "Apartments"
 msgid "Manage Apartments"
-msgstr "Apartamente"
+msgstr "Управление квартирами"
 
 #: templates/staff/apartments_list.html:11
-#, fuzzy
-#| msgid "Apartment"
 msgid "Add Apartment"
-msgstr "Apartament"
+msgstr "Добавить квартиру"
 
 #: templates/staff/apartments_list.html:20
-#, fuzzy
-#| msgid "No image"
 msgid "Image"
-msgstr "Imagine"
+msgstr "Изображение"
 
 #: templates/staff/apartments_list.html:23
 msgid "Capacity"
-msgstr "Capacitate"
+msgstr "Вместимость"
 
 #: templates/staff/apartments_list.html:24
 msgid "Price/Night"
-msgstr "Preț/Noapte"
+msgstr "Цена/Ночь"
 
 #: templates/staff/base_staff.html:33
 msgid "Staff Panel"
-msgstr "Panou Personal"
+msgstr "Панель персонала"
 
 #: templates/staff/base_staff.html:37 templates/staff/booking_detail.html:10
 #: templates/staff/bookings_list.html:9
-#, fuzzy
-#| msgid "My Bookings"
 msgid "Bookings"
-msgstr "Rezervările Mele"
+msgstr "Бронирования"
 
 #: templates/staff/base_staff.html:46
 #, fuzzy
-#| msgid "Discount savings"
+#| msgid "Discount"
 msgid "Discount Periods"
-msgstr "Reducere"
+msgstr "Скидка"
 
 #: templates/staff/booking_detail.html:33
-#, fuzzy
-#| msgid "Guests"
 msgid "Guest"
-msgstr "Oaspeți"
+msgstr "Гость"
 
 #: templates/staff/bookings_list.html:5
-#, fuzzy
-#| msgid "My Bookings"
 msgid "Manage Bookings"
-msgstr "Rezervările Mele"
+msgstr "Управление бронированиями"

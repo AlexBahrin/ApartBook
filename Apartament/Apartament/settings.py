@@ -119,6 +119,8 @@ LANGUAGE_CODE = 'en'
 LANGUAGES = [
     ('en', _('English')),
     ('ro', _('Romanian')),
+    ('ru', _('Russian')),
+    ('uk', _('Ukrainian')),
     ('de', _('German')),
     ('fr', _('French')),
     ('es', _('Spanish')),
@@ -127,6 +129,12 @@ LANGUAGES = [
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
+
+# Language cookie settings
+LANGUAGE_COOKIE_NAME = 'django_language'
+LANGUAGE_COOKIE_AGE = None  # Session cookie
+LANGUAGE_COOKIE_DOMAIN = None
+LANGUAGE_COOKIE_PATH = '/'
 
 TIME_ZONE = 'UTC'
 

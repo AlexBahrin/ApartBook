@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Avg
 from datetime import date, timedelta
@@ -145,7 +146,7 @@ def create_booking(request, slug):
         if form.is_valid():
             # Check availability
             if not form.check_availability():
-                messages.error(request, 'The apartment is not available for the selected dates.')
+                messages.error(request, _('The apartment is not available for the selected dates.'))
                 return redirect('apartment_detail', slug=slug)
             
             # Create booking
@@ -164,7 +165,7 @@ def create_booking(request, slug):
             # Send email notification to admin
             send_new_booking_notification(booking)
             
-            messages.success(request, 'Your booking request has been submitted! The owner will review it shortly.')
+            messages.success(request, _('Your booking request has been submitted! The owner will review it shortly.'))
             return redirect('my_bookings')
         else:
             for error in form.errors.values():
@@ -381,9 +382,9 @@ def cancel_booking(request, pk):
         booking.save()
         # Send notification (user cancelled their own booking)
         send_booking_cancelled_notification(booking, cancelled_by='user')
-        messages.success(request, 'Your booking has been cancelled.')
+        messages.success(request, _('Your booking has been cancelled.'))
     else:
-        messages.error(request, 'Only pending bookings can be cancelled.')
+        messages.error(request, _('Only pending bookings can be cancelled.'))
     
     return redirect('my_booking_detail', pk=pk)
 
@@ -416,7 +417,7 @@ class StaffApartmentCreateView(StaffRequiredMixin, CreateView):
     success_url = reverse_lazy('staff_apartments')
 
     def form_valid(self, form):
-        messages.success(self.request, 'Apartment created successfully!')
+        messages.success(self.request, _('Apartment created successfully!'))
         return super().form_valid(form)
 
 
@@ -428,7 +429,7 @@ class StaffApartmentUpdateView(StaffRequiredMixin, UpdateView):
     success_url = reverse_lazy('staff_apartments')
 
     def form_valid(self, form):
-        messages.success(self.request, 'Apartment updated successfully!')
+        messages.success(self.request, _('Apartment updated successfully!'))
         return super().form_valid(form)
 
 
@@ -439,7 +440,7 @@ class StaffApartmentDeleteView(StaffRequiredMixin, DeleteView):
     success_url = reverse_lazy('staff_apartments')
 
     def form_valid(self, form):
-        messages.success(self.request, 'Apartment deleted successfully!')
+        messages.success(self.request, _('Apartment deleted successfully!'))
         return super().form_valid(form)
 
 
@@ -454,7 +455,7 @@ def staff_apartment_images(request, pk):
             image = form.save(commit=False)
             image.apartment = apartment
             image.save()
-            messages.success(request, 'Image uploaded successfully!')
+            messages.success(request, _('Image uploaded successfully!'))
             return redirect('staff_apartment_images', pk=pk)
     else:
         form = ApartmentImageForm()
@@ -473,7 +474,7 @@ def staff_delete_image(request, pk):
     image = get_object_or_404(ApartmentImage, pk=pk)
     apartment_pk = image.apartment.pk
     image.delete()
-    messages.success(request, 'Image deleted successfully!')
+    messages.success(request, _('Image deleted successfully!'))
     return redirect('staff_apartment_images', pk=apartment_pk)
 
 
@@ -525,7 +526,9 @@ def staff_booking_detail(request, pk):
             elif new_status == 'CANCELLED_BY_ADMIN':
                 send_booking_cancelled_notification(booking, cancelled_by='admin')
             
-            messages.success(request, f'Booking status updated to {booking.get_status_display()}!')
+            messages.success(request, _('Booking status updated to %(status)s!') % {
+                'status': booking.get_status_display()
+            })
             return redirect('staff_booking_detail', pk=pk)
     else:
         form = BookingStatusForm()
@@ -557,7 +560,7 @@ def staff_availability(request, pk):
                     'note': availability.note,
                 }
             )
-            messages.success(request, 'Availability updated!')
+            messages.success(request, _('Availability updated!'))
             return redirect('staff_availability', pk=pk)
     else:
         form = AvailabilityForm()
@@ -635,7 +638,7 @@ def staff_calendar_events_api(request, pk):
     for blocked in blocked_dates:
         events.append({
             'id': f'blocked-{blocked.pk}',
-            'title': blocked.note or 'Blocked',
+            'title': blocked.note or _('Blocked'),
             'start': blocked.date.isoformat(),
             'end': blocked.date.isoformat(),
             'color': '#dc3545',
@@ -659,7 +662,7 @@ def staff_pricing_rules(request, pk):
             rule = form.save(commit=False)
             rule.apartment = apartment
             rule.save()
-            messages.success(request, 'Pricing rule added!')
+            messages.success(request, _('Pricing rule added!'))
             return redirect('staff_pricing_rules', pk=pk)
     else:
         form = PricingRuleForm()
@@ -679,7 +682,7 @@ def staff_delete_pricing_rule(request, pk):
     rule = get_object_or_404(PricingRule, pk=pk)
     apartment_pk = rule.apartment.pk
     rule.delete()
-    messages.success(request, 'Pricing rule deleted!')
+    messages.success(request, _('Pricing rule deleted!'))
     return redirect('staff_pricing_rules', pk=apartment_pk)
 
 
@@ -689,7 +692,7 @@ def staff_delete_availability(request, pk):
     availability = get_object_or_404(Availability, pk=pk)
     apartment_pk = availability.apartment.pk
     availability.delete()
-    messages.success(request, 'Availability entry deleted!')
+    messages.success(request, _('Availability entry deleted!'))
     return redirect('staff_availability', pk=apartment_pk)
 
 
@@ -729,7 +732,7 @@ def conversation_detail(request, pk):
             message.save()
             # Update conversation timestamp
             conversation.save()
-            messages.success(request, 'Message sent!')
+            messages.success(request, _('Message sent!'))
             return redirect('conversation_detail', pk=pk)
     else:
         form = MessageForm()
@@ -792,7 +795,7 @@ def staff_conversation_detail(request, pk):
             message.save()
             # Update conversation timestamp
             conversation.save()
-            messages.success(request, 'Message sent!')
+            messages.success(request, _('Message sent!'))
             return redirect('staff_conversation_detail', pk=pk)
     else:
         form = MessageForm()
@@ -827,7 +830,9 @@ class StaffDiscountPeriodCreateView(StaffRequiredMixin, CreateView):
     success_url = reverse_lazy('staff_discount_periods')
 
     def form_valid(self, form):
-        messages.success(self.request, f'Discount period "{form.instance.name}" created successfully!')
+        messages.success(self.request, _('Discount period "%(name)s" created successfully!') % {
+            'name': form.instance.name
+        })
         return super().form_valid(form)
 
 
@@ -839,7 +844,9 @@ class StaffDiscountPeriodUpdateView(StaffRequiredMixin, UpdateView):
     success_url = reverse_lazy('staff_discount_periods')
 
     def form_valid(self, form):
-        messages.success(self.request, f'Discount period "{form.instance.name}" updated successfully!')
+        messages.success(self.request, _('Discount period "%(name)s" updated successfully!') % {
+            'name': form.instance.name
+        })
         return super().form_valid(form)
 
 
@@ -850,7 +857,7 @@ class StaffDiscountPeriodDeleteView(StaffRequiredMixin, DeleteView):
     success_url = reverse_lazy('staff_discount_periods')
 
     def form_valid(self, form):
-        messages.success(self.request, f'Discount period deleted successfully!')
+        messages.success(self.request, _('Discount period deleted successfully!'))
         return super().form_valid(form)
 
 

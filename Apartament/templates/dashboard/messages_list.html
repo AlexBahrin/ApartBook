@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}My Messages{% endblock %}
+{% block title %}{% trans "My Messages" %}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="bi bi-chat-dots"></i> My Messages</h2>
+                <h2><i class="bi bi-chat-dots"></i> {% trans "My Messages" %}</h2>
                 <a href="{% url 'my_bookings' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Back to Bookings
+                    <i class="bi bi-arrow-left"></i> {% trans "Back to Bookings" %}
                 </a>
             </div>
             
@@ -23,13 +24,13 @@
                                     {% if conversation.booking %}
                                         {{ conversation.booking.apartment.title }}
                                     {% else %}
-                                        General Inquiry
+                                        {% trans "General Inquiry" %}
                                     {% endif %}
                                     {% if conversation.unread_count > 0 %}
-                                        <span class="badge bg-danger">{{ conversation.unread_count }} new</span>
+                                        <span class="badge bg-danger">{{ conversation.unread_count }} {% trans "new" %}</span>
                                     {% endif %}
                                 </h5>
-                                <small class="text-muted">{{ conversation.updated_at|timesince }} ago</small>
+                                <small class="text-muted">{{ conversation.updated_at|timesince }} {% trans "ago" %}</small>
                             </div>
                             {% with last_msg=conversation.get_last_message %}
                                 {% if last_msg %}
@@ -41,7 +42,7 @@
                             {% endwith %}
                             {% if conversation.booking %}
                                 <small class="text-muted">
-                                    Booking: {{ conversation.booking.check_in|date:"M d" }} - {{ conversation.booking.check_out|date:"M d, Y" }}
+                                    {% trans "Booking" %}: {{ conversation.booking.check_in|date:"M d" }} - {{ conversation.booking.check_out|date:"M d, Y" }}
                                 </small>
                             {% endif %}
                         </a>
@@ -50,9 +51,9 @@
             {% else %}
                 <div class="text-center py-5">
                     <i class="bi bi-chat-square text-muted" style="font-size: 4rem;"></i>
-                    <h4 class="mt-3 text-muted">No messages yet</h4>
-                    <p class="text-muted">Start a conversation from one of your bookings</p>
-                    <a href="{% url 'my_bookings' %}" class="btn btn-primary">View My Bookings</a>
+                    <h4 class="mt-3 text-muted">{% trans "No messages yet" %}</h4>
+                    <p class="text-muted">{% trans "Start a conversation from one of your bookings" %}</p>
+                    <a href="{% url 'my_bookings' %}" class="btn btn-primary">{% trans "View My Bookings" %}</a>
                 </div>
             {% endif %}
         </div>

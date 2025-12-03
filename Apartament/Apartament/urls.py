@@ -14,7 +14,6 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path('', include('app.urls')),
     path('authentication/', include('authentication.urls')),
-    prefix_default_language=False,  # Don't add /en/ prefix for default language
 )
 
 # Serve media files in development

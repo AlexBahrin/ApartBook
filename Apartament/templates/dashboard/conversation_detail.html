@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Conversation{% endblock %}
+{% block title %}{% trans "Conversation" %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -45,7 +46,7 @@
                                 {% if conversation.booking %}
                                     {{ conversation.booking.apartment.title }}
                                 {% else %}
-                                    General Inquiry
+                                    {% trans "General Inquiry" %}
                                 {% endif %}
                             </h5>
                             {% if conversation.booking %}
@@ -56,7 +57,7 @@
                             {% endif %}
                         </div>
                         <a href="{% url 'my_messages' %}" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-arrow-left"></i> All Messages
+                            <i class="bi bi-arrow-left"></i> {% trans "All Messages" %}
                         </a>
                     </div>
                 </div>
@@ -79,7 +80,7 @@
                     {% else %}
                         <div class="text-center py-4 text-muted">
                             <i class="bi bi-chat-square-text" style="font-size: 2rem;"></i>
-                            <p class="mt-2">No messages yet. Start the conversation!</p>
+                            <p class="mt-2">{% trans "No messages yet. Start the conversation!" %}</p>
                         </div>
                     {% endif %}
                 </div>
@@ -91,7 +92,7 @@
                         <div class="input-group">
                             {{ form.body }}
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-send"></i> Send
+                                <i class="bi bi-send"></i> {% trans "Send" %}
                             </button>
                         </div>
                     </form>

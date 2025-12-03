@@ -1,10 +1,12 @@
 {% extends 'staff/base_staff.html' %}
+{% load i18n %}
+{% load currency_tags %}
 
-{% block title %}Manage Bookings - Staff{% endblock %}
+{% block title %}{% trans "Manage Bookings" %} - {% trans "Staff" %}{% endblock %}
 
 {% block staff_content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Bookings</h2>
+    <h2>{% trans "Bookings" %}</h2>
     
     <!-- Filters -->
     <form method="get" class="d-flex gap-2">

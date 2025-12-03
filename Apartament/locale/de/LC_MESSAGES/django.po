@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-03 13:06+0000\n"
+"POT-Creation-Date: 2025-12-03 13:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,288 +17,765 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
 #: Apartament/settings.py:120
 msgid "English"
-msgstr ""
+msgstr "Englisch"
 
 #: Apartament/settings.py:121
 msgid "Romanian"
-msgstr ""
+msgstr "Rumänisch"
 
 #: Apartament/settings.py:122
-msgid "German"
-msgstr ""
+msgid "Russian"
+msgstr "Russisch"
 
 #: Apartament/settings.py:123
-msgid "French"
-msgstr ""
+msgid "Ukrainian"
+msgstr "Ukrainisch"
 
 #: Apartament/settings.py:124
+msgid "German"
+msgstr "Deutsch"
+
+#: Apartament/settings.py:125
+msgid "French"
+msgstr "Französisch"
+
+#: Apartament/settings.py:126
 msgid "Spanish"
-msgstr ""
+msgstr "Spanisch"
 
-#: templates/base.html:88 templates/public/landing.html:18
+#: app/models.py:19
+msgid "Maximum number of guests"
+msgstr "Maximale Anzahl von Gästen"
+
+#: app/models.py:22
+msgid "List of amenities"
+msgstr "Liste der Annehmlichkeiten"
+
+#: app/models.py:85
+msgid "Availabilities"
+msgstr "Verfügbarkeiten"
+
+#: app/models.py:88
+msgid "Available"
+msgstr "Verfügbar"
+
+#: app/models.py:88
+msgid "Unavailable"
+msgstr "Nicht verfügbar"
+
+#: app/models.py:95
+msgid "Seasonal"
+msgstr "Saisonal"
+
+#: app/models.py:96
+msgid "Weekend"
+msgstr "Wochenende"
+
+#: app/models.py:97
+msgid "Discount"
+msgstr "Rabatt"
+
+#: app/models.py:98
+msgid "Holiday"
+msgstr "Feiertag"
+
+#: app/models.py:107
+msgid "0=Monday, 6=Sunday. Leave blank to apply to all days."
+msgstr "0=Montag, 6=Sonntag. Leer lassen für alle Tage."
+
+#: app/models.py:111
+msgid "Higher priority rules override lower ones"
+msgstr "Regeln mit höherer Priorität überschreiben niedrigere"
+
+#: app/models.py:123 templates/dashboard/booking_detail.html:22
+#: templates/dashboard/bookings_list.html:43
+#: templates/staff/booking_detail.html:21
+msgid "Pending"
+msgstr "Ausstehend"
+
+#: app/models.py:124 templates/dashboard/booking_detail.html:24
+#: templates/dashboard/bookings_list.html:45
+#: templates/staff/booking_detail.html:23
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+#: app/models.py:125
+msgid "Cancelled by User"
+msgstr "Vom Benutzer storniert"
+
+#: app/models.py:126
+msgid "Cancelled by Admin"
+msgstr "Vom Administrator storniert"
+
+#: app/models.py:127 templates/dashboard/booking_detail.html:26
+#: templates/dashboard/bookings_list.html:47
+#: templates/staff/booking_detail.html:25
+msgid "Completed"
+msgstr "Abgeschlossen"
+
+#: app/models.py:131
+msgid "Not Required"
+msgstr "Nicht erforderlich"
+
+#: app/models.py:132
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+#: app/models.py:133
+msgid "Paid"
+msgstr "Bezahlt"
+
+#: app/models.py:134
+msgid "Refunded"
+msgstr "Erstattet"
+
+#: app/models.py:144
+msgid "Detailed price breakdown per day"
+msgstr "Detaillierte Preisaufschlüsselung pro Tag"
+
+#: app/models.py:148
+msgid "Message from guest to owner"
+msgstr "Nachricht vom Gast an den Eigentümer"
+
+#: app/models.py:230
+msgid "Check-out date must be after check-in date."
+msgstr "Das Abreisedatum muss nach dem Anreisedatum liegen."
+
+#: app/models.py:235
+#, python-format
+msgid "Guests count exceeds apartment capacity (%(capacity)s)."
+msgstr ""
+"Die Anzahl der Gäste überschreitet die Kapazität der Wohnung (%(capacity)s)."
+
+#: app/models.py:305
+msgid "e.g., 'Winter Sale', 'Early Bird'"
+msgstr "z.B. 'Winterschlussverkauf', 'Frühbucher'"
+
+#: app/models.py:310
+msgid "Percentage discount (1-100)"
+msgstr "Prozentualer Rabatt (1-100)"
+
+#: app/models.py:326
+msgid "End date must be after or equal to start date."
+msgstr "Das Enddatum muss nach oder gleich dem Startdatum sein."
+
+#: app/views.py:149
+msgid "The apartment is not available for the selected dates."
+msgstr "Die Wohnung ist für die ausgewählten Daten nicht verfügbar."
+
+#: app/views.py:168
+msgid ""
+"Your booking request has been submitted! The owner will review it shortly."
+msgstr ""
+"Ihre Buchungsanfrage wurde gesendet! Der Eigentümer wird sie in Kürze prüfen."
+
+#: app/views.py:385
+msgid "Your booking has been cancelled."
+msgstr "Ihre Buchung wurde storniert."
+
+#: app/views.py:387
+msgid "Only pending bookings can be cancelled."
+msgstr "Nur ausstehende Buchungen können storniert werden."
+
+#: app/views.py:420
+msgid "Apartment created successfully!"
+msgstr "Wohnung erfolgreich erstellt!"
+
+#: app/views.py:432
+msgid "Apartment updated successfully!"
+msgstr "Wohnung erfolgreich aktualisiert!"
+
+#: app/views.py:443
+msgid "Apartment deleted successfully!"
+msgstr "Wohnung erfolgreich gelöscht!"
+
+#: app/views.py:458
+msgid "Image uploaded successfully!"
+msgstr "Bild erfolgreich hochgeladen!"
+
+#: app/views.py:477
+msgid "Image deleted successfully!"
+msgstr "Bild erfolgreich gelöscht!"
+
+#: app/views.py:529
+#, python-format
+msgid "Booking status updated to %(status)s!"
+msgstr "Buchungsstatus auf %(status)s aktualisiert!"
+
+#: app/views.py:563
+msgid "Availability updated!"
+msgstr "Verfügbarkeit aktualisiert!"
+
+#: app/views.py:641
+msgid "Blocked"
+msgstr "Gesperrt"
+
+#: app/views.py:665
+msgid "Pricing rule added!"
+msgstr "Preisregel hinzugefügt!"
+
+#: app/views.py:685
+msgid "Pricing rule deleted!"
+msgstr "Preisregel gelöscht!"
+
+#: app/views.py:695
+msgid "Availability entry deleted!"
+msgstr "Verfügbarkeitseintrag gelöscht!"
+
+#: app/views.py:735 app/views.py:798
+msgid "Message sent!"
+msgstr "Nachricht gesendet!"
+
+#: app/views.py:833
+#, python-format
+msgid "Discount period \"%(name)s\" created successfully!"
+msgstr "Rabattzeitraum \"%(name)s\" erfolgreich erstellt!"
+
+#: app/views.py:847
+#, python-format
+msgid "Discount period \"%(name)s\" updated successfully!"
+msgstr "Rabattzeitraum \"%(name)s\" erfolgreich aktualisiert!"
+
+#: app/views.py:860
+msgid "Discount period deleted successfully!"
+msgstr "Rabattzeitraum erfolgreich gelöscht!"
+
+#: templates/base.html:88 templates/dashboard/bookings_list.html:68
+#: templates/public/landing.html:18
 msgid "Browse Apartments"
-msgstr ""
+msgstr "Wohnungen durchsuchen"
 
-#: templates/base.html:136
+#: templates/base.html:136 templates/dashboard/booking_detail.html:11
+#: templates/dashboard/bookings_list.html:5
+#: templates/dashboard/bookings_list.html:9
 msgid "My Bookings"
-msgstr ""
+msgstr "Meine Buchungen"
 
-#: templates/base.html:141
+#: templates/base.html:141 templates/staff/base_staff.html:43
 msgid "Messages"
-msgstr ""
+msgstr "Nachrichten"
 
-#: templates/base.html:147
+#: templates/base.html:147 templates/staff/base_staff.html:4
 msgid "Staff Dashboard"
-msgstr ""
+msgstr "Mitarbeiter-Dashboard"
 
 #: templates/base.html:160
 msgid "Logout"
-msgstr ""
+msgstr "Abmelden"
 
 #: templates/base.html:168
 msgid "Login"
-msgstr ""
+msgstr "Anmelden"
 
 #: templates/base.html:171
 msgid "Sign Up"
-msgstr ""
+msgstr "Registrieren"
 
 #: templates/base.html:202
 msgid "Find your perfect stay."
-msgstr ""
+msgstr "Finden Sie Ihren perfekten Aufenthalt."
 
 #: templates/base.html:205
 msgid "All rights reserved."
+msgstr "Alle Rechte vorbehalten."
+
+#: templates/dashboard/booking_detail.html:5
+#: templates/dashboard/booking_detail.html:12
+#: templates/dashboard/messages_list.html:45
+#: templates/staff/booking_detail.html:5 templates/staff/booking_detail.html:11
+#: templates/staff/booking_detail.html:19
+msgid "Booking"
+msgstr "Buchung"
+
+#: templates/dashboard/booking_detail.html:20
+msgid "Booking Details"
+msgstr "Buchungsdetails"
+
+#: templates/dashboard/booking_detail.html:28
+#: templates/dashboard/bookings_list.html:49
+#: templates/staff/booking_detail.html:27
+#, fuzzy
+#| msgid "Cancelled by User"
+msgid "Cancelled"
+msgstr "Storniert"
+
+#: templates/dashboard/booking_detail.html:34
+#: templates/dashboard/bookings_list.html:16 templates/public/landing.html:23
+#: templates/staff/apartment_form.html:4 templates/staff/booking_detail.html:38
+msgid "Apartment"
+msgstr "Wohnung"
+
+#: templates/dashboard/booking_detail.html:43
+msgid "Booking Created"
+msgstr "Buchung erstellt"
+
+#: templates/dashboard/booking_detail.html:53
+#: templates/public/apartment_detail.html:138
+#: templates/staff/booking_detail.html:52
+msgid "Check-in"
+msgstr "Check-in"
+
+#: templates/dashboard/booking_detail.html:57
+#: templates/public/apartment_detail.html:143
+msgid "Check-out"
+msgstr "Check-out"
+
+#: templates/dashboard/booking_detail.html:61
+msgid "Duration"
+msgstr "Dauer"
+
+#: templates/dashboard/booking_detail.html:62
+#: templates/dashboard/bookings_list.html:37
+#: templates/public/apartment_detail.html:164
+msgid "nights"
+msgstr "Nächte"
+
+#: templates/dashboard/booking_detail.html:68
+#: templates/dashboard/bookings_list.html:18
+#: templates/public/apartment_detail.html:148
+#: templates/public/apartment_list.html:83
+msgid "Guests"
+msgstr "Gäste"
+
+#: templates/dashboard/booking_detail.html:72
+msgid "Total Price"
+msgstr "Gesamtpreis"
+
+#: templates/dashboard/booking_detail.html:76
+#, fuzzy
+#| msgid "Discount"
+msgid "Discount applied"
+msgstr "Rabatt angewendet"
+
+#: templates/dashboard/booking_detail.html:81
+msgid "Payment Status"
+msgstr "Zahlungsstatus"
+
+#: templates/dashboard/booking_detail.html:88
+msgid "Your Notes"
+msgstr "Ihre Notizen"
+
+#: templates/dashboard/booking_detail.html:98
+msgid "Awaiting Confirmation"
+msgstr "Warte auf Bestätigung"
+
+#: templates/dashboard/booking_detail.html:100
+msgid ""
+"Your booking request is being reviewed by the owner. You'll receive a "
+"notification once it's confirmed."
 msgstr ""
+"Ihre Buchungsanfrage wird vom Eigentümer geprüft. Sie erhalten eine "
+"Benachrichtigung, sobald sie bestätigt wurde."
+
+#: templates/dashboard/booking_detail.html:102
+msgid "Are you sure you want to cancel this booking?"
+msgstr "Sind Sie sicher, dass Sie diese Buchung stornieren möchten?"
+
+#: templates/dashboard/booking_detail.html:105
+msgid "Cancel Booking"
+msgstr "Buchung stornieren"
+
+#: templates/dashboard/booking_detail.html:114
+msgid "Booking Confirmed!"
+msgstr "Buchung bestätigt!"
+
+#: templates/dashboard/booking_detail.html:116
+msgid "Your booking has been confirmed. We look forward to hosting you!"
+msgstr "Ihre Buchung wurde bestätigt. Wir freuen uns darauf, Sie zu empfangen!"
+
+#: templates/dashboard/booking_detail.html:134
+msgid "guests max"
+msgstr "Gäste max"
+
+#: templates/dashboard/booking_detail.html:137
+msgid "View Apartment"
+msgstr "Wohnung ansehen"
+
+#: templates/dashboard/booking_detail.html:145
+msgid "Need Help?"
+msgstr "Brauchen Sie Hilfe?"
+
+#: templates/dashboard/booking_detail.html:146
+msgid "Send a message to the property owner"
+msgstr "Nachricht an den Eigentümer senden"
+
+#: templates/dashboard/booking_detail.html:148
+msgid "Message Owner"
+msgstr "Eigentümer kontaktieren"
+
+#: templates/dashboard/bookings_list.html:17
+msgid "Dates"
+msgstr "Daten"
+
+#: templates/dashboard/bookings_list.html:19
+#: templates/public/apartment_detail.html:173
+msgid "Total"
+msgstr "Gesamt"
+
+#: templates/dashboard/bookings_list.html:20
+#: templates/staff/apartments_list.html:25
+msgid "Status"
+msgstr "Status"
+
+#: templates/dashboard/bookings_list.html:21
+#: templates/staff/apartments_list.html:26
+msgid "Actions"
+msgstr "Aktionen"
+
+#: templates/dashboard/bookings_list.html:54
+#: templates/public/apartment_list.html:162
+msgid "View"
+msgstr "Ansehen"
+
+#: templates/dashboard/bookings_list.html:65
+msgid "No bookings yet"
+msgstr "Noch keine Buchungen"
+
+#: templates/dashboard/bookings_list.html:66
+msgid "Start exploring apartments to make your first booking!"
+msgstr "Beginnen Sie mit der Erkundung von Wohnungen, um Ihre erste Buchung vorzunehmen!"
+
+#: templates/dashboard/conversation_detail.html:4
+msgid "Conversation"
+msgstr "Unterhaltung"
+
+#: templates/dashboard/conversation_detail.html:49
+#: templates/dashboard/messages_list.html:27
+msgid "General Inquiry"
+msgstr "Allgemeine Anfrage"
+
+#: templates/dashboard/conversation_detail.html:60
+#, fuzzy
+#| msgid "Message sent!"
+msgid "All Messages"
+msgstr "Alle Nachrichten"
+
+#: templates/dashboard/conversation_detail.html:83
+msgid "No messages yet. Start the conversation!"
+msgstr "Noch keine Nachrichten. Beginnen Sie die Unterhaltung!"
+
+#: templates/dashboard/conversation_detail.html:95
+msgid "Send"
+msgstr "Senden"
+
+#: templates/dashboard/messages_list.html:4
+#: templates/dashboard/messages_list.html:11
+#, fuzzy
+#| msgid "Message sent!"
+msgid "My Messages"
+msgstr "Meine Nachrichten"
+
+#: templates/dashboard/messages_list.html:13
+msgid "Back to Bookings"
+msgstr "Zurück zu Buchungen"
+
+#: templates/dashboard/messages_list.html:30
+msgid "new"
+msgstr "neu"
+
+#: templates/dashboard/messages_list.html:33
+msgid "ago"
+msgstr "vor"
+
+#: templates/dashboard/messages_list.html:54
+#, fuzzy
+#| msgid "Message sent!"
+msgid "No messages yet"
+msgstr "Noch keine Nachrichten"
+
+#: templates/dashboard/messages_list.html:55
+msgid "Start a conversation from one of your bookings"
+msgstr "Beginnen Sie eine Unterhaltung von einer Ihrer Buchungen"
+
+#: templates/dashboard/messages_list.html:56
+msgid "View My Bookings"
+msgstr "Meine Buchungen ansehen"
 
 #: templates/public/apartment_detail.html:75
 #: templates/public/apartment_detail.html:150 templates/public/landing.html:52
 msgid "guests"
-msgstr ""
+msgstr "Gäste"
 
 #: templates/public/apartment_detail.html:80 templates/public/landing.html:54
 msgid "bedrooms"
-msgstr ""
+msgstr "Schlafzimmer"
 
 #: templates/public/apartment_detail.html:85
 msgid "bathrooms"
-msgstr ""
+msgstr "Badezimmer"
 
 #: templates/public/apartment_detail.html:92
 msgid "About this place"
-msgstr ""
+msgstr "Über diese Unterkunft"
 
 #: templates/public/apartment_detail.html:99
 msgid "Amenities"
-msgstr ""
+msgstr "Ausstattung"
 
 #: templates/public/apartment_detail.html:115
+#: templates/staff/apartments_list.html:22
 msgid "Location"
-msgstr ""
+msgstr "Standort"
 
 #: templates/public/apartment_detail.html:130
 #: templates/public/apartment_list.html:160 templates/public/landing.html:57
 msgid "night"
-msgstr ""
-
-#: templates/public/apartment_detail.html:138
-msgid "Check-in"
-msgstr ""
-
-#: templates/public/apartment_detail.html:143
-msgid "Check-out"
-msgstr ""
-
-#: templates/public/apartment_detail.html:148
-#: templates/public/apartment_list.html:83
-msgid "Guests"
-msgstr ""
+msgstr "Nacht"
 
 #: templates/public/apartment_detail.html:150
 msgid "Max"
-msgstr ""
+msgstr "Max"
 
 #: templates/public/apartment_detail.html:154
 msgid "Notes for the owner (optional)"
-msgstr ""
-
-#: templates/public/apartment_detail.html:164
-msgid "nights"
-msgstr ""
+msgstr "Notizen für den Eigentümer (optional)"
 
 #: templates/public/apartment_detail.html:168
 msgid "Discount savings"
-msgstr ""
-
-#: templates/public/apartment_detail.html:173
-msgid "Total"
-msgstr ""
+msgstr "Rabattersparnisse"
 
 #: templates/public/apartment_detail.html:183
 msgid "Request to Book"
-msgstr ""
+msgstr "Buchungsanfrage"
 
 #: templates/public/apartment_detail.html:189
 msgid "You won't be charged yet"
-msgstr ""
+msgstr "Sie werden noch nicht belastet"
 
 #: templates/public/apartment_detail.html:193
 msgid "Sign in to book this apartment"
-msgstr ""
+msgstr "Melden Sie sich an, um diese Wohnung zu buchen"
 
 #: templates/public/apartment_detail.html:195
 msgid "Login to Book"
-msgstr ""
+msgstr "Anmelden zum Buchen"
 
 #: templates/public/apartment_detail.html:198
 msgid "Don't have an account?"
-msgstr ""
+msgstr "Haben Sie noch kein Konto?"
 
 #: templates/public/apartment_detail.html:198
 msgid "Sign up"
-msgstr ""
+msgstr "Registrieren"
 
 #: templates/public/apartment_list.html:5
 #: templates/public/apartment_list.html:112
+#: templates/staff/apartment_form.html:9 templates/staff/apartments_list.html:9
+#: templates/staff/base_staff.html:40
 msgid "Apartments"
-msgstr ""
+msgstr "Wohnungen"
 
 #: templates/public/apartment_list.html:66
 msgid "Filters"
-msgstr ""
+msgstr "Filter"
 
 #: templates/public/apartment_list.html:71
+#: templates/staff/apartment_form.html:46
 msgid "City"
-msgstr ""
+msgstr "Stadt"
 
 #: templates/public/apartment_list.html:73
 msgid "All Cities"
-msgstr ""
+msgstr "Alle Städte"
 
 #: templates/public/apartment_list.html:85
 msgid "Number of guests"
-msgstr ""
+msgstr "Anzahl der Gäste"
 
 #: templates/public/apartment_list.html:89
 msgid "Price Range"
-msgstr ""
+msgstr "Preisspanne"
 
 #: templates/public/apartment_list.html:102
 msgid "Apply Filters"
-msgstr ""
+msgstr "Filter anwenden"
 
 #: templates/public/apartment_list.html:103
 msgid "Clear"
-msgstr ""
+msgstr "Löschen"
 
 #: templates/public/apartment_list.html:114
 msgid "results"
-msgstr ""
+msgstr "Ergebnisse"
 
 #: templates/public/apartment_list.html:117
 msgid "List"
-msgstr ""
+msgstr "Liste"
 
 #: templates/public/apartment_list.html:120
 msgid "Map"
-msgstr ""
+msgstr "Karte"
 
 #: templates/public/apartment_list.html:123
 msgid "Split"
-msgstr ""
-
-#: templates/public/apartment_list.html:162
-msgid "View"
-msgstr ""
+msgstr "Geteilt"
 
 #: templates/public/apartment_list.html:177
 msgid "Previous"
-msgstr ""
+msgstr "Zurück"
 
 #: templates/public/apartment_list.html:189
 msgid "Next"
-msgstr ""
+msgstr "Weiter"
 
 #: templates/public/apartment_list.html:198
 msgid "No apartments found"
-msgstr ""
+msgstr "Keine Wohnungen gefunden"
 
 #: templates/public/apartment_list.html:199
 msgid "Try adjusting your filters"
-msgstr ""
+msgstr "Versuchen Sie, Ihre Filter anzupassen"
 
 #: templates/public/landing.html:5
 msgid "Find Your Perfect Stay"
-msgstr ""
+msgstr "Finden Sie Ihren perfekten Aufenthalt"
 
 #: templates/public/landing.html:13
 msgid "Find Your Perfect Apartment"
-msgstr ""
+msgstr "Finden Sie Ihre perfekte Wohnung"
 
 #: templates/public/landing.html:15
 msgid ""
 "Discover beautiful apartments for your next trip. Book directly with the "
 "owner for the best experience."
 msgstr ""
-
-#: templates/public/landing.html:23
-msgid "Apartment"
-msgstr ""
+"Entdecken Sie schöne Wohnungen für Ihre nächste Reise. Buchen Sie direkt "
+"beim Eigentümer für die beste Erfahrung."
 
 #: templates/public/landing.html:32
 msgid "Featured Apartments"
-msgstr ""
+msgstr "Ausgewählte Wohnungen"
 
 #: templates/public/landing.html:44
 msgid "No image"
-msgstr ""
+msgstr "Kein Bild"
 
 #: templates/public/landing.html:52
 msgid "Up to"
-msgstr ""
+msgstr "Bis zu"
 
 #: templates/public/landing.html:59
 msgid "View Details"
-msgstr ""
+msgstr "Details ansehen"
 
 #: templates/public/landing.html:70
 msgid "View All Apartments"
-msgstr ""
+msgstr "Alle Wohnungen ansehen"
 
 #: templates/public/landing.html:76
 msgid "No apartments available yet"
-msgstr ""
+msgstr "Noch keine Wohnungen verfügbar"
 
 #: templates/public/landing.html:77
 msgid "Check back soon for new listings!"
-msgstr ""
+msgstr "Schauen Sie bald wieder für neue Angebote vorbei!"
 
 #: templates/public/landing.html:86
 msgid "How It Works"
-msgstr ""
+msgstr "So funktioniert es"
 
 #: templates/public/landing.html:92
 msgid "1. Browse"
-msgstr ""
+msgstr "1. Durchsuchen"
 
 #: templates/public/landing.html:93
 msgid "Explore our selection of beautiful apartments"
-msgstr ""
+msgstr "Erkunden Sie unsere Auswahl an schönen Wohnungen"
 
 #: templates/public/landing.html:99
 msgid "2. Book"
-msgstr ""
+msgstr "2. Buchen"
 
 #: templates/public/landing.html:100
 msgid "Select your dates and submit a booking request"
-msgstr ""
+msgstr "Wählen Sie Ihre Daten und senden Sie eine Buchungsanfrage"
 
 #: templates/public/landing.html:106
 msgid "3. Enjoy"
-msgstr ""
+msgstr "3. Genießen"
 
 #: templates/public/landing.html:107
 msgid "Get confirmation and enjoy your stay!"
-msgstr ""
+msgstr "Erhalten Sie die Bestätigung und genießen Sie Ihren Aufenthalt!"
+
+#: templates/staff/apartment_form.html:4 templates/staff/apartment_form.html:10
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: templates/staff/apartment_form.html:4 templates/staff/apartment_form.html:10
+msgid "Create"
+msgstr "Erstellen"
+
+#: templates/staff/apartment_form.html:4 templates/staff/apartments_list.html:5
+#: templates/staff/booking_detail.html:5 templates/staff/bookings_list.html:5
+msgid "Staff"
+msgstr "Personal"
+
+#: templates/staff/apartment_form.html:18
+msgid "Edit Apartment"
+msgstr "Wohnung bearbeiten"
+
+#: templates/staff/apartment_form.html:18
+msgid "New Apartment"
+msgstr "Neue Wohnung"
+
+#: templates/staff/apartment_form.html:25
+#: templates/staff/apartments_list.html:21
+msgid "Title"
+msgstr "Titel"
+
+#: templates/staff/apartment_form.html:33
+msgid "Description"
+msgstr "Beschreibung"
+
+#: templates/staff/apartment_form.html:39
+msgid "Address"
+msgstr "Adresse"
+
+#: templates/staff/apartment_form.html:50
+msgid "Country"
+msgstr "Land"
+
+#: templates/staff/apartments_list.html:5
+msgid "Manage Apartments"
+msgstr "Wohnungen verwalten"
+
+#: templates/staff/apartments_list.html:11
+msgid "Add Apartment"
+msgstr "Wohnung hinzufügen"
+
+#: templates/staff/apartments_list.html:20
+msgid "Image"
+msgstr "Bild"
+
+#: templates/staff/apartments_list.html:23
+msgid "Capacity"
+msgstr "Kapazität"
+
+#: templates/staff/apartments_list.html:24
+msgid "Price/Night"
+msgstr "Preis/Nacht"
+
+#: templates/staff/base_staff.html:33
+msgid "Staff Panel"
+msgstr "Personal-Panel"
+
+#: templates/staff/base_staff.html:37 templates/staff/booking_detail.html:10
+#: templates/staff/bookings_list.html:9
+msgid "Bookings"
+msgstr "Buchungen"
+
+#: templates/staff/base_staff.html:46
+msgid "Discount Periods"
+msgstr "Rabattzeiträume"
+
+#: templates/staff/booking_detail.html:33
+msgid "Guest"
+msgstr "Gast"
+
+#: templates/staff/bookings_list.html:5
+msgid "Manage Bookings"
+msgstr "Buchungen verwalten"
