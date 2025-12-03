@@ -1,0 +1,20 @@
+Booking Cancelled
+=================
+
+Dear {{ user.username }},
+
+{% if cancelled_by == 'admin' %}
+We regret to inform you that your booking has been cancelled by the property owner.
+{% else %}
+Your booking has been cancelled as requested.
+{% endif %}
+
+{{ apartment.title }}
+{{ booking.check_in|date:"F d, Y" }} - {{ booking.check_out|date:"F d, Y" }}
+
+{% if cancelled_by == 'admin' %}
+If you have any questions, please contact us.
+{% endif %}
+
+---
+This is an automated notification from ApartBook.

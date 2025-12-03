@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}New Booking Request{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-bell"></i> New Booking Request</h4>
+                </div>
+                <div class="card-body">
+                    <p>Hello,</p>
+                    <p>A new booking request has been submitted:</p>
+                    
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Apartment</th>
+                            <td>{{ apartment.title }}</td>
+                        </tr>
+                        <tr>
+                            <th>Guest</th>
+                            <td>{{ user.username }} ({{ user.email }})</td>
+                        </tr>
+                        <tr>
+                            <th>Check-in</th>
+                            <td>{{ booking.check_in|date:"F d, Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Check-out</th>
+                            <td>{{ booking.check_out|date:"F d, Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nights</th>
+                            <td>{{ booking.get_nights }}</td>
+                        </tr>
+                        <tr>
+                            <th>Guests</th>
+                            <td>{{ booking.guests_count }}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Price</th>
+                            <td><strong>€{{ booking.total_price }}</strong></td>
+                        </tr>
+                        {% if booking.notes %}
+                        <tr>
+                            <th>Guest Notes</th>
+                            <td>{{ booking.notes }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                    
+                    <p>
+                        <a href="#" class="btn btn-primary">View Booking</a>
+                    </p>
+                    
+                    <hr>
+                    <p class="text-muted small">This is an automated notification from ApartBook.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

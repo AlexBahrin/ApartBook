@@ -1,0 +1,305 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-03 13:06+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+#: Apartament/settings.py:120
+msgid "English"
+msgstr ""
+
+#: Apartament/settings.py:121
+msgid "Romanian"
+msgstr ""
+
+#: Apartament/settings.py:122
+msgid "German"
+msgstr ""
+
+#: Apartament/settings.py:123
+msgid "French"
+msgstr ""
+
+#: Apartament/settings.py:124
+msgid "Spanish"
+msgstr ""
+
+#: templates/base.html:88 templates/public/landing.html:18
+msgid "Browse Apartments"
+msgstr ""
+
+#: templates/base.html:136
+msgid "My Bookings"
+msgstr ""
+
+#: templates/base.html:141
+msgid "Messages"
+msgstr ""
+
+#: templates/base.html:147
+msgid "Staff Dashboard"
+msgstr ""
+
+#: templates/base.html:160
+msgid "Logout"
+msgstr ""
+
+#: templates/base.html:168
+msgid "Login"
+msgstr ""
+
+#: templates/base.html:171
+msgid "Sign Up"
+msgstr ""
+
+#: templates/base.html:202
+msgid "Find your perfect stay."
+msgstr ""
+
+#: templates/base.html:205
+msgid "All rights reserved."
+msgstr ""
+
+#: templates/public/apartment_detail.html:75
+#: templates/public/apartment_detail.html:150 templates/public/landing.html:52
+msgid "guests"
+msgstr ""
+
+#: templates/public/apartment_detail.html:80 templates/public/landing.html:54
+msgid "bedrooms"
+msgstr ""
+
+#: templates/public/apartment_detail.html:85
+msgid "bathrooms"
+msgstr ""
+
+#: templates/public/apartment_detail.html:92
+msgid "About this place"
+msgstr ""
+
+#: templates/public/apartment_detail.html:99
+msgid "Amenities"
+msgstr ""
+
+#: templates/public/apartment_detail.html:115
+msgid "Location"
+msgstr ""
+
+#: templates/public/apartment_detail.html:130
+#: templates/public/apartment_list.html:160 templates/public/landing.html:57
+msgid "night"
+msgstr ""
+
+#: templates/public/apartment_detail.html:138
+msgid "Check-in"
+msgstr ""
+
+#: templates/public/apartment_detail.html:143
+msgid "Check-out"
+msgstr ""
+
+#: templates/public/apartment_detail.html:148
+#: templates/public/apartment_list.html:83
+msgid "Guests"
+msgstr ""
+
+#: templates/public/apartment_detail.html:150
+msgid "Max"
+msgstr ""
+
+#: templates/public/apartment_detail.html:154
+msgid "Notes for the owner (optional)"
+msgstr ""
+
+#: templates/public/apartment_detail.html:164
+msgid "nights"
+msgstr ""
+
+#: templates/public/apartment_detail.html:168
+msgid "Discount savings"
+msgstr ""
+
+#: templates/public/apartment_detail.html:173
+msgid "Total"
+msgstr ""
+
+#: templates/public/apartment_detail.html:183
+msgid "Request to Book"
+msgstr ""
+
+#: templates/public/apartment_detail.html:189
+msgid "You won't be charged yet"
+msgstr ""
+
+#: templates/public/apartment_detail.html:193
+msgid "Sign in to book this apartment"
+msgstr ""
+
+#: templates/public/apartment_detail.html:195
+msgid "Login to Book"
+msgstr ""
+
+#: templates/public/apartment_detail.html:198
+msgid "Don't have an account?"
+msgstr ""
+
+#: templates/public/apartment_detail.html:198
+msgid "Sign up"
+msgstr ""
+
+#: templates/public/apartment_list.html:5
+#: templates/public/apartment_list.html:112
+msgid "Apartments"
+msgstr ""
+
+#: templates/public/apartment_list.html:66
+msgid "Filters"
+msgstr ""
+
+#: templates/public/apartment_list.html:71
+msgid "City"
+msgstr ""
+
+#: templates/public/apartment_list.html:73
+msgid "All Cities"
+msgstr ""
+
+#: templates/public/apartment_list.html:85
+msgid "Number of guests"
+msgstr ""
+
+#: templates/public/apartment_list.html:89
+msgid "Price Range"
+msgstr ""
+
+#: templates/public/apartment_list.html:102
+msgid "Apply Filters"
+msgstr ""
+
+#: templates/public/apartment_list.html:103
+msgid "Clear"
+msgstr ""
+
+#: templates/public/apartment_list.html:114
+msgid "results"
+msgstr ""
+
+#: templates/public/apartment_list.html:117
+msgid "List"
+msgstr ""
+
+#: templates/public/apartment_list.html:120
+msgid "Map"
+msgstr ""
+
+#: templates/public/apartment_list.html:123
+msgid "Split"
+msgstr ""
+
+#: templates/public/apartment_list.html:162
+msgid "View"
+msgstr ""
+
+#: templates/public/apartment_list.html:177
+msgid "Previous"
+msgstr ""
+
+#: templates/public/apartment_list.html:189
+msgid "Next"
+msgstr ""
+
+#: templates/public/apartment_list.html:198
+msgid "No apartments found"
+msgstr ""
+
+#: templates/public/apartment_list.html:199
+msgid "Try adjusting your filters"
+msgstr ""
+
+#: templates/public/landing.html:5
+msgid "Find Your Perfect Stay"
+msgstr ""
+
+#: templates/public/landing.html:13
+msgid "Find Your Perfect Apartment"
+msgstr ""
+
+#: templates/public/landing.html:15
+msgid ""
+"Discover beautiful apartments for your next trip. Book directly with the "
+"owner for the best experience."
+msgstr ""
+
+#: templates/public/landing.html:23
+msgid "Apartment"
+msgstr ""
+
+#: templates/public/landing.html:32
+msgid "Featured Apartments"
+msgstr ""
+
+#: templates/public/landing.html:44
+msgid "No image"
+msgstr ""
+
+#: templates/public/landing.html:52
+msgid "Up to"
+msgstr ""
+
+#: templates/public/landing.html:59
+msgid "View Details"
+msgstr ""
+
+#: templates/public/landing.html:70
+msgid "View All Apartments"
+msgstr ""
+
+#: templates/public/landing.html:76
+msgid "No apartments available yet"
+msgstr ""
+
+#: templates/public/landing.html:77
+msgid "Check back soon for new listings!"
+msgstr ""
+
+#: templates/public/landing.html:86
+msgid "How It Works"
+msgstr ""
+
+#: templates/public/landing.html:92
+msgid "1. Browse"
+msgstr ""
+
+#: templates/public/landing.html:93
+msgid "Explore our selection of beautiful apartments"
+msgstr ""
+
+#: templates/public/landing.html:99
+msgid "2. Book"
+msgstr ""
+
+#: templates/public/landing.html:100
+msgid "Select your dates and submit a booking request"
+msgstr ""
+
+#: templates/public/landing.html:106
+msgid "3. Enjoy"
+msgstr ""
+
+#: templates/public/landing.html:107
+msgid "Get confirmation and enjoy your stay!"
+msgstr ""

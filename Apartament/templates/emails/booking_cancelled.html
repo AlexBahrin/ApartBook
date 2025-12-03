@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Cancelled{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-x-circle"></i> Booking Cancelled</h4>
+                </div>
+                <div class="card-body">
+                    <p>Dear {{ user.username }},</p>
+                    
+                    {% if cancelled_by == 'admin' %}
+                    <p>We regret to inform you that your booking has been cancelled by the property owner.</p>
+                    {% else %}
+                    <p>Your booking has been cancelled as requested.</p>
+                    {% endif %}
+                    
+                    <div class="bg-light p-4 rounded mb-4">
+                        <h5>{{ apartment.title }}</h5>
+                        <p class="mb-0">
+                            {{ booking.check_in|date:"F d, Y" }} - {{ booking.check_out|date:"F d, Y" }}
+                        </p>
+                    </div>
+                    
+                    {% if cancelled_by == 'admin' %}
+                    <p>If you have any questions, please contact us.</p>
+                    {% endif %}
+                    
+                    <p>
+                        <a href="#" class="btn btn-primary">Browse Other Apartments</a>
+                    </p>
+                    
+                    <hr>
+                    <p class="text-muted small">This is an automated notification from ApartBook.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+New Booking Request
+===================
+
+Hello,
+
+A new booking request has been submitted:
+
+Apartment: {{ apartment.title }}
+Guest: {{ user.username }} ({{ user.email }})
+Check-in: {{ booking.check_in|date:"F d, Y" }}
+Check-out: {{ booking.check_out|date:"F d, Y" }}
+Nights: {{ booking.get_nights }}
+Guests: {{ booking.guests_count }}
+Total Price: €{{ booking.total_price }}
+{% if booking.notes %}
+Guest Notes: {{ booking.notes }}
+{% endif %}
+
+Please review and confirm or decline this booking.
+
+---
+This is an automated notification from ApartBook.

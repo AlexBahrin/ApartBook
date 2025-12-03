@@ -1,0 +1,131 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Conversation with {{ conversation.user.username }} - Staff{% endblock %}
+
+{% block extra_css %}
+<style>
+    .message-container {
+        max-height: 450px;
+        overflow-y: auto;
+    }
+    .message {
+        max-width: 75%;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .message-sent {
+        background-color: #198754;
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 0.25rem;
+    }
+    .message-received {
+        background-color: #e9ecef;
+        color: #212529;
+        border-bottom-left-radius: 0.25rem;
+    }
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
+
+{% block staff_content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'staff_messages' %}">Messages</a></li>
+        <li class="breadcrumb-item active">{{ conversation.user.username }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Messages Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-dots"></i> Conversation with {{ conversation.user.username }}
+                </h5>
+            </div>
+            <div class="card-body message-container" id="messageContainer">
+                {% if messages_list %}
+                    {% for msg in messages_list %}
+                        <div class="d-flex">
+                            <div class="message {% if msg.sender.is_staff %}message-sent{% else %}message-received{% endif %}">
+                                <div>{{ msg.body }}</div>
+                                <div class="message-time">
+                                    {{ msg.sender.username }} &bull; {{ msg.created_at|date:"M d, H:i" }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-chat-square-text" style="font-size: 2rem;"></i>
+                        <p class="mt-2">No messages yet</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Message Form -->
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        {{ form.body }}
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-send"></i> Send
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Guest Info -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">Guest Info</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>{{ conversation.user.username }}</strong></p>
+                <p class="text-muted mb-0">{{ conversation.user.email }}</p>
+            </div>
+        </div>
+        
+        {% if conversation.booking %}
+            <!-- Booking Info -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Related Booking</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>{{ conversation.booking.apartment.title }}</strong></p>
+                    <p class="text-muted mb-1">
+                        {{ conversation.booking.check_in|date:"M d" }} - {{ conversation.booking.check_out|date:"M d, Y" }}
+                    </p>
+                    <p class="mb-2">
+                        <span class="badge {% if conversation.booking.status == 'CONFIRMED' %}bg-success{% elif conversation.booking.status == 'PENDING' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {{ conversation.booking.get_status_display }}
+                        </span>
+                    </p>
+                    <a href="{% url 'staff_booking_detail' conversation.booking.pk %}" class="btn btn-sm btn-outline-primary">
+                        View Booking
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Scroll to bottom of messages
+    const container = document.getElementById('messageContainer');
+    container.scrollTop = container.scrollHeight;
+</script>
+{% endblock %}

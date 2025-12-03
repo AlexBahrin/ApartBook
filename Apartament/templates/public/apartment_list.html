@@ -1,6 +1,60 @@
 {% extends 'base.html' %}
+{% load i18n %}
+{% load currency_tags %}
 
-{% block title %}Browse Apartments - ApartBook{% endblock %}
+{% block title %}{% trans "Apartments" %} - ApartBook{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+    #map {
+        height: 500px;
+        border-radius: 8px;
+        position: sticky;
+        top: 80px;
+    }
+    .view-toggle .btn {
+        border-radius: 20px;
+    }
+    .view-toggle .btn.active {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+    .apartment-popup {
+        min-width: 200px;
+    }
+    .apartment-popup img {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    .apartment-popup h6 {
+        margin: 8px 0 4px 0;
+        font-size: 0.9rem;
+    }
+    .apartment-popup .price {
+        color: var(--bs-primary);
+        font-weight: 600;
+    }
+    .map-section {
+        display: none;
+    }
+    .map-section.show {
+        display: block;
+    }
+    .list-section.hide {
+        display: none;
+    }
+    @media (min-width: 992px) {
+        .split-view .list-section,
+        .split-view .map-section {
+            display: block !important;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -9,14 +63,14 @@
         <div class="col-lg-3 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-funnel"></i> Filters</h5>
+                    <h5 class="mb-0"><i class="bi bi-funnel"></i> {% trans "Filters" %}</h5>
                 </div>
                 <div class="card-body">
                     <form method="get" action="{% url 'apartment_list' %}">
                         <div class="mb-3">
-                            <label class="form-label">City</label>
+                            <label class="form-label">{% trans "City" %}</label>
                             <select name="city" class="form-select">
-                                <option value="">All Cities</option>
+                                <option value="">{% trans "All Cities" %}</option>
                                 {% for city in cities %}
                                     <option value="{{ city }}" {% if request.GET.city == city %}selected{% endif %}>
                                         {{ city }}
@@ -26,13 +80,13 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Guests</label>
+                            <label class="form-label">{% trans "Guests" %}</label>
                             <input type="number" name="guests" class="form-control" min="1" 
-                                   value="{{ request.GET.guests }}" placeholder="Number of guests">
+                                   value="{{ request.GET.guests }}" placeholder="{% trans "Number of guests" %}">
                         </div>
                         
                         <div class="mb-3">
-                            <label class="form-label">Price Range (€)</label>
+                            <label class="form-label">{% trans "Price Range" %} ({{ currency_symbol }})</label>
                             <div class="row g-2">
                                 <div class="col-6">
                                     <input type="number" name="min_price" class="form-control" 
@@ -45,8 +99,8 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                        <a href="{% url 'apartment_list' %}" class="btn btn-outline-secondary w-100 mt-2">Clear</a>
+                        <button type="submit" class="btn btn-primary w-100">{% trans "Apply Filters" %}</button>
+                        <a href="{% url 'apartment_list' %}" class="btn btn-outline-secondary w-100 mt-2">{% trans "Clear" %}</a>
                     </form>
                 </div>
             </div>
@@ -55,17 +109,36 @@
         <!-- Apartments Grid -->
         <div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Apartments</h2>
-                <span class="text-muted">{{ apartments|length }} results</span>
+                <h2>{% trans "Apartments" %}</h2>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">{{ apartments|length }} {% trans "results" %}</span>
+                    <div class="view-toggle btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary btn-sm active" id="listViewBtn">
+                            <i class="bi bi-grid-3x3-gap"></i> {% trans "List" %}
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="mapViewBtn">
+                            <i class="bi bi-map"></i> {% trans "Map" %}
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm d-none d-lg-inline-block" id="splitViewBtn">
+                            <i class="bi bi-layout-split"></i> {% trans "Split" %}
+                        </button>
+                    </div>
+                </div>
             </div>
             
-            {% if apartments %}
-                <div class="row g-4">
-                    {% for apartment in apartments %}
-                        <div class="col-md-6 col-xl-4">
-                            <div class="card apartment-card h-100">
-                                {% if apartment.get_main_image %}
-                                    <img src="{{ apartment.get_main_image.image.url }}" 
+            <div class="row" id="mainContent">
+                <!-- List Section -->
+                <div class="col-12 col-lg-6 list-section" id="listSection">
+                    {% if apartments %}
+                        <div class="row g-4">
+                            {% for apartment in apartments %}
+                                <div class="col-12 col-md-6 col-lg-12 col-xl-6 apartment-item" 
+                                     data-lat="{{ apartment.latitude|default:'' }}" 
+                                     data-lng="{{ apartment.longitude|default:'' }}"
+                                     data-id="{{ apartment.id }}">
+                                    <div class="card apartment-card h-100">
+                                        {% if apartment.get_main_image %}
+                                            <img src="{{ apartment.get_main_image.image.url }}" 
                                          class="card-img-top" alt="{{ apartment.title }}">
                                 {% else %}
                                     <img src="https://via.placeholder.com/400x200?text=No+Image" 
@@ -84,9 +157,9 @@
                                         <i class="bi bi-droplet"></i> {{ apartment.bathrooms }} bath
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <span class="price-tag">€{{ apartment.base_price_per_night }}/night</span>
+                                        <span class="price-tag">{% price apartment.base_price_per_night %}/{% trans "night" %}</span>
                                         <a href="{% url 'apartment_detail' apartment.slug %}" class="btn btn-outline-primary btn-sm">
-                                            View
+                                            {% trans "View" %}
                                         </a>
                                     </div>
                                 </div>
@@ -101,7 +174,7 @@
                         <ul class="pagination justify-content-center">
                             {% if page_obj.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a>
                                 </li>
                             {% endif %}
                             
@@ -113,20 +186,163 @@
                             
                             {% if page_obj.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a>
                                 </li>
                             {% endif %}
                         </ul>
                     </nav>
                 {% endif %}
-            {% else %}
-                <div class="text-center py-5">
-                    <i class="bi bi-search display-1 text-muted"></i>
-                    <h4 class="mt-3">No apartments found</h4>
-                    <p class="text-muted">Try adjusting your filters</p>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-search display-1 text-muted"></i>
+                            <h4 class="mt-3">{% trans "No apartments found" %}</h4>
+                            <p class="text-muted">{% trans "Try adjusting your filters" %}</p>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
+                
+                <!-- Map Section -->
+                <div class="col-12 col-lg-6 map-section" id="mapSection">
+                    <div id="map"></div>
+                    <p class="text-muted text-center mt-2 small">
+                        <i class="bi bi-info-circle"></i> Only apartments with location data are shown on the map
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // View toggle buttons
+    const listViewBtn = document.getElementById('listViewBtn');
+    const mapViewBtn = document.getElementById('mapViewBtn');
+    const splitViewBtn = document.getElementById('splitViewBtn');
+    const listSection = document.getElementById('listSection');
+    const mapSection = document.getElementById('mapSection');
+    const mainContent = document.getElementById('mainContent');
+    
+    let map = null;
+    let markers = [];
+    
+    // Apartment data for map
+    const apartments = [
+        {% for apartment in apartments %}
+        {
+            id: {{ apartment.id }},
+            title: "{{ apartment.title|escapejs }}",
+            slug: "{{ apartment.slug }}",
+            city: "{{ apartment.city|escapejs }}",
+            price: "{{ apartment.base_price_per_night }}",
+            image: "{% if apartment.get_main_image %}{{ apartment.get_main_image.image.url }}{% else %}https://via.placeholder.com/200x100?text=No+Image{% endif %}",
+            lat: {{ apartment.latitude|default:'null' }},
+            lng: {{ apartment.longitude|default:'null' }}
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    function initMap() {
+        if (map) return;
+        
+        // Default center (Europe)
+        let defaultCenter = [45.0, 15.0];
+        let defaultZoom = 4;
+        
+        // Find apartments with coordinates
+        const validApartments = apartments.filter(a => a.lat !== null && a.lng !== null);
+        
+        if (validApartments.length > 0) {
+            // Center on first apartment
+            defaultCenter = [validApartments[0].lat, validApartments[0].lng];
+            defaultZoom = 10;
+        }
+        
+        map = L.map('map').setView(defaultCenter, defaultZoom);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Add markers for each apartment
+        validApartments.forEach(apartment => {
+            const marker = L.marker([apartment.lat, apartment.lng]).addTo(map);
+            
+            const popupContent = `
+                <div class="apartment-popup">
+                    <img src="${apartment.image}" alt="${apartment.title}">
+                    <h6>${apartment.title}</h6>
+                    <p class="text-muted mb-1 small"><i class="bi bi-geo-alt"></i> ${apartment.city}</p>
+                    <p class="price mb-1">€${apartment.price}/night</p>
+                    <a href="/apartments/${apartment.slug}/" class="btn btn-primary btn-sm w-100">View Details</a>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            markers.push(marker);
+        });
+        
+        // Fit bounds if multiple markers
+        if (markers.length > 1) {
+            const group = L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+    }
+    
+    function setActiveView(view) {
+        // Reset button states
+        listViewBtn.classList.remove('active');
+        mapViewBtn.classList.remove('active');
+        if (splitViewBtn) splitViewBtn.classList.remove('active');
+        
+        // Reset section visibility
+        mainContent.classList.remove('split-view');
+        listSection.classList.remove('hide');
+        mapSection.classList.remove('show');
+        
+        if (view === 'list') {
+            listViewBtn.classList.add('active');
+            listSection.classList.remove('hide');
+            mapSection.classList.remove('show');
+        } else if (view === 'map') {
+            mapViewBtn.classList.add('active');
+            listSection.classList.add('hide');
+            mapSection.classList.add('show');
+            setTimeout(() => {
+                initMap();
+                if (map) map.invalidateSize();
+            }, 100);
+        } else if (view === 'split') {
+            if (splitViewBtn) splitViewBtn.classList.add('active');
+            mainContent.classList.add('split-view');
+            listSection.classList.remove('hide');
+            mapSection.classList.add('show');
+            setTimeout(() => {
+                initMap();
+                if (map) map.invalidateSize();
+            }, 100);
+        }
+        
+        // Save preference
+        localStorage.setItem('apartmentViewMode', view);
+    }
+    
+    // Event listeners
+    listViewBtn.addEventListener('click', () => setActiveView('list'));
+    mapViewBtn.addEventListener('click', () => setActiveView('map'));
+    if (splitViewBtn) {
+        splitViewBtn.addEventListener('click', () => setActiveView('split'));
+    }
+    
+    // Restore saved preference
+    const savedView = localStorage.getItem('apartmentViewMode');
+    if (savedView && (savedView === 'list' || savedView === 'map' || savedView === 'split')) {
+        setActiveView(savedView);
+    }
+});
+</script>
 {% endblock %}

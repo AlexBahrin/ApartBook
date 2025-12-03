@@ -1,0 +1,306 @@
+# ApartBook Translations
+# Copyright (C) 2025 ApartBook
+# This file is distributed under the same license as the ApartBook package.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ApartBook 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-03 13:06+0000\n"
+"PO-Revision-Date: 2025-12-03 13:10+0000\n"
+"Last-Translator: ApartBook Team\n"
+"Language-Team: Romanian\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1));\n"
+#: Apartament/settings.py:120
+msgid "English"
+msgstr "Engleză"
+
+#: Apartament/settings.py:121
+msgid "Romanian"
+msgstr "Română"
+
+#: Apartament/settings.py:122
+msgid "German"
+msgstr "Germană"
+
+#: Apartament/settings.py:123
+msgid "French"
+msgstr "Franceză"
+
+#: Apartament/settings.py:124
+msgid "Spanish"
+msgstr "Spaniolă"
+
+#: templates/base.html:88 templates/public/landing.html:18
+msgid "Browse Apartments"
+msgstr "Căutați Apartamente"
+
+#: templates/base.html:136
+msgid "My Bookings"
+msgstr "Rezervările Mele"
+
+#: templates/base.html:141
+msgid "Messages"
+msgstr "Mesaje"
+
+#: templates/base.html:147
+msgid "Staff Dashboard"
+msgstr "Panou Administrare"
+
+#: templates/base.html:160
+msgid "Logout"
+msgstr "Deconectare"
+
+#: templates/base.html:168
+msgid "Login"
+msgstr "Autentificare"
+
+#: templates/base.html:171
+msgid "Sign Up"
+msgstr "Înregistrare"
+
+#: templates/base.html:202
+msgid "Find your perfect stay."
+msgstr "Găsește cazarea perfectă."
+
+#: templates/base.html:205
+msgid "All rights reserved."
+msgstr "Toate drepturile rezervate."
+
+#: templates/public/apartment_detail.html:75
+#: templates/public/apartment_detail.html:150 templates/public/landing.html:52
+msgid "guests"
+msgstr "oaspeți"
+
+#: templates/public/apartment_detail.html:80 templates/public/landing.html:54
+msgid "bedrooms"
+msgstr "dormitoare"
+
+#: templates/public/apartment_detail.html:85
+msgid "bathrooms"
+msgstr "băi"
+
+#: templates/public/apartment_detail.html:92
+msgid "About this place"
+msgstr "Despre această locuință"
+
+#: templates/public/apartment_detail.html:99
+msgid "Amenities"
+msgstr "Facilități"
+
+#: templates/public/apartment_detail.html:115
+msgid "Location"
+msgstr "Locație"
+
+#: templates/public/apartment_detail.html:130
+#: templates/public/apartment_list.html:160 templates/public/landing.html:57
+msgid "night"
+msgstr "noapte"
+
+#: templates/public/apartment_detail.html:138
+msgid "Check-in"
+msgstr "Check-in"
+
+#: templates/public/apartment_detail.html:143
+msgid "Check-out"
+msgstr "Check-out"
+
+#: templates/public/apartment_detail.html:148
+#: templates/public/apartment_list.html:83
+msgid "Guests"
+msgstr "Oaspeți"
+
+#: templates/public/apartment_detail.html:150
+msgid "Max"
+msgstr "Max"
+
+#: templates/public/apartment_detail.html:154
+msgid "Notes for the owner (optional)"
+msgstr "Note pentru proprietar (opțional)"
+
+#: templates/public/apartment_detail.html:164
+msgid "nights"
+msgstr "nopți"
+
+#: templates/public/apartment_detail.html:168
+msgid "Discount savings"
+msgstr "Reducere"
+
+#: templates/public/apartment_detail.html:173
+msgid "Total"
+msgstr "Total"
+
+#: templates/public/apartment_detail.html:183
+msgid "Request to Book"
+msgstr "Solicită Rezervare"
+
+#: templates/public/apartment_detail.html:189
+msgid "You won't be charged yet"
+msgstr "Nu vei fi taxat încă"
+
+#: templates/public/apartment_detail.html:193
+msgid "Sign in to book this apartment"
+msgstr "Autentifică-te pentru a rezerva acest apartament"
+
+#: templates/public/apartment_detail.html:195
+msgid "Login to Book"
+msgstr "Autentifică-te pentru a rezerva"
+
+#: templates/public/apartment_detail.html:198
+msgid "Don't have an account?"
+msgstr "Nu ai cont?"
+
+#: templates/public/apartment_detail.html:198
+msgid "Sign up"
+msgstr "Înregistrează-te"
+
+#: templates/public/apartment_list.html:5
+#: templates/public/apartment_list.html:112
+msgid "Apartments"
+msgstr "Apartamente"
+
+#: templates/public/apartment_list.html:66
+msgid "Filters"
+msgstr "Filtre"
+
+#: templates/public/apartment_list.html:71
+msgid "City"
+msgstr "Oraș"
+
+#: templates/public/apartment_list.html:73
+msgid "All Cities"
+msgstr "Toate Orașele"
+
+#: templates/public/apartment_list.html:85
+msgid "Number of guests"
+msgstr "Număr de oaspeți"
+
+#: templates/public/apartment_list.html:89
+msgid "Price Range"
+msgstr "Interval de Preț"
+
+#: templates/public/apartment_list.html:102
+msgid "Apply Filters"
+msgstr "Aplică Filtre"
+
+#: templates/public/apartment_list.html:103
+msgid "Clear"
+msgstr "Șterge"
+
+#: templates/public/apartment_list.html:114
+msgid "results"
+msgstr "rezultate"
+
+#: templates/public/apartment_list.html:117
+msgid "List"
+msgstr "Listă"
+
+#: templates/public/apartment_list.html:120
+msgid "Map"
+msgstr "Hartă"
+
+#: templates/public/apartment_list.html:123
+msgid "Split"
+msgstr "Împărțit"
+
+#: templates/public/apartment_list.html:162
+msgid "View"
+msgstr "Vezi"
+
+#: templates/public/apartment_list.html:177
+msgid "Previous"
+msgstr "Anterior"
+
+#: templates/public/apartment_list.html:189
+msgid "Next"
+msgstr "Următor"
+
+#: templates/public/apartment_list.html:198
+msgid "No apartments found"
+msgstr "Niciun apartament găsit"
+
+#: templates/public/apartment_list.html:199
+msgid "Try adjusting your filters"
+msgstr "Încearcă să modifici filtrele"
+
+#: templates/public/landing.html:5
+msgid "Find Your Perfect Stay"
+msgstr "Găsește Cazarea Perfectă"
+
+#: templates/public/landing.html:13
+msgid "Find Your Perfect Apartment"
+msgstr "Găsește Apartamentul Perfect"
+
+#: templates/public/landing.html:15
+msgid ""
+"Discover beautiful apartments for your next trip. Book directly with the "
+"owner for the best experience."
+msgstr ""
+"Descoperă apartamente frumoase pentru următoarea ta călătorie. Rezervă "
+"direct cu proprietarul pentru cea mai bună experiență."
+
+#: templates/public/landing.html:23
+msgid "Apartment"
+msgstr "Apartament"
+
+#: templates/public/landing.html:32
+msgid "Featured Apartments"
+msgstr "Apartamente Recomandate"
+
+#: templates/public/landing.html:44
+msgid "No image"
+msgstr "Fără imagine"
+
+#: templates/public/landing.html:52
+msgid "Up to"
+msgstr "Până la"
+
+#: templates/public/landing.html:59
+msgid "View Details"
+msgstr "Vezi Detalii"
+
+#: templates/public/landing.html:70
+msgid "View All Apartments"
+msgstr "Vezi Toate Apartamentele"
+
+#: templates/public/landing.html:76
+msgid "No apartments available yet"
+msgstr "Încă nu există apartamente disponibile"
+
+#: templates/public/landing.html:77
+msgid "Check back soon for new listings!"
+msgstr "Revino în curând pentru noi anunțuri!"
+
+#: templates/public/landing.html:86
+msgid "How It Works"
+msgstr "Cum Funcționează"
+
+#: templates/public/landing.html:92
+msgid "1. Browse"
+msgstr "1. Caută"
+
+#: templates/public/landing.html:93
+msgid "Explore our selection of beautiful apartments"
+msgstr "Explorează selecția noastră de apartamente frumoase"
+
+#: templates/public/landing.html:99
+msgid "2. Book"
+msgstr "2. Rezervă"
+
+#: templates/public/landing.html:100
+msgid "Select your dates and submit a booking request"
+msgstr "Selectează datele și trimite o cerere de rezervare"
+
+#: templates/public/landing.html:106
+msgid "3. Enjoy"
+msgstr "3. Bucură-te"
+
+#: templates/public/landing.html:107
+msgid "Get confirmation and enjoy your stay!"
+msgstr "Primește confirmarea și bucură-te de ședere!"

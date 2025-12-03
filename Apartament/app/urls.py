@@ -10,6 +10,8 @@ urlpatterns = [
     path('apartments/<slug:slug>/', views.ApartmentDetailView.as_view(), name='apartment_detail'),
     path('apartments/<slug:slug>/book/', views.create_booking, name='create_booking'),
     path('api/apartments/<slug:slug>/availability/', views.apartment_availability_api, name='apartment_availability_api'),
+    path('api/apartments/<slug:slug>/price/', views.apartment_price_api, name='apartment_price_api'),
+    path('api/apartments/<slug:slug>/price-with-discounts/', views.apartment_price_with_discounts_api, name='apartment_price_with_discounts'),
 
     # ==========================================================================
     # USER DASHBOARD URLS
@@ -18,6 +20,9 @@ urlpatterns = [
     path('dashboard/bookings/', views.MyBookingsListView.as_view(), name='my_bookings'),
     path('dashboard/bookings/<int:pk>/', views.MyBookingDetailView.as_view(), name='my_booking_detail'),
     path('dashboard/bookings/<int:pk>/cancel/', views.cancel_booking, name='cancel_booking'),
+    path('dashboard/bookings/<int:pk>/message/', views.start_conversation, name='start_conversation'),
+    path('dashboard/messages/', views.MyConversationsListView.as_view(), name='my_messages'),
+    path('dashboard/messages/<int:pk>/', views.conversation_detail, name='conversation_detail'),
 
     # ==========================================================================
     # STAFF DASHBOARD URLS
@@ -33,6 +38,8 @@ urlpatterns = [
     
     # Availability & Pricing
     path('staff/apartments/<int:pk>/availability/', views.staff_availability, name='staff_availability'),
+    path('staff/apartments/<int:pk>/calendar/', views.staff_calendar, name='staff_calendar'),
+    path('api/staff/apartments/<int:pk>/calendar-events/', views.staff_calendar_events_api, name='staff_calendar_events'),
     path('staff/availability/<int:pk>/delete/', views.staff_delete_availability, name='staff_delete_availability'),
     path('staff/apartments/<int:pk>/pricing-rules/', views.staff_pricing_rules, name='staff_pricing_rules'),
     path('staff/pricing-rules/<int:pk>/delete/', views.staff_delete_pricing_rule, name='staff_delete_pricing_rule'),
@@ -40,4 +47,17 @@ urlpatterns = [
     # Bookings management
     path('staff/bookings/', views.StaffBookingsListView.as_view(), name='staff_bookings'),
     path('staff/bookings/<int:pk>/', views.staff_booking_detail, name='staff_booking_detail'),
+    
+    # Messages management
+    path('staff/messages/', views.StaffConversationsListView.as_view(), name='staff_messages'),
+    path('staff/messages/<int:pk>/', views.staff_conversation_detail, name='staff_conversation_detail'),
+    
+    # Discount periods management
+    path('staff/discount-periods/', views.StaffDiscountPeriodListView.as_view(), name='staff_discount_periods'),
+    path('staff/discount-periods/create/', views.StaffDiscountPeriodCreateView.as_view(), name='staff_discount_period_create'),
+    path('staff/discount-periods/<int:pk>/edit/', views.StaffDiscountPeriodUpdateView.as_view(), name='staff_discount_period_edit'),
+    path('staff/discount-periods/<int:pk>/delete/', views.StaffDiscountPeriodDeleteView.as_view(), name='staff_discount_period_delete'),
+    
+    # Settings
+    path('set-currency/', views.set_currency, name='set_currency'),
 ]

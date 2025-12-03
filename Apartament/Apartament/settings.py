@@ -44,11 +44,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # Must be after SessionMiddleware and before CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app.middleware.CurrencyMiddleware',  # Custom currency middleware
 ]
 
 ROOT_URLCONF = 'Apartament.urls'
@@ -63,6 +65,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',  # For i18n template tags
+                'app.context_processors.currency_context',  # Custom currency context
             ],
         },
     },
@@ -108,13 +112,37 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGE_CODE = 'en'
+
+LANGUAGES = [
+    ('en', _('English')),
+    ('ro', _('Romanian')),
+    ('de', _('German')),
+    ('fr', _('French')),
+    ('es', _('Spanish')),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
+
+# Currency settings
+CURRENCIES = {
+    'EUR': {'symbol': '€', 'name': 'Euro', 'rate': 1.0},
+    'USD': {'symbol': '$', 'name': 'US Dollar', 'rate': 1.08},
+    'GBP': {'symbol': '£', 'name': 'British Pound', 'rate': 0.86},
+    'RON': {'symbol': 'lei', 'name': 'Romanian Leu', 'rate': 4.97},
+    'CHF': {'symbol': 'CHF', 'name': 'Swiss Franc', 'rate': 0.95},
+}
+DEFAULT_CURRENCY = 'EUR'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -134,10 +162,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = "login"
 LOGOUT_REDIRECT_URL = "login"
-LOGIN_REDIRECT_URL = "homepage"
-LOGOUT_REDIRECT_URL = "login"
+LOGIN_REDIRECT_URL = "landing"
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'ApartBook <noreply@apartbook.com>'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.gmail.com'

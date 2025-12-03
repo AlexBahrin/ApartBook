@@ -139,6 +139,8 @@ class Booking(models.Model):
     check_out = models.DateField()
     guests_count = models.PositiveIntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_discount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    price_breakdown = models.JSONField(default=list, blank=True, help_text="Detailed price breakdown per day")
     currency = models.CharField(max_length=3, default='EUR')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='NOT_REQUIRED')
@@ -158,15 +160,20 @@ class Booking(models.Model):
 
     def calculate_total_price(self):
         """
-        Calculate total price based on base price and applicable pricing rules.
+        Calculate total price based on base price, pricing rules, and discount periods.
+        Returns (total_price, total_discount, price_breakdown).
+        
+        Price breakdown includes per-day details with original and discounted prices.
         """
         from datetime import timedelta
         
         total = Decimal('0.00')
+        total_discount = Decimal('0.00')
+        breakdown = []
         current_date = self.check_in
         
         while current_date < self.check_out:
-            # Check for pricing rules that apply to this date
+            # Get base price for the day (from pricing rules or apartment base price)
             applicable_rule = self.apartment.pricing_rules.filter(
                 start_date__lte=current_date,
                 end_date__gte=current_date
@@ -175,13 +182,42 @@ class Booking(models.Model):
             ).order_by('-priority').first()
             
             if applicable_rule:
-                total += applicable_rule.price_per_night
+                base_day_price = applicable_rule.price_per_night
             else:
-                total += self.apartment.base_price_per_night
+                base_day_price = self.apartment.base_price_per_night
             
+            # Check for discount period
+            discount_period = self.apartment.discount_periods.filter(
+                is_active=True,
+                start_date__lte=current_date,
+                end_date__gte=current_date
+            ).first()
+            
+            if discount_period:
+                discount_amount = base_day_price * (discount_period.discount_percentage / Decimal('100'))
+                final_day_price = base_day_price - discount_amount
+                total_discount += discount_amount
+                breakdown.append({
+                    'date': current_date.isoformat(),
+                    'original_price': str(base_day_price),
+                    'final_price': str(final_day_price),
+                    'discount_percentage': str(discount_period.discount_percentage),
+                    'discount_name': discount_period.name,
+                    'has_discount': True
+                })
+            else:
+                final_day_price = base_day_price
+                breakdown.append({
+                    'date': current_date.isoformat(),
+                    'original_price': str(base_day_price),
+                    'final_price': str(base_day_price),
+                    'has_discount': False
+                })
+            
+            total += final_day_price
             current_date += timedelta(days=1)
         
-        return total
+        return total, total_discount, breakdown
 
     def clean(self):
         """Validate booking data."""
@@ -192,8 +228,10 @@ class Booking(models.Model):
         if self.check_out and self.check_in and self.check_out <= self.check_in:
             errors['check_out'] = 'Check-out date must be after check-in date.'
         
-        if self.apartment and self.guests_count and self.guests_count > self.apartment.capacity:
-            errors['guests_count'] = f'Guests count exceeds apartment capacity ({self.apartment.capacity}).'
+        # Use apartment_id to avoid RelatedObjectDoesNotExist when apartment not yet set
+        if self.apartment_id and self.guests_count:
+            if self.guests_count > self.apartment.capacity:
+                errors['guests_count'] = f'Guests count exceeds apartment capacity ({self.apartment.capacity}).'
         
         if errors:
             raise ValidationError(errors)
@@ -207,3 +245,79 @@ class Booking(models.Model):
             check_out__gt=self.check_in
         ).exclude(pk=self.pk)
         return overlapping.exists()
+
+
+class Conversation(models.Model):
+    """A conversation thread between a guest and admin, typically about a booking."""
+    booking = models.OneToOneField(
+        Booking, 
+        on_delete=models.CASCADE, 
+        related_name='conversation',
+        null=True, 
+        blank=True
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversations')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        if self.booking:
+            return f"Conversation: {self.user.username} - {self.booking.apartment.title}"
+        return f"Conversation: {self.user.username}"
+
+    def get_last_message(self):
+        """Get the most recent message in this conversation."""
+        return self.messages.order_by('-created_at').first()
+
+    def get_unread_count(self, for_user):
+        """Get count of unread messages for a specific user."""
+        return self.messages.filter(is_read=False).exclude(sender=for_user).count()
+
+
+class Message(models.Model):
+    """A single message within a conversation."""
+    conversation = models.ForeignKey(
+        Conversation, 
+        on_delete=models.CASCADE, 
+        related_name='messages'
+    )
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    body = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"Message from {self.sender.username} at {self.created_at}"
+
+
+class DiscountPeriod(models.Model):
+    """Staff-defined discount periods for apartments."""
+    apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='discount_periods')
+    name = models.CharField(max_length=100, help_text="e.g., 'Winter Sale', 'Early Bird'")
+    discount_percentage = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(Decimal('100.00'))],
+        help_text="Percentage discount (1-100)"
+    )
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.apartment.title} - {self.name} ({self.discount_percentage}% off)"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.end_date and self.start_date and self.end_date < self.start_date:
+            raise ValidationError({'end_date': 'End date must be after or equal to start date.'})

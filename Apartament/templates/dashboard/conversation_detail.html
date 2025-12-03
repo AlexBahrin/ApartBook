@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversation{% endblock %}
+
+{% block extra_css %}
+<style>
+    .message-container {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    .message {
+        max-width: 75%;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .message-sent {
+        background-color: #0d6efd;
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 0.25rem;
+    }
+    .message-received {
+        background-color: #e9ecef;
+        color: #212529;
+        border-bottom-left-radius: 0.25rem;
+    }
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">
+                                {% if conversation.booking %}
+                                    {{ conversation.booking.apartment.title }}
+                                {% else %}
+                                    General Inquiry
+                                {% endif %}
+                            </h5>
+                            {% if conversation.booking %}
+                                <small class="text-muted">
+                                    {{ conversation.booking.check_in|date:"M d" }} - {{ conversation.booking.check_out|date:"M d, Y" }}
+                                    &bull; {{ conversation.booking.get_status_display }}
+                                </small>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'my_messages' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-left"></i> All Messages
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div class="card">
+                <div class="card-body message-container" id="messageContainer">
+                    {% if messages_list %}
+                        {% for msg in messages_list %}
+                            <div class="d-flex">
+                                <div class="message {% if msg.sender == request.user %}message-sent{% else %}message-received{% endif %}">
+                                    <div>{{ msg.body }}</div>
+                                    <div class="message-time">
+                                        {{ msg.sender.username }} &bull; {{ msg.created_at|date:"M d, H:i" }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-chat-square-text" style="font-size: 2rem;"></i>
+                            <p class="mt-2">No messages yet. Start the conversation!</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Message Form -->
+                <div class="card-footer">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ form.body }}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Scroll to bottom of messages
+    const container = document.getElementById('messageContainer');
+    container.scrollTop = container.scrollHeight;
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+Booking Confirmed!
+==================
+
+Dear {{ user.username }},
+
+Great news! Your booking has been confirmed:
+
+{{ apartment.title }}
+{{ apartment.address }}, {{ apartment.city }}, {{ apartment.country }}
+
+Check-in: {{ booking.check_in|date:"l, F d, Y" }}
+Check-out: {{ booking.check_out|date:"l, F d, Y" }}
+Nights: {{ booking.get_nights }}
+Guests: {{ booking.guests_count }}
+Total Price: €{{ booking.total_price }}
+
+We look forward to hosting you!
+
+---
+This is an automated notification from ApartBook.

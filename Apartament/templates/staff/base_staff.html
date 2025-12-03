@@ -38,6 +38,12 @@
                 <a class="nav-link {% if 'apartments' in request.path and 'availability' not in request.path and 'pricing' not in request.path %}active{% endif %}" href="{% url 'staff_apartments' %}">
                     <i class="bi bi-house"></i> Apartments
                 </a>
+                <a class="nav-link {% if 'messages' in request.path %}active{% endif %}" href="{% url 'staff_messages' %}">
+                    <i class="bi bi-chat-dots"></i> Messages
+                </a>
+                <a class="nav-link {% if 'discount-periods' in request.path %}active{% endif %}" href="{% url 'staff_discount_periods' %}">
+                    <i class="bi bi-percent"></i> Discount Periods
+                </a>
             </nav>
         </div>
         
