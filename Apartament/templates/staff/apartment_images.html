@@ -1,0 +1,109 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Manage Images - {{ apartment.title }}{% endblock %}
+
+{% block staff_content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartments' %}">Apartments</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartment_edit' apartment.pk %}">{{ apartment.title }}</a></li>
+        <li class="breadcrumb-item active">Images</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Current Images</h5>
+            </div>
+            <div class="card-body">
+                {% if images %}
+                    <div class="row" id="image-list">
+                        {% for image in images %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 {% if image.is_main %}border-primary{% endif %}">
+                                    <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.alt_text|default:apartment.title }}" style="height: 150px; object-fit: cover;">
+                                    <div class="card-body p-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            {% if image.is_main %}
+                                                <span class="badge bg-primary">Main</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Order: {{ image.order }}</span>
+                                            {% endif %}
+                                            <form method="post" action="{% url 'staff_delete_image' image.pk %}" onsubmit="return confirm('Delete this image?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                        <p class="text-muted mt-3">No images uploaded yet</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Upload New Image -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Upload New Image</h6>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.image.id_for_label }}" class="form-label">Image File</label>
+                        {{ form.image }}
+                        {% if form.image.errors %}
+                            <div class="invalid-feedback d-block">{{ form.image.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.alt_text.id_for_label }}" class="form-label">Alt Text (optional)</label>
+                        <input type="text" name="alt_text" id="{{ form.alt_text.id_for_label }}" class="form-control" placeholder="Describe the image">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.order.id_for_label }}" class="form-label">Display Order</label>
+                        <input type="number" name="order" id="{{ form.order.id_for_label }}" class="form-control" value="0" min="0">
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="is_main" id="{{ form.is_main.id_for_label }}" class="form-check-input">
+                        <label for="{{ form.is_main.id_for_label }}" class="form-check-label">Set as main image</label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-upload"></i> Upload Image
+                    </button>
+                </form>
+                
+                <hr>
+                
+                <div class="text-muted small">
+                    <p class="mb-2"><strong>Tips:</strong></p>
+                    <ul class="mb-0">
+                        <li>Use high-quality images (minimum 800x600)</li>
+                        <li>The main image appears in listings</li>
+                        <li>Lower order numbers appear first</li>
+                        <li>Supported formats: JPG, PNG, WebP</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

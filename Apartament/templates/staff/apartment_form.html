@@ -1,0 +1,142 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Apartment - Staff{% endblock %}
+
+{% block staff_content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartments' %}">Apartments</a></li>
+        <li class="breadcrumb-item active">{% if object %}Edit{% else %}Create{% endif %}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{% if object %}Edit Apartment{% else %}New Apartment{% endif %}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-danger">{{ form.title.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Address</label>
+                            {{ form.address }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">City</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Country</label>
+                            {{ form.country }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Latitude (optional)</label>
+                            {{ form.latitude }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Longitude (optional)</label>
+                            {{ form.longitude }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Max Guests</label>
+                            {{ form.capacity }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Bedrooms</label>
+                            {{ form.bedrooms }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Bathrooms</label>
+                            {{ form.bathrooms }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Amenities</label>
+                        {{ form.amenities }}
+                        <small class="text-muted">{{ form.amenities.help_text }}</small>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Base Price per Night (€)</label>
+                            {{ form.base_price_per_night }}
+                        </div>
+                        <div class="col-md-6 mb-3 d-flex align-items-end">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active (visible to guests)</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Save Apartment
+                        </button>
+                        <a href="{% url 'staff_apartments' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h6>Tips</h6>
+                <ul class="text-muted small">
+                    <li>Use a descriptive title that includes location</li>
+                    <li>Write a detailed description to attract guests</li>
+                    <li>List all amenities (WiFi, parking, etc.)</li>
+                    <li>Set competitive pricing</li>
+                </ul>
+                
+                {% if object %}
+                    <hr>
+                    <p class="mb-2"><strong>Next steps:</strong></p>
+                    <a href="{% url 'staff_apartment_images' object.pk %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                        <i class="bi bi-images"></i> Manage Images
+                    </a>
+                    <a href="{% url 'staff_availability' object.pk %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                        <i class="bi bi-calendar"></i> Set Availability
+                    </a>
+                    <a href="{% url 'staff_pricing_rules' object.pk %}" class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="bi bi-currency-euro"></i> Pricing Rules
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

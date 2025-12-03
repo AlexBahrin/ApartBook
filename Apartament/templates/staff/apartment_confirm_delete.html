@@ -1,0 +1,49 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Delete {{ apartment.title }}?{% endblock %}
+
+{% block staff_content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Confirm Deletion</h5>
+            </div>
+            <div class="card-body text-center">
+                <i class="bi bi-building-x text-danger" style="font-size: 4rem;"></i>
+                
+                <h4 class="mt-3">Delete "{{ apartment.title }}"?</h4>
+                
+                <p class="text-muted">
+                    This action cannot be undone. This will permanently delete the apartment
+                    and all associated data including:
+                </p>
+                
+                <ul class="text-start">
+                    <li>{{ apartment.images.count }} image(s)</li>
+                    <li>{{ apartment.availability_set.count }} availability entries</li>
+                    <li>{{ apartment.pricingrule_set.count }} pricing rules</li>
+                    <li>{{ apartment.booking_set.count }} booking(s)</li>
+                </ul>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle"></i>
+                    Instead of deleting, consider marking the apartment as inactive.
+                </div>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{% url 'staff_apartments' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Yes, Delete Apartment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

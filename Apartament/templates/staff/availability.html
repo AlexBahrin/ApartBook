@@ -1,0 +1,182 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Availability - {{ apartment.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .availability-calendar {
+        max-width: 100%;
+    }
+    .availability-entry {
+        border-left: 4px solid;
+        padding-left: 1rem;
+    }
+    .availability-entry.available {
+        border-color: #198754;
+    }
+    .availability-entry.unavailable {
+        border-color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block staff_content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartments' %}">Apartments</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartment_edit' apartment.pk %}">{{ apartment.title }}</a></li>
+        <li class="breadcrumb-item active">Availability</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Availability Schedule</h5>
+            </div>
+            <div class="card-body">
+                {% if availability_list %}
+                    <div class="list-group">
+                        {% for entry in availability_list %}
+                            <div class="list-group-item availability-entry {% if entry.is_available %}available{% else %}unavailable{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ entry.date|date:"l, M d, Y" }}</strong>
+                                        <br>
+                                        {% if entry.is_available %}
+                                            <span class="text-success">
+                                                <i class="bi bi-check-circle"></i> Available
+                                            </span>
+                                        {% else %}
+                                            <span class="text-danger">
+                                                <i class="bi bi-x-circle"></i> Unavailable
+                                            </span>
+                                        {% endif %}
+                                        {% if entry.note %}
+                                            <small class="text-muted d-block">{{ entry.note }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <form method="post" action="{% url 'staff_delete_availability' entry.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-calendar-check text-muted" style="font-size: 4rem;"></i>
+                        <p class="text-muted mt-3">No availability entries yet</p>
+                        <p class="text-muted">By default, all dates are available unless blocked here</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Upcoming Bookings -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Upcoming Bookings</h5>
+            </div>
+            <div class="card-body">
+                {% if upcoming_bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Guest</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in upcoming_bookings %}
+                                    <tr>
+                                        <td>{{ booking.user.username }}</td>
+                                        <td>{{ booking.check_in|date:"M d" }}</td>
+                                        <td>{{ booking.check_out|date:"M d" }}</td>
+                                        <td>
+                                            <span class="badge {% if booking.status == 'CONFIRMED' %}badge-confirmed{% else %}badge-pending{% endif %}">
+                                                {{ booking.get_status_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No upcoming bookings</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Add Availability Entry -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Block or Open Dates</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="text" name="date" id="date" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <div class="form-check">
+                            <input type="radio" name="is_available" id="is_available_true" value="true" class="form-check-input" checked>
+                            <label for="is_available_true" class="form-check-label">Available</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="is_available" id="is_available_false" value="false" class="form-check-input">
+                            <label for="is_available_false" class="form-check-label">Blocked</label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Notes (optional)</label>
+                        <textarea name="note" id="note" class="form-control" rows="2" placeholder="e.g., Maintenance, Personal use"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-lg"></i> Add Entry
+                    </button>
+                </form>
+                
+                <hr>
+                
+                <div class="text-muted small">
+                    <p class="mb-2"><strong>How it works:</strong></p>
+                    <ul class="mb-0">
+                        <li>All dates are available by default</li>
+                        <li>Block dates for maintenance or personal use</li>
+                        <li>Existing bookings automatically block dates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    flatpickr('#date', {
+        minDate: 'today',
+        dateFormat: 'Y-m-d'
+    });
+</script>
+{% endblock %}

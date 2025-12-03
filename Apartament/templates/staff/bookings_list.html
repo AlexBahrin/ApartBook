@@ -1,0 +1,109 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Manage Bookings - Staff{% endblock %}
+
+{% block staff_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Bookings</h2>
+    
+    <!-- Filters -->
+    <form method="get" class="d-flex gap-2">
+        <select name="status" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+            <option value="">All Status</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="apartment" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+            <option value="">All Apartments</option>
+            {% for apt in apartments %}
+                <option value="{{ apt.pk }}" {% if request.GET.apartment == apt.pk|stringformat:"i" %}selected{% endif %}>{{ apt.title }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Guest</th>
+                    <th>Apartment</th>
+                    <th>Dates</th>
+                    <th>Guests</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>#{{ booking.pk }}</td>
+                        <td>
+                            {{ booking.user.username }}
+                            <br>
+                            <small class="text-muted">{{ booking.user.email }}</small>
+                        </td>
+                        <td>{{ booking.apartment.title }}</td>
+                        <td>
+                            {{ booking.check_in|date:"M d" }} - {{ booking.check_out|date:"M d" }}
+                            <br>
+                            <small class="text-muted">{{ booking.get_nights }} nights</small>
+                        </td>
+                        <td>{{ booking.guests_count }}</td>
+                        <td>€{{ booking.total_price }}</td>
+                        <td>
+                            {% if booking.status == 'PENDING' %}
+                                <span class="badge badge-pending">Pending</span>
+                            {% elif booking.status == 'CONFIRMED' %}
+                                <span class="badge badge-confirmed">Confirmed</span>
+                            {% elif booking.status == 'COMPLETED' %}
+                                <span class="badge badge-completed">Completed</span>
+                            {% else %}
+                                <span class="badge badge-cancelled">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ booking.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'staff_booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
+                                Manage
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-calendar-x display-1 text-muted"></i>
+        <h4 class="mt-3">No bookings found</h4>
+        <p class="text-muted">Bookings will appear here when guests make requests.</p>
+    </div>
+{% endif %}
+{% endblock %}
