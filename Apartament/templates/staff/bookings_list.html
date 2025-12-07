@@ -57,7 +57,7 @@
                             <small class="text-muted">{{ booking.get_nights }} nights</small>
                         </td>
                         <td>{{ booking.guests_count }}</td>
-                        <td>€{{ booking.total_price }}</td>
+                        <td>{% price booking.total_price %}</td>
                         <td>
                             {% if booking.status == 'PENDING' %}
                                 <span class="badge badge-pending">Pending</span>

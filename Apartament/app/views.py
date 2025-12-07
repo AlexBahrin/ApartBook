@@ -11,10 +11,10 @@ from django.db.models import Q, Avg
 from datetime import date, timedelta
 from decimal import Decimal
 
-from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Conversation, Message, DiscountPeriod
+from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Conversation, Message
 from .forms import (
     BookingForm, ApartmentForm, ApartmentImageForm, 
-    AvailabilityForm, PricingRuleForm, BookingStatusForm, MessageForm, DiscountPeriodForm
+    AvailabilityForm, PricingRuleForm, BookingStatusForm, MessageForm
 )
 from .emails import (
     send_new_booking_notification,
@@ -139,6 +139,11 @@ class ApartmentDetailView(DetailView):
 @login_required
 def create_booking(request, slug):
     """Handle booking form submission."""
+    # Prevent staff users from creating bookings
+    if request.user.is_staff:
+        messages.error(request, _('Staff members cannot create bookings. Please use a regular user account.'))
+        return redirect('apartment_detail', slug=slug)
+    
     apartment = get_object_or_404(Apartment, slug=slug, is_active=True)
     
     if request.method == 'POST':
@@ -154,10 +159,9 @@ def create_booking(request, slug):
             booking.apartment = apartment
             booking.user = request.user
             
-            # Calculate price with discount periods
-            total_price, total_discount, price_breakdown = booking.calculate_total_price()
+            # Calculate price
+            total_price, price_breakdown = booking.calculate_total_price()
             booking.total_price = total_price
-            booking.total_discount = total_discount
             booking.price_breakdown = price_breakdown
             
             booking.save()
@@ -211,11 +215,12 @@ def apartment_availability_api(request, slug):
 
 
 def apartment_price_api(request, slug):
-    """API endpoint for calculating booking price with dynamic pricing."""
+    """API endpoint for calculating booking price with dynamic pricing and guest count."""
     apartment = get_object_or_404(Apartment, slug=slug, is_active=True)
     
     check_in_str = request.GET.get('check_in')
     check_out_str = request.GET.get('check_out')
+    guests_count = request.GET.get('guests_count', 1)
     
     if not check_in_str or not check_out_str:
         return JsonResponse({'error': 'check_in and check_out are required'}, status=400)
@@ -224,11 +229,15 @@ def apartment_price_api(request, slug):
         from datetime import datetime
         check_in = datetime.strptime(check_in_str, '%Y-%m-%d').date()
         check_out = datetime.strptime(check_out_str, '%Y-%m-%d').date()
+        guests_count = int(guests_count)
     except ValueError:
-        return JsonResponse({'error': 'Invalid date format'}, status=400)
+        return JsonResponse({'error': 'Invalid date format or guest count'}, status=400)
     
     if check_out <= check_in:
         return JsonResponse({'error': 'check_out must be after check_in'}, status=400)
+    
+    # Get base price based on guest count and pricing type
+    base_price_for_guests = apartment.get_price_for_guests(guests_count)
     
     # Calculate total price with pricing rules
     total = 0
@@ -246,7 +255,7 @@ def apartment_price_api(request, slug):
         if applicable_rule:
             day_price = applicable_rule.price_per_night
         else:
-            day_price = apartment.base_price_per_night
+            day_price = base_price_for_guests
         
         daily_prices.append({
             'date': current_date.isoformat(),
@@ -260,91 +269,10 @@ def apartment_price_api(request, slug):
     return JsonResponse({
         'total_price': str(total),
         'nights': nights,
-        'base_price': str(apartment.base_price_per_night),
+        'base_price': str(base_price_for_guests),
+        'pricing_type': apartment.pricing_type,
+        'guests_count': guests_count,
         'daily_prices': daily_prices,
-    })
-
-
-def apartment_price_with_discounts_api(request, slug):
-    """API endpoint for calculating booking price with discount periods."""
-    apartment = get_object_or_404(Apartment, slug=slug, is_active=True)
-    
-    check_in_str = request.GET.get('check_in')
-    check_out_str = request.GET.get('check_out')
-    
-    if not check_in_str or not check_out_str:
-        return JsonResponse({'error': 'check_in and check_out are required'}, status=400)
-    
-    try:
-        from datetime import datetime
-        check_in = datetime.strptime(check_in_str, '%Y-%m-%d').date()
-        check_out = datetime.strptime(check_out_str, '%Y-%m-%d').date()
-    except ValueError:
-        return JsonResponse({'error': 'Invalid date format'}, status=400)
-    
-    if check_out <= check_in:
-        return JsonResponse({'error': 'check_out must be after check_in'}, status=400)
-    
-    # Calculate price breakdown with discounts
-    total = Decimal('0.00')
-    total_discount = Decimal('0.00')
-    current_date = check_in
-    daily_breakdown = []
-    
-    while current_date < check_out:
-        # Get base price for the day
-        applicable_rule = PricingRule.objects.filter(
-            apartment=apartment,
-            start_date__lte=current_date,
-            end_date__gte=current_date
-        ).order_by('-priority').first()
-        
-        if applicable_rule:
-            base_day_price = applicable_rule.price_per_night
-        else:
-            base_day_price = apartment.base_price_per_night
-        
-        # Check for discount period
-        discount_period = DiscountPeriod.objects.filter(
-            apartment=apartment,
-            is_active=True,
-            start_date__lte=current_date,
-            end_date__gte=current_date
-        ).first()
-        
-        if discount_period:
-            discount_amount = base_day_price * (discount_period.discount_percentage / Decimal('100'))
-            final_day_price = base_day_price - discount_amount
-            total_discount += discount_amount
-            daily_breakdown.append({
-                'date': current_date.isoformat(),
-                'original_price': str(base_day_price),
-                'final_price': str(final_day_price),
-                'discount_percentage': str(discount_period.discount_percentage),
-                'discount_name': discount_period.name,
-                'has_discount': True
-            })
-        else:
-            final_day_price = base_day_price
-            daily_breakdown.append({
-                'date': current_date.isoformat(),
-                'original_price': str(base_day_price),
-                'final_price': str(base_day_price),
-                'has_discount': False
-            })
-        
-        total += final_day_price
-        current_date += timedelta(days=1)
-    
-    nights = (check_out - check_in).days
-    
-    return JsonResponse({
-        'total_price': str(total),
-        'total_discount': str(total_discount),
-        'nights': nights,
-        'base_price': str(apartment.base_price_per_night),
-        'daily_breakdown': daily_breakdown,
-        'has_discounts': total_discount > 0
     })
 
 
@@ -352,7 +280,19 @@ def apartment_price_with_discounts_api(request, slug):
 # USER DASHBOARD VIEWS
 # =============================================================================
 
-class MyBookingsListView(LoginRequiredMixin, ListView):
+class NonStaffRequiredMixin(UserPassesTestMixin):
+    """Mixin to require non-staff users (regular users only)."""
+    def test_func(self):
+        return self.request.user.is_authenticated and not self.request.user.is_staff
+    
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated and self.request.user.is_staff:
+            messages.error(self.request, _('Staff members cannot access user bookings. Please use the Staff Dashboard.'))
+            return redirect('staff_dashboard')
+        return super().handle_no_permission()
+
+
+class MyBookingsListView(NonStaffRequiredMixin, LoginRequiredMixin, ListView):
     """List current user's bookings."""
     model = Booking
     template_name = 'dashboard/bookings_list.html'
@@ -362,7 +302,7 @@ class MyBookingsListView(LoginRequiredMixin, ListView):
         return Booking.objects.filter(user=self.request.user).order_by('-created_at')
 
 
-class MyBookingDetailView(LoginRequiredMixin, DetailView):
+class MyBookingDetailView(NonStaffRequiredMixin, LoginRequiredMixin, DetailView):
     """Show booking details for current user."""
     model = Booking
     template_name = 'dashboard/booking_detail.html'
@@ -375,6 +315,11 @@ class MyBookingDetailView(LoginRequiredMixin, DetailView):
 @login_required
 def cancel_booking(request, pk):
     """Allow user to cancel their pending booking."""
+    # Prevent staff from cancelling bookings through user interface
+    if request.user.is_staff:
+        messages.error(request, _('Staff members cannot cancel bookings through this interface. Please use the Staff Dashboard.'))
+        return redirect('staff_dashboard')
+    
     booking = get_object_or_404(Booking, pk=pk, user=request.user)
     
     if booking.status == 'PENDING':
@@ -700,7 +645,7 @@ def staff_delete_availability(request, pk):
 # MESSAGING VIEWS - USER DASHBOARD
 # =============================================================================
 
-class MyConversationsListView(LoginRequiredMixin, ListView):
+class MyConversationsListView(NonStaffRequiredMixin, LoginRequiredMixin, ListView):
     """List user's conversations."""
     model = Conversation
     template_name = 'dashboard/messages_list.html'
@@ -718,6 +663,11 @@ class MyConversationsListView(LoginRequiredMixin, ListView):
 @login_required
 def conversation_detail(request, pk):
     """View and reply to a conversation."""
+    # Prevent staff from accessing user conversations directly
+    if request.user.is_staff:
+        messages.error(request, _('Staff members should use the Staff Dashboard to manage conversations.'))
+        return redirect('staff_conversations')
+    
     conversation = get_object_or_404(Conversation, pk=pk, user=request.user)
     
     # Mark messages as read (those not sent by current user)
@@ -805,60 +755,6 @@ def staff_conversation_detail(request, pk):
         'messages_list': conversation.messages.all(),
         'form': form,
     })
-
-
-# =============================================================================
-# DISCOUNT PERIOD VIEWS - STAFF DASHBOARD
-# =============================================================================
-
-class StaffDiscountPeriodListView(StaffRequiredMixin, ListView):
-    """Staff view: list all discount periods."""
-    model = DiscountPeriod
-    template_name = 'staff/discount_periods_list.html'
-    context_object_name = 'discount_periods'
-    paginate_by = 20
-
-    def get_queryset(self):
-        return DiscountPeriod.objects.all().order_by('-created_at')
-
-
-class StaffDiscountPeriodCreateView(StaffRequiredMixin, CreateView):
-    """Staff view: create a new discount period."""
-    model = DiscountPeriod
-    form_class = DiscountPeriodForm
-    template_name = 'staff/discount_period_form.html'
-    success_url = reverse_lazy('staff_discount_periods')
-
-    def form_valid(self, form):
-        messages.success(self.request, _('Discount period "%(name)s" created successfully!') % {
-            'name': form.instance.name
-        })
-        return super().form_valid(form)
-
-
-class StaffDiscountPeriodUpdateView(StaffRequiredMixin, UpdateView):
-    """Staff view: edit an existing discount period."""
-    model = DiscountPeriod
-    form_class = DiscountPeriodForm
-    template_name = 'staff/discount_period_form.html'
-    success_url = reverse_lazy('staff_discount_periods')
-
-    def form_valid(self, form):
-        messages.success(self.request, _('Discount period "%(name)s" updated successfully!') % {
-            'name': form.instance.name
-        })
-        return super().form_valid(form)
-
-
-class StaffDiscountPeriodDeleteView(StaffRequiredMixin, DeleteView):
-    """Staff view: delete a discount period."""
-    model = DiscountPeriod
-    template_name = 'staff/discount_period_confirm_delete.html'
-    success_url = reverse_lazy('staff_discount_periods')
-
-    def form_valid(self, form):
-        messages.success(self.request, _('Discount period deleted successfully!'))
-        return super().form_valid(form)
 
 
 # =============================================================================

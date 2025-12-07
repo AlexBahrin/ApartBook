@@ -130,7 +130,7 @@
                         <span class="text-muted">/ {% trans "night" %}</span>
                     </div>
                     
-                    {% if user.is_authenticated %}
+                    {% if user.is_authenticated and not user.is_staff %}
                         <form method="post" action="{% url 'create_booking' apartment.slug %}">
                             {% csrf_token %}
                             
@@ -157,24 +157,14 @@
                             
                             <!-- Price Breakdown -->
                             <div id="priceBreakdown" class="price-breakdown mb-3">
-                                <div id="dailyPricesContainer">
-                                    <!-- Daily prices will be populated by JS -->
-                                </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span><span id="nightsCount">0</span> {% trans "nights" %}</span>
+                                    <span><span id="nightsCount">0</span> {% trans "nights" %} × <span id="pricePerNight">{{ currency_symbol }}0</span></span>
                                     <span id="subtotalPrice">{{ currency_symbol }}0</span>
-                                </div>
-                                <div id="discountRow" class="d-flex justify-content-between mb-2 text-success" style="display: none;">
-                                    <span><i class="bi bi-tag"></i> {% trans "Discount savings" %}</span>
-                                    <span id="discountAmount">-{{ currency_symbol }}0</span>
                                 </div>
                                 <hr>
                                 <div class="d-flex justify-content-between fw-bold">
                                     <span>{% trans "Total" %}</span>
-                                    <span>
-                                        <span id="originalTotal" class="text-decoration-line-through text-muted me-2" style="display: none;"></span>
-                                        <span id="totalPrice">{{ currency_symbol }}0</span>
-                                    </span>
+                                    <span id="totalPrice">{{ currency_symbol }}0</span>
                                 </div>
                             </div>
                             
@@ -188,6 +178,17 @@
                         <p class="text-center text-muted mt-3 mb-0">
                             <small>{% trans "You won't be charged yet" %}</small>
                         </p>
+                    {% elif user.is_authenticated and user.is_staff %}
+                        <div class="text-center py-4">
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-info-circle"></i>
+                                <p class="mb-2"><strong>Staff Account</strong></p>
+                                <p class="mb-0"><small>Staff members cannot create bookings. Use the Staff Dashboard to manage apartments and bookings.</small></p>
+                            </div>
+                            <a href="{% url 'staff_dashboard' %}" class="btn btn-outline-primary mt-3 w-100">
+                                <i class="bi bi-gear"></i> Go to Staff Dashboard
+                            </a>
+                        </div>
                     {% else %}
                         <div class="text-center py-4">
                             <p class="mb-3">{% trans "Sign in to book this apartment" %}</p>
@@ -212,18 +213,23 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     const unavailableDates = {{ unavailable_dates|safe }};
-    const basePrice = {{ apartment.base_price_per_night }};
+    const basePrice = parseFloat("{{ apartment.base_price_per_night }}".replace(',', '.'));
     const apartmentSlug = "{{ apartment.slug }}";
     const currencySymbol = "{{ currency_symbol }}";
-    const currencyRate = {{ currency_rate }};
+    const currencyRate = parseFloat("{{ currency_rate }}".replace(',', '.'));
     
     let checkInDate = null;
     let checkOutDate = null;
     
-    // Helper to convert and format price
-    function formatPrice(priceInEur) {
-        const converted = parseFloat(priceInEur) * currencyRate;
-        return currencySymbol + converted.toFixed(2);
+    // Helper to convert and format price from RON to selected currency
+    function formatPrice(priceInRon) {
+        const converted = parseFloat(priceInRon) * currencyRate;
+        // Format based on currency
+        if ("{{ current_currency }}" === 'RON') {
+            return converted.toFixed(2) + ' ' + currencySymbol;
+        } else {
+            return currencySymbol + converted.toFixed(2);
+        }
     }
     
     // Initialize location map if coordinates exist
@@ -247,12 +253,11 @@
     function updatePriceBreakdown() {
         const priceBreakdown = document.getElementById('priceBreakdown');
         const nightsCount = document.getElementById('nightsCount');
+        const pricePerNight = document.getElementById('pricePerNight');
         const subtotalPrice = document.getElementById('subtotalPrice');
         const totalPrice = document.getElementById('totalPrice');
-        const originalTotal = document.getElementById('originalTotal');
-        const discountRow = document.getElementById('discountRow');
-        const discountAmount = document.getElementById('discountAmount');
-        const dailyPricesContainer = document.getElementById('dailyPricesContainer');
+        const guestsInput = document.getElementById('id_guests_count');
+        const guestsCount = guestsInput ? parseInt(guestsInput.value) || 1 : 1;
         
         if (checkInDate && checkOutDate) {
             const diffTime = checkOutDate - checkInDate;
@@ -262,93 +267,31 @@
                 nightsCount.textContent = nights;
                 priceBreakdown.classList.add('show');
                 
-                // Fetch pricing with discounts from API
-                fetch(`/api/apartments/${apartmentSlug}/price-with-discounts/?check_in=${formatDate(checkInDate)}&check_out=${formatDate(checkOutDate)}`)
+                // Fetch pricing from API with guest count
+                fetch(`/api/apartments/${apartmentSlug}/price/?check_in=${formatDate(checkInDate)}&check_out=${formatDate(checkOutDate)}&guests_count=${guestsCount}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.error) {
                             // Fallback to basic pricing
                             const basicTotal = basePrice * nights;
+                            pricePerNight.textContent = formatPrice(basePrice);
                             subtotalPrice.textContent = formatPrice(basicTotal);
                             totalPrice.textContent = formatPrice(basicTotal);
-                            originalTotal.style.display = 'none';
-                            discountRow.style.display = 'none';
-                            dailyPricesContainer.innerHTML = '';
                             return;
                         }
                         
-                        // Calculate original total (sum of all original prices)
-                        const originalTotalValue = data.daily_breakdown.reduce((sum, dp) => sum + parseFloat(dp.original_price), 0);
-                        const totalDiscountValue = parseFloat(data.total_discount);
-                        const finalTotal = parseFloat(data.total_price);
-                        
-                        // Helper function to format date nicely
-                        function formatDisplayDate(isoDate) {
-                            const date = new Date(isoDate + 'T12:00:00'); // Add time to avoid timezone issues
-                            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                        }
-                        
-                        // Only show discount info if there are actual discounts (greater than 0)
-                        if (data.has_discounts && totalDiscountValue > 0.01) {
-                            // Build daily prices HTML showing discounted days
-                            let dailyHtml = '<div class="small mb-2">';
-                            let discountedNights = 0;
-                            
-                            data.daily_breakdown.forEach(dp => {
-                                if (dp.has_discount) {
-                                    discountedNights++;
-                                    const origPrice = parseFloat(dp.original_price);
-                                    const finalPrice = parseFloat(dp.final_price);
-                                    const discPct = parseFloat(dp.discount_percentage);
-                                    dailyHtml += `
-                                        <div class="d-flex justify-content-between text-success">
-                                            <span>${formatDisplayDate(dp.date)} <span class="badge bg-success">${discPct}% off</span></span>
-                                            <span>
-                                                <span class="text-decoration-line-through text-muted">${formatPrice(origPrice)}</span>
-                                                ${formatPrice(finalPrice)}
-                                            </span>
-                                        </div>`;
-                                }
-                            });
-                            
-                            if (discountedNights > 0 && discountedNights < data.daily_breakdown.length) {
-                                const regularNights = data.daily_breakdown.length - discountedNights;
-                                const regularTotal = data.daily_breakdown.filter(dp => !dp.has_discount).reduce((sum, dp) => sum + parseFloat(dp.original_price), 0);
-                                dailyHtml += `
-                                    <div class="d-flex justify-content-between text-muted">
-                                        <span>${regularNights} regular night${regularNights > 1 ? 's' : ''}</span>
-                                        <span>${formatPrice(regularTotal)}</span>
-                                    </div>`;
-                            }
-                            
-                            dailyHtml += '</div>';
-                            dailyPricesContainer.innerHTML = dailyHtml;
-                            
-                            // Show discount row only if discount is meaningful
-                            discountRow.style.display = 'flex';
-                            discountAmount.textContent = '-' + formatPrice(totalDiscountValue);
-                            
-                            // Show original total with strikethrough
-                            originalTotal.textContent = formatPrice(originalTotalValue);
-                            originalTotal.style.display = 'inline';
-                        } else {
-                            // No discounts - hide all discount-related elements completely
-                            dailyPricesContainer.innerHTML = '';
-                            discountRow.style.display = 'none';
-                            originalTotal.style.display = 'none';
-                        }
-                        
-                        subtotalPrice.textContent = formatPrice(originalTotalValue);
-                        totalPrice.textContent = formatPrice(finalTotal);
+                        const totalValue = parseFloat(data.total_price);
+                        const avgPricePerNight = totalValue / nights;
+                        pricePerNight.textContent = formatPrice(avgPricePerNight);
+                        subtotalPrice.textContent = formatPrice(totalValue);
+                        totalPrice.textContent = formatPrice(totalValue);
                     })
                     .catch(err => {
                         console.log('Price API error:', err);
                         const basicTotal = basePrice * nights;
+                        pricePerNight.textContent = formatPrice(basePrice);
                         subtotalPrice.textContent = formatPrice(basicTotal);
                         totalPrice.textContent = formatPrice(basicTotal);
-                        originalTotal.style.display = 'none';
-                        discountRow.style.display = 'none';
-                        dailyPricesContainer.innerHTML = '';
                     });
             } else {
                 priceBreakdown.classList.remove('show');
@@ -362,31 +305,71 @@
         return date.toISOString().split('T')[0];
     }
     
-    const checkInPicker = flatpickr("#id_check_in", {
-        minDate: "today",
-        dateFormat: "Y-m-d",
-        disable: unavailableDates,
-        onChange: function(selectedDates, dateStr) {
-            if (selectedDates[0]) {
-                checkInDate = selectedDates[0];
-                const nextDay = new Date(selectedDates[0]);
-                nextDay.setDate(nextDay.getDate() + 1);
-                checkOutPicker.set('minDate', nextDay);
-                updatePriceBreakdown();
-            }
-        }
-    });
+    // Only initialize flatpickr and price updates for authenticated users
+    {% if user.is_authenticated and not user.is_staff %}
+    const checkInInput = document.getElementById('id_check_in');
+    const checkOutInput = document.getElementById('id_check_out');
     
-    const checkOutPicker = flatpickr("#id_check_out", {
-        minDate: "today",
-        dateFormat: "Y-m-d",
-        disable: unavailableDates,
-        onChange: function(selectedDates, dateStr) {
-            if (selectedDates[0]) {
-                checkOutDate = selectedDates[0];
+    if (checkInInput && checkOutInput) {
+        const checkInPicker = flatpickr("#id_check_in", {
+            minDate: "today",
+            dateFormat: "Y-m-d",
+            disable: unavailableDates,
+            onChange: function(selectedDates, dateStr) {
+                console.log('Check-in changed:', dateStr);
+                if (selectedDates[0]) {
+                    checkInDate = selectedDates[0];
+                    const nextDay = new Date(selectedDates[0]);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    checkOutPicker.set('minDate', nextDay);
+                    updatePriceBreakdown();
+                }
+            }
+        });
+        
+        const checkOutPicker = flatpickr("#id_check_out", {
+            minDate: "today",
+            dateFormat: "Y-m-d",
+            disable: unavailableDates,
+            onChange: function(selectedDates, dateStr) {
+                console.log('Check-out changed:', dateStr);
+                if (selectedDates[0]) {
+                    checkOutDate = selectedDates[0];
+                    updatePriceBreakdown();
+                }
+            }
+        });
+        
+        // Fallback: also listen to native change events
+        checkInInput.addEventListener('change', function(e) {
+            console.log('Native check-in change:', e.target.value);
+            if (e.target.value) {
+                checkInDate = new Date(e.target.value);
                 updatePriceBreakdown();
             }
+        });
+        
+        checkOutInput.addEventListener('change', function(e) {
+            console.log('Native check-out change:', e.target.value);
+            if (e.target.value) {
+                checkOutDate = new Date(e.target.value);
+                updatePriceBreakdown();
+            }
+        });
+        
+        // Listen for guest count changes
+        const guestsInput = document.getElementById('id_guests_count');
+        if (guestsInput) {
+            guestsInput.addEventListener('change', function(e) {
+                console.log('Guest count changed:', e.target.value);
+                updatePriceBreakdown();
+            });
         }
-    });
+        
+        console.log('Flatpickr initialized');
+    } else {
+        console.error('Date input fields not found');
+    }
+    {% endif %}
 </script>
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'staff/base_staff.html' %}
 {% load i18n %}
+{% load currency_tags %}
 
 {% block title %}{% if object %}{% trans "Edit" %}{% else %}{% trans "Create" %}{% endif %} {% trans "Apartment" %} - {% trans "Staff" %}{% endblock %}
 
@@ -88,11 +89,47 @@
                     
                     <hr>
                     
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Base Price per Night (€)</label>
-                            {{ form.base_price_per_night }}
+                    <h6 class="mb-3">{% trans "Pricing Configuration" %}</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Pricing Model" %}</label>
+                        <div>
+                            {% for value, label in form.pricing_type.field.choices %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pricing_type" id="pricing_type_{{ value }}" value="{{ value }}" {% if form.pricing_type.value == value %}checked{% elif not form.pricing_type.value and value == 'APARTMENT' %}checked{% endif %}>
+                                <label class="form-check-label" for="pricing_type_{{ value }}">
+                                    {{ label }}
+                                </label>
+                            </div>
+                            {% endfor %}
                         </div>
+                    </div>
+                    
+                    <!-- Price for whole apartment -->
+                    <div id="apartmentPriceSection" class="mb-3">
+                        <label class="form-label">{% trans "Price per Night" %} ({{ currency_symbol }})</label>
+                        {{ form.base_price_per_night }}
+                        <small class="text-muted d-block">{% trans "Fixed price per night regardless of guest count" %}</small>
+                    </div>
+                    
+                    <!-- Price by number of guests -->
+                    <div id="guestPriceSection" style="display: none;">
+                        <label class="form-label">{% trans "Price per Night by Guest Count" %} ({{ currency_symbol }})</label>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div id="guestPriceInputs">
+                                    <!-- Will be populated by JavaScript based on capacity -->
+                                </div>
+                                <small class="text-muted">{% trans "Set the capacity first to configure per-guest pricing" %}</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{ form.price_per_guest }}
+                    
+                    <hr>
+                    
+                    <div class="row">
                         <div class="col-md-6 mb-3 d-flex align-items-end">
                             <div class="form-check">
                                 {{ form.is_active }}
@@ -140,4 +177,121 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pricingTypeRadios = document.querySelectorAll('input[name="pricing_type"]');
+    const apartmentPriceSection = document.getElementById('apartmentPriceSection');
+    const guestPriceSection = document.getElementById('guestPriceSection');
+    const guestPriceInputs = document.getElementById('guestPriceInputs');
+    const capacityInput = document.getElementById('id_capacity');
+    const basePriceInput = document.getElementById('id_base_price_per_night');
+    const pricePerGuestInput = document.getElementById('id_price_per_guest');
+    
+    // Load existing per-guest prices if any
+    let existingPrices = {};
+    try {
+        const existingValue = pricePerGuestInput.value;
+        if (existingValue && existingValue !== '{}') {
+            existingPrices = JSON.parse(existingValue);
+        }
+    } catch (e) {
+        console.log('No existing guest prices');
+    }
+    
+    function updatePricingUI() {
+        const selectedType = document.querySelector('input[name="pricing_type"]:checked').value;
+        
+        if (selectedType === 'GUEST') {
+            apartmentPriceSection.style.display = 'none';
+            guestPriceSection.style.display = 'block';
+            generateGuestPriceInputs();
+        } else {
+            apartmentPriceSection.style.display = 'block';
+            guestPriceSection.style.display = 'none';
+        }
+    }
+    
+    function generateGuestPriceInputs() {
+        const capacity = parseInt(capacityInput.value) || 0;
+        
+        if (capacity === 0) {
+            guestPriceInputs.innerHTML = '<p class="text-muted small mb-0">{% trans "Please set the maximum guest capacity first" %}</p>';
+            return;
+        }
+        
+        guestPriceInputs.innerHTML = '';
+        
+        for (let i = 1; i <= capacity; i++) {
+            const existingPrice = existingPrices[i] || '';
+            
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'mb-2';
+            inputGroup.innerHTML = `
+                <div class="row align-items-center">
+                    <div class="col-4">
+                        <label class="form-label mb-0">${i} {% trans "guest" %}${i > 1 ? 's' : ''}</label>
+                    </div>
+                    <div class="col-8">
+                        <div class="input-group">
+                            <span class="input-group-text">{{ currency_symbol }}</span>
+                            <input type="number" 
+                                   class="form-control guest-price-input" 
+                                   data-guest-count="${i}"
+                                   value="${existingPrice}"
+                                   min="0" 
+                                   step="0.01"
+                                   placeholder="{% trans "Price per night" %}"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            guestPriceInputs.appendChild(inputGroup);
+        }
+        
+        // Add event listeners to update JSON
+        document.querySelectorAll('.guest-price-input').forEach(input => {
+            input.addEventListener('input', updateGuestPricesJSON);
+        });
+    }
+    
+    function updateGuestPricesJSON() {
+        const selectedType = document.querySelector('input[name="pricing_type"]:checked').value;
+        
+        if (selectedType === 'GUEST') {
+            const prices = {};
+            document.querySelectorAll('.guest-price-input').forEach(input => {
+                const guestCount = input.dataset.guestCount;
+                const price = input.value;
+                if (price) {
+                    prices[guestCount] = price;
+                }
+            });
+            pricePerGuestInput.value = JSON.stringify(prices);
+        } else {
+            pricePerGuestInput.value = '{}';
+        }
+    }
+    
+    // Event listeners
+    pricingTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            updatePricingUI();
+            updateGuestPricesJSON();
+        });
+    });
+    
+    capacityInput.addEventListener('change', function() {
+        const selectedType = document.querySelector('input[name="pricing_type"]:checked').value;
+        if (selectedType === 'GUEST') {
+            generateGuestPriceInputs();
+        }
+    });
+    
+    // Initialize on page load
+    updatePricingUI();
+});
+</script>
 {% endblock %}

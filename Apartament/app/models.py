@@ -8,6 +8,11 @@ from decimal import Decimal
 
 class Apartment(models.Model):
     """Represents an apartment listing."""
+    PRICING_TYPE_CHOICES = [
+        ('APARTMENT', _('Per Apartment')),
+        ('GUEST', _('Per Guest')),
+    ]
+    
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     description = models.TextField()
@@ -20,7 +25,22 @@ class Apartment(models.Model):
     bedrooms = models.PositiveIntegerField(default=1)
     bathrooms = models.PositiveIntegerField(default=1)
     amenities = models.JSONField(default=list, blank=True, help_text=_("List of amenities"))
-    base_price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
+    pricing_type = models.CharField(
+        max_length=20, 
+        choices=PRICING_TYPE_CHOICES, 
+        default='APARTMENT',
+        help_text=_("Pricing model: per apartment or per guest")
+    )
+    base_price_per_night = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2,
+        help_text=_("Base price per night (for apartment) or price for 1 guest")
+    )
+    price_per_guest = models.JSONField(
+        default=dict, 
+        blank=True,
+        help_text=_("Price per guest count: {1: 100, 2: 150, 3: 200, etc.}")
+    )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -48,6 +68,18 @@ class Apartment(models.Model):
         if main_image:
             return main_image
         return self.images.first()
+    
+    def get_price_for_guests(self, guest_count):
+        """Get the price per night based on guest count and pricing type."""
+        if self.pricing_type == 'APARTMENT':
+            return self.base_price_per_night
+        else:  # GUEST pricing
+            # Try to get exact guest count price from JSON
+            guest_count_str = str(guest_count)
+            if self.price_per_guest and guest_count_str in self.price_per_guest:
+                return Decimal(str(self.price_per_guest[guest_count_str]))
+            # Fallback to base price for 1 guest, multiply by guest count
+            return self.base_price_per_night * guest_count
 
 
 class ApartmentImage(models.Model):
@@ -94,7 +126,6 @@ class PricingRule(models.Model):
     RULE_TYPES = [
         ('SEASONAL', _('Seasonal')),
         ('WEEKEND', _('Weekend')),
-        ('DISCOUNT', _('Discount')),
         ('HOLIDAY', _('Holiday')),
     ]
 
@@ -140,9 +171,8 @@ class Booking(models.Model):
     check_out = models.DateField()
     guests_count = models.PositiveIntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    total_discount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    price_breakdown = models.JSONField(default=list, blank=True, help_text=_("Detailed price breakdown per day"))
-    currency = models.CharField(max_length=3, default='EUR')
+    price_breakdown = models.JSONField(default=list, blank=True, help_text=_('Detailed price breakdown per day'))
+    currency = models.CharField(max_length=3, default='RON')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='NOT_REQUIRED')
     notes = models.TextField(blank=True, help_text=_("Message from guest to owner"))
@@ -161,17 +191,19 @@ class Booking(models.Model):
 
     def calculate_total_price(self):
         """
-        Calculate total price based on base price, pricing rules, and discount periods.
-        Returns (total_price, total_discount, price_breakdown).
+        Calculate total price based on guest count, pricing type, and pricing rules.
+        Returns (total_price, price_breakdown).
         
-        Price breakdown includes per-day details with original and discounted prices.
+        Price breakdown includes per-day details with prices.
         """
         from datetime import timedelta
         
         total = Decimal('0.00')
-        total_discount = Decimal('0.00')
         breakdown = []
         current_date = self.check_in
+        
+        # Get base price based on guest count and pricing type
+        base_price_for_guests = self.apartment.get_price_for_guests(self.guests_count)
         
         while current_date < self.check_out:
             # Get base price for the day (from pricing rules or apartment base price)
@@ -183,42 +215,19 @@ class Booking(models.Model):
             ).order_by('-priority').first()
             
             if applicable_rule:
-                base_day_price = applicable_rule.price_per_night
+                day_price = applicable_rule.price_per_night
             else:
-                base_day_price = self.apartment.base_price_per_night
+                day_price = base_price_for_guests
             
-            # Check for discount period
-            discount_period = self.apartment.discount_periods.filter(
-                is_active=True,
-                start_date__lte=current_date,
-                end_date__gte=current_date
-            ).first()
+            breakdown.append({
+                'date': current_date.isoformat(),
+                'price': str(day_price),
+            })
             
-            if discount_period:
-                discount_amount = base_day_price * (discount_period.discount_percentage / Decimal('100'))
-                final_day_price = base_day_price - discount_amount
-                total_discount += discount_amount
-                breakdown.append({
-                    'date': current_date.isoformat(),
-                    'original_price': str(base_day_price),
-                    'final_price': str(final_day_price),
-                    'discount_percentage': str(discount_period.discount_percentage),
-                    'discount_name': discount_period.name,
-                    'has_discount': True
-                })
-            else:
-                final_day_price = base_day_price
-                breakdown.append({
-                    'date': current_date.isoformat(),
-                    'original_price': str(base_day_price),
-                    'final_price': str(base_day_price),
-                    'has_discount': False
-                })
-            
-            total += final_day_price
+            total += day_price
             current_date += timedelta(days=1)
         
-        return total, total_discount, breakdown
+        return total, breakdown
 
     def clean(self):
         """Validate booking data."""
@@ -298,29 +307,3 @@ class Message(models.Model):
     def __str__(self):
         return f"Message from {self.sender.username} at {self.created_at}"
 
-
-class DiscountPeriod(models.Model):
-    """Staff-defined discount periods for apartments."""
-    apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='discount_periods')
-    name = models.CharField(max_length=100, help_text=_("e.g., 'Winter Sale', 'Early Bird'"))
-    discount_percentage = models.DecimalField(
-        max_digits=5, 
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(Decimal('100.00'))],
-        help_text=_("Percentage discount (1-100)")
-    )
-    start_date = models.DateField()
-    end_date = models.DateField()
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.apartment.title} - {self.name} ({self.discount_percentage}% off)"
-
-    def clean(self):
-        from django.core.exceptions import ValidationError
-        if self.end_date and self.start_date and self.end_date < self.start_date:
-            raise ValidationError({'end_date': _('End date must be after or equal to start date.')})

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Conversation, Message, DiscountPeriod
+from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Conversation, Message
 
 
 @admin.register(Apartment)
@@ -31,7 +31,7 @@ class PricingRuleAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'apartment', 'user', 'check_in', 'check_out', 'status', 'total_price', 'total_discount', 'created_at']
+    list_display = ['id', 'apartment', 'user', 'check_in', 'check_out', 'status', 'total_price', 'created_at']
     list_filter = ['status', 'payment_status', 'apartment']
     search_fields = ['user__username', 'user__email', 'apartment__title']
     date_hierarchy = 'created_at'
@@ -49,11 +49,3 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ['id', 'conversation', 'sender', 'is_read', 'created_at']
     list_filter = ['is_read', 'created_at']
     search_fields = ['body', 'sender__username']
-
-
-@admin.register(DiscountPeriod)
-class DiscountPeriodAdmin(admin.ModelAdmin):
-    list_display = ['apartment', 'name', 'discount_percentage', 'start_date', 'end_date', 'is_active']
-    list_filter = ['is_active', 'apartment']
-    search_fields = ['name', 'apartment__title']
-    readonly_fields = ['created_at']

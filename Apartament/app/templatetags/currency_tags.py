@@ -8,7 +8,7 @@ register = template.Library()
 @register.filter
 def convert_currency(value, currency_code=None):
     """
-    Convert a price from EUR to the specified currency.
+    Convert a price from base currency (RON) to the specified currency.
     Usage: {{ price|convert_currency:"USD" }} or {{ price|convert_currency:current_currency }}
     """
     if value is None:
@@ -19,7 +19,8 @@ def convert_currency(value, currency_code=None):
     except (ValueError, TypeError):
         return value
     
-    if currency_code is None or currency_code == 'EUR':
+    base_currency = settings.DEFAULT_CURRENCY
+    if currency_code is None or currency_code == base_currency:
         return value
     
     currency_data = settings.CURRENCIES.get(currency_code)
@@ -46,20 +47,21 @@ def format_price(value, currency_code=None):
         return str(value)
     
     if currency_code is None:
-        currency_code = 'EUR'
+        currency_code = settings.DEFAULT_CURRENCY
     
-    currency_data = settings.CURRENCIES.get(currency_code, settings.CURRENCIES['EUR'])
+    currency_data = settings.CURRENCIES.get(currency_code, settings.CURRENCIES[settings.DEFAULT_CURRENCY])
     symbol = currency_data['symbol']
     
-    # Convert from EUR if needed
-    if currency_code != 'EUR':
+    # Convert from base currency (RON) if needed
+    base_currency = settings.DEFAULT_CURRENCY
+    if currency_code != base_currency:
         rate = Decimal(str(currency_data['rate']))
         value = value * rate
     
     value = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     
     # Format based on currency
-    if currency_code in ['EUR', 'GBP', 'CHF']:
+    if currency_code in ['EUR', 'GBP', 'CHF', 'USD']:
         return f"{symbol}{value}"
     elif currency_code == 'RON':
         return f"{value} {symbol}"
@@ -73,7 +75,7 @@ def price(context, value):
     Display price in user's selected currency.
     Usage: {% price apartment.base_price_per_night %}
     """
-    currency_code = context.get('current_currency', 'EUR')
+    currency_code = context.get('current_currency', settings.DEFAULT_CURRENCY)
     return format_price(value, currency_code)
 
 

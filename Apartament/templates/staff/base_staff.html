@@ -42,9 +42,6 @@
                 <a class="nav-link {% if 'messages' in request.path %}active{% endif %}" href="{% url 'staff_messages' %}">
                     <i class="bi bi-chat-dots"></i> {% trans "Messages" %}
                 </a>
-                <a class="nav-link {% if 'discount-periods' in request.path %}active{% endif %}" href="{% url 'staff_discount_periods' %}">
-                    <i class="bi bi-percent"></i> {% trans "Discount Periods" %}
-                </a>
             </nav>
         </div>
         

@@ -71,11 +71,6 @@
                         <div class="col-md-4">
                             <h6 class="text-muted">{% trans "Total Price" %}</h6>
                             <p class="fs-5 mb-0 text-primary fw-bold">{% price booking.total_price %}</p>
-                            {% if booking.total_discount > 0 %}
-                                <small class="text-success">
-                                    <i class="bi bi-tag"></i> {% trans "Discount applied" %}: -{% price booking.total_discount %}
-                                </small>
-                            {% endif %}
                         </div>
                         <div class="col-md-4">
                             <h6 class="text-muted">{% trans "Payment Status" %}</h6>

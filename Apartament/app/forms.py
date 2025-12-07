@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from datetime import date
-from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Message, DiscountPeriod
+from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Message
 
 
 class BookingForm(forms.ModelForm):
@@ -105,7 +105,7 @@ class ApartmentForm(forms.ModelForm):
         fields = [
             'title', 'description', 'address', 'city', 'country',
             'latitude', 'longitude', 'capacity', 'bedrooms', 'bathrooms',
-            'amenities', 'base_price_per_night', 'is_active'
+            'amenities', 'pricing_type', 'base_price_per_night', 'price_per_guest', 'is_active'
         ]
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -118,7 +118,9 @@ class ApartmentForm(forms.ModelForm):
             'capacity': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
             'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
             'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+            'pricing_type': forms.RadioSelect(attrs={'class': 'form-check-input'}),
             'base_price_per_night': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'step': '0.01'}),
+            'price_per_guest': forms.HiddenInput(attrs={'id': 'id_price_per_guest'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
@@ -239,51 +241,3 @@ class MessageForm(forms.ModelForm):
         labels = {
             'body': ''
         }
-
-
-class DiscountPeriodForm(forms.ModelForm):
-    """Form for creating/editing discount periods (staff only)."""
-    
-    class Meta:
-        model = DiscountPeriod
-        fields = [
-            'apartment', 'name', 'discount_percentage',
-            'start_date', 'end_date', 'is_active'
-        ]
-        widgets = {
-            'apartment': forms.Select(attrs={'class': 'form-select'}),
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'e.g., Winter Sale, Early Bird'
-            }),
-            'discount_percentage': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1,
-                'max': 100,
-                'step': '0.01',
-                'placeholder': 'e.g., 20 for 20% off'
-            }),
-            'start_date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'form-control'
-            }),
-            'end_date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'form-control'
-            }),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
-
-    def clean(self):
-        cleaned_data = super().clean()
-        start_date = cleaned_data.get('start_date')
-        end_date = cleaned_data.get('end_date')
-        discount_percentage = cleaned_data.get('discount_percentage')
-
-        if start_date and end_date and end_date < start_date:
-            raise ValidationError({'end_date': 'End date must be after or equal to start date.'})
-
-        if discount_percentage and discount_percentage > 100:
-            raise ValidationError({'discount_percentage': 'Discount percentage cannot exceed 100%.'})
-
-        return cleaned_data

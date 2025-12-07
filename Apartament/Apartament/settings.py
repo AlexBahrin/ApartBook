@@ -143,14 +143,16 @@ USE_L10N = True
 USE_TZ = True
 
 # Currency settings
+# Rates are relative to RON (base currency with rate 1.0)
+# Example: 5.10 RON = 1 EUR, so EUR rate = 1/5.10 ≈ 0.196
 CURRENCIES = {
-    'EUR': {'symbol': '€', 'name': 'Euro', 'rate': 1.0},
-    'USD': {'symbol': '$', 'name': 'US Dollar', 'rate': 1.08},
-    'GBP': {'symbol': '£', 'name': 'British Pound', 'rate': 0.86},
-    'RON': {'symbol': 'lei', 'name': 'Romanian Leu', 'rate': 4.97},
-    'CHF': {'symbol': 'CHF', 'name': 'Swiss Franc', 'rate': 0.95},
+    'RON': {'symbol': 'lei', 'name': 'Romanian Leu', 'rate': 1.0},
+    'EUR': {'symbol': '€', 'name': 'Euro', 'rate': 1/5.10},
+    'USD': {'symbol': '$', 'name': 'US Dollar', 'rate': 1/5.50},
+    'GBP': {'symbol': '£', 'name': 'British Pound', 'rate': 1/6.20},
+    'CHF': {'symbol': 'CHF', 'name': 'Swiss Franc', 'rate': 1/5.35},
 }
-DEFAULT_CURRENCY = 'EUR'
+DEFAULT_CURRENCY = 'RON'
 
 
 # Static files (CSS, JavaScript, Images)

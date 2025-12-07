@@ -1,4 +1,5 @@
 {% extends 'staff/base_staff.html' %}
+{% load currency_tags %}
 
 {% block title %}Pricing Rules - {{ apartment.title }}{% endblock %}
 
@@ -16,7 +17,7 @@
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Pricing Rules</h5>
-                <span class="badge bg-secondary">Base price: €{{ apartment.base_price_per_night }}/night</span>
+                <span class="badge bg-secondary">Base price: {% price apartment.base_price_per_night %}/night</span>
             </div>
             <div class="card-body">
                 {% if pricing_rules %}
@@ -41,14 +42,12 @@
                                                 <span class="badge bg-warning">Weekend</span>
                                             {% elif rule.rule_type == 'HOLIDAY' %}
                                                 <span class="badge bg-danger">Holiday</span>
-                                            {% else %}
-                                                <span class="badge bg-success">Discount</span>
                                             {% endif %}
                                         </td>
                                         <td>
                                             {{ rule.start_date|date:"M d" }} - {{ rule.end_date|date:"M d, Y" }}
                                         </td>
-                                        <td class="fw-bold">€{{ rule.price_per_night }}</td>
+                                        <td class="fw-bold">{% price rule.price_per_night %}</td>
                                         <td>{{ rule.priority }}</td>
                                         <td>
                                             <form method="post" action="{% url 'staff_delete_pricing_rule' rule.pk %}" class="d-inline">
@@ -67,7 +66,7 @@
                     <div class="text-center py-5">
                         <i class="bi bi-currency-euro text-muted" style="font-size: 4rem;"></i>
                         <p class="text-muted mt-3">No pricing rules yet</p>
-                        <p class="text-muted">Using base price of €{{ apartment.base_price_per_night }} per night</p>
+                        <p class="text-muted">Using base price of {% price apartment.base_price_per_night %} per night</p>
                     </div>
                 {% endif %}
             </div>
@@ -100,7 +99,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="{{ form.price_per_night.id_for_label }}" class="form-label">Price per Night (€)</label>
+                        <label for="{{ form.price_per_night.id_for_label }}" class="form-label">Price per Night ({{ currency_symbol }})</label>
                         {{ form.price_per_night }}
                     </div>
                     
@@ -123,7 +122,6 @@
                         <li><strong>Seasonal:</strong> Holiday periods, summer rates</li>
                         <li><strong>Weekend:</strong> Friday-Sunday pricing</li>
                         <li><strong>Holiday:</strong> Festivals, events, holidays</li>
-                        <li><strong>Discount:</strong> Special offers or promotions</li>
                     </ul>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 {% extends 'staff/base_staff.html' %}
+{% load currency_tags %}
 
 {% block title %}Calendar - {{ apartment.title }}{% endblock %}
 
@@ -82,7 +83,7 @@
             <div class="card-body">
                 <p class="mb-1"><strong>{{ apartment.title }}</strong></p>
                 <p class="mb-1 text-muted">{{ apartment.city }}, {{ apartment.country }}</p>
-                <p class="mb-0">Base price: <strong>€{{ apartment.base_price_per_night }}/night</strong></p>
+                <p class="mb-0">Base price: <strong>{% price apartment.base_price_per_night %}/night</strong></p>
             </div>
         </div>
     </div>

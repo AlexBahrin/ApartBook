@@ -45,7 +45,7 @@
                         </td>
                         <td>{{ apartment.city }}, {{ apartment.country }}</td>
                         <td>{{ apartment.capacity }}</td>
-                        <td>€{{ apartment.base_price_per_night }}</td>
+                        <td>{% price apartment.base_price_per_night %}</td>
                         <td>
                             {% if apartment.is_active %}
                                 <span class="badge bg-success">Active</span>

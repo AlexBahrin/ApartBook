@@ -69,12 +69,7 @@
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <h6 class="text-muted">Total Price</h6>
-                        <p class="fs-4 text-primary fw-bold mb-0">€{{ booking.total_price }}</p>
-                        {% if booking.total_discount > 0 %}
-                            <small class="text-success">
-                                <i class="bi bi-tag"></i> Discount savings: -€{{ booking.total_discount }}
-                            </small>
-                        {% endif %}
+                        <p class="fs-4 text-primary fw-bold mb-0">{% price booking.total_price %}</p>
                     </div>
                     <div class="col-md-4">
                         <h6 class="text-muted">Payment Status</h6>
