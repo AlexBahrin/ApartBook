@@ -766,6 +766,7 @@ def staff_delete_pricing_rule(request, pk):
 
 
 @staff_member_required
+@staff_member_required
 def staff_delete_availability(request, pk):
     """Staff view: delete availability entry."""
     availability = get_object_or_404(Availability, pk=pk)
@@ -773,6 +774,80 @@ def staff_delete_availability(request, pk):
     availability.delete()
     messages.success(request, _('Availability entry deleted!'))
     return redirect('staff_availability', pk=apartment_pk)
+
+
+@staff_member_required
+def staff_block_dates(request, pk):
+    """Staff view: block date range for an apartment."""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'})
+    
+    apartment = get_object_or_404(Apartment, pk=pk)
+    
+    try:
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+        note = request.POST.get('note', '').strip()
+        
+        start_date = date.fromisoformat(start_date_str)
+        end_date = date.fromisoformat(end_date_str)
+        
+        if start_date > end_date:
+            return JsonResponse({'success': False, 'error': _('Start date must be before end date')})
+        
+        if start_date < date.today():
+            return JsonResponse({'success': False, 'error': _('Cannot block past dates')})
+        
+        # Check for existing bookings in this range
+        existing_bookings = Booking.objects.filter(
+            apartment=apartment,
+            status__in=['PENDING', 'CONFIRMED'],
+            check_in__lte=end_date,
+            check_out__gte=start_date
+        )
+        
+        if existing_bookings.exists():
+            return JsonResponse({
+                'success': False, 
+                'error': _('Cannot block dates with existing bookings')
+            })
+        
+        # Create blocked dates
+        current_date = start_date
+        blocked_count = 0
+        while current_date <= end_date:
+            Availability.objects.update_or_create(
+                apartment=apartment,
+                date=current_date,
+                defaults={
+                    'is_available': False,
+                    'note': note or _('Blocked')
+                }
+            )
+            blocked_count += 1
+            current_date += timedelta(days=1)
+        
+        return JsonResponse({
+            'success': True,
+            'message': _(f'{blocked_count} date(s) blocked successfully')
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@staff_member_required
+def staff_unblock_date(request, pk, availability_id):
+    """Staff view: unblock a single date."""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'})
+    
+    apartment = get_object_or_404(Apartment, pk=pk)
+    availability = get_object_or_404(Availability, pk=availability_id, apartment=apartment)
+    
+    availability.delete()
+    
+    return JsonResponse({'success': True, 'message': _('Date unblocked successfully')})
 
 
 # =============================================================================

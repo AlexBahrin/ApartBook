@@ -1,7 +1,8 @@
 {% extends 'staff/base_staff.html' %}
 {% load currency_tags %}
+{% load i18n %}
 
-{% block title %}Calendar - {{ apartment.title }}{% endblock %}
+{% block title %}{% trans "Calendar" %} - {{ apartment.title }}{% endblock %}
 
 {% block extra_css %}
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
@@ -11,6 +12,10 @@
         margin: 0 auto;
     }
     .fc-event {
+        cursor: pointer;
+    }
+    .fc-daygrid-day:hover {
+        background-color: rgba(13, 110, 253, 0.05);
         cursor: pointer;
     }
     .legend-item {
@@ -30,32 +35,93 @@
 {% block staff_content %}
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'staff_apartments' %}">Apartments</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartments' %}">{% trans "Apartments" %}</a></li>
         <li class="breadcrumb-item"><a href="{% url 'staff_apartment_edit' apartment.pk %}">{{ apartment.title }}</a></li>
-        <li class="breadcrumb-item active">Calendar</li>
+        <li class="breadcrumb-item active">{% trans "Calendar" %}</li>
     </ol>
 </nav>
 
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-calendar3"></i> Booking Calendar</h5>
-        <div class="d-flex">
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #198754;"></div>
-                <small>Confirmed</small>
+        <h5 class="mb-0"><i class="bi bi-calendar3"></i> {% trans "Booking Calendar" %}</h5>
+        <div class="d-flex align-items-center">
+            <div class="d-flex me-3">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #198754;"></div>
+                    <small>{% trans "Confirmed" %}</small>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffc107;"></div>
+                    <small>{% trans "Pending" %}</small>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #dc3545;"></div>
+                    <small>{% trans "Blocked" %}</small>
+                </div>
             </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ffc107;"></div>
-                <small>Pending</small>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #dc3545;"></div>
-                <small>Blocked</small>
-            </div>
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#blockDateModal">
+                <i class="bi bi-calendar-x"></i> {% trans "Block Dates" %}
+            </button>
         </div>
     </div>
     <div class="card-body">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> {% trans "Click on any date to block it. Click on a blocked date to unblock it." %}
+        </div>
         <div id="calendar"></div>
+    </div>
+</div>
+
+<!-- Block Date Modal -->
+<div class="modal fade" id="blockDateModal" tabindex="-1" aria-labelledby="blockDateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="blockDateModalLabel">{% trans "Block Date Range" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="blockDateForm" method="post" action="{% url 'staff_block_dates' apartment.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">{% trans "Start Date" %}</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">{% trans "End Date" %}</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="note" class="form-label">{% trans "Note (optional)" %}</label>
+                        <input type="text" class="form-control" id="note" name="note" placeholder="e.g., Maintenance, Personal use">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+                    <button type="submit" class="btn btn-primary">{% trans "Block Dates" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Unblock Date Modal -->
+<div class="modal fade" id="unblockDateModal" tabindex="-1" aria-labelledby="unblockDateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="unblockDateModalLabel">{% trans "Unblock Date" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{% trans "Are you sure you want to unblock this date?" %}</p>
+                <p id="unblockDateText" class="fw-bold"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
+                <button type="button" class="btn btn-danger" id="confirmUnblock">{% trans "Unblock" %}</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -63,14 +129,14 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h6 class="mb-0">Quick Actions</h6>
+                <h6 class="mb-0">{% trans "Quick Actions" %}</h6>
             </div>
             <div class="card-body">
                 <a href="{% url 'staff_availability' apartment.pk %}" class="btn btn-outline-primary btn-sm me-2">
-                    <i class="bi bi-calendar-x"></i> Manage Availability
+                    <i class="bi bi-calendar-x"></i> {% trans "Manage Availability" %}
                 </a>
                 <a href="{% url 'staff_pricing_rules' apartment.pk %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-currency-euro"></i> Pricing Rules
+                    <i class="bi bi-currency-euro"></i> {% trans "Pricing Rules" %}
                 </a>
             </div>
         </div>
@@ -78,12 +144,12 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h6 class="mb-0">Apartment Info</h6>
+                <h6 class="mb-0">{% trans "Apartment Info" %}</h6>
             </div>
             <div class="card-body">
                 <p class="mb-1"><strong>{{ apartment.title }}</strong></p>
                 <p class="mb-1 text-muted">{{ apartment.address }}</p>
-                <p class="mb-0">Base price: <strong>{% price apartment.base_price_per_night %}/night</strong></p>
+                <p class="mb-0">{% trans "Base price" %}: <strong>{% price apartment.base_price_per_night %}/{% trans "night" %}</strong></p>
             </div>
         </div>
     </div>
@@ -95,6 +161,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');
+        let currentUnblockId = null;
+        const unblockModal = new bootstrap.Modal(document.getElementById('unblockDateModal'));
+        
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             headerToolbar: {
@@ -102,25 +171,122 @@
                 center: 'title',
                 right: 'dayGridMonth,dayGridWeek'
             },
-            events: '/api/staff/apartments/{{ apartment.pk }}/calendar-events/',
+            events: '{% url "staff_calendar_events" apartment.pk %}',
             eventClick: function(info) {
-                if (info.event.url) {
+                // Check if it's a blocked date
+                if (info.event.extendedProps.type === 'blocked') {
+                    info.jsEvent.preventDefault();
+                    const dateStr = new Date(info.event.start).toLocaleDateString();
+                    document.getElementById('unblockDateText').textContent = dateStr;
+                    currentUnblockId = info.event.id.replace('blocked-', '');
+                    unblockModal.show();
+                } else if (info.event.url) {
                     window.location.href = info.event.url;
                     info.jsEvent.preventDefault();
                 }
             },
             dateClick: function(info) {
-                // Redirect to availability page with date pre-selected
-                window.location.href = '{% url "staff_availability" apartment.pk %}?date=' + info.dateStr;
+                const clickedDate = new Date(info.dateStr);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // Don't allow blocking past dates
+                if (clickedDate < today) {
+                    alert('{% trans "Cannot block past dates" %}');
+                    return;
+                }
+                
+                // Quick block single date
+                if (confirm('{% trans "Block this date?" %}\n' + clickedDate.toLocaleDateString())) {
+                    fetch('{% url "staff_block_dates" apartment.pk %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: new URLSearchParams({
+                            'start_date': info.dateStr,
+                            'end_date': info.dateStr,
+                            'note': 'Blocked from calendar'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            calendar.refetchEvents();
+                        } else {
+                            alert(data.error || '{% trans "Error blocking date" %}');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('{% trans "Error blocking date" %}');
+                    });
+                }
             },
             eventDidMount: function(info) {
                 // Add tooltip
                 if (info.event.extendedProps.type === 'booking') {
                     info.el.title = `${info.event.title} - ${info.event.extendedProps.status}`;
+                } else if (info.event.extendedProps.type === 'blocked') {
+                    info.el.title = '{% trans "Click to unblock" %}';
+                    info.el.style.cursor = 'pointer';
                 }
             }
         });
+        
         calendar.render();
+        
+        // Handle block date form submission
+        document.getElementById('blockDateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('blockDateModal')).hide();
+                    calendar.refetchEvents();
+                    this.reset();
+                } else {
+                    alert(data.error || '{% trans "Error blocking dates" %}');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('{% trans "Error blocking dates" %}');
+            });
+        });
+        
+        // Handle unblock confirmation
+        document.getElementById('confirmUnblock').addEventListener('click', function() {
+            if (!currentUnblockId) return;
+            
+            fetch('{% url "staff_unblock_date" apartment.pk 0 %}'.replace('/0/', `/${currentUnblockId}/`), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    unblockModal.hide();
+                    calendar.refetchEvents();
+                    currentUnblockId = null;
+                } else {
+                    alert(data.error || '{% trans "Error unblocking date" %}');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('{% trans "Error unblocking date" %}');
+            });
+        });
     });
 </script>
 {% endblock %}
