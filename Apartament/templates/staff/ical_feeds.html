@@ -1,0 +1,201 @@
+{% extends 'staff/base_staff.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "iCal Sync" %} - {{ apartment.title }}{% endblock %}
+
+{% block staff_content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartments' %}">{% trans "Apartments" %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'staff_apartment_edit' apartment.pk %}">{{ apartment.title }}</a></li>
+        <li class="breadcrumb-item active">{% trans "iCal Sync" %}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- Export Section -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-box-arrow-up"></i> {% trans "Export Calendar" %}</h5>
+            </div>
+            <div class="card-body">
+                <p>{% trans "Use this URL to share your calendar with other platforms like Airbnb, Booking.com, or any service that supports iCal." %}</p>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">{% trans "Your iCal URL" %}:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="exportUrl" value="{{ export_url }}" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyExportUrl()">
+                            <i class="bi bi-clipboard"></i> {% trans "Copy" %}
+                        </button>
+                    </div>
+                    <small class="text-muted">{% trans "This URL will always show the latest bookings and blocked dates." %}</small>
+                </div>
+                
+                <a href="{{ export_url }}" class="btn btn-success" download>
+                    <i class="bi bi-download"></i> {% trans "Download .ics file" %}
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import Section -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-box-arrow-in-down"></i> {% trans "Import Calendars" %}</h5>
+            </div>
+            <div class="card-body">
+                <p>{% trans "Add iCal URLs from other platforms to automatically sync their bookings. Calendars are synced every minute." %}</p>
+                
+                <form method="post" class="mb-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="name" placeholder="{% trans 'Name (e.g., Airbnb)' %}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="url" class="form-control" name="url" placeholder="{% trans 'iCal URL' %}" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-plus"></i> {% trans "Add" %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                {% if feeds.count > 0 %}
+                <form method="post" class="mb-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="sync_all">
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-arrow-repeat"></i> {% trans "Sync All Now" %}
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Connected Calendars List -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-link-45deg"></i> {% trans "Connected Calendars" %}</h5>
+    </div>
+    <div class="card-body">
+        {% if feeds %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <th>{% trans "URL" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th>{% trans "Last Synced" %}</th>
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feed in feeds %}
+                    <tr>
+                        <td>
+                            <strong>{{ feed.name }}</strong>
+                            {% if not feed.is_active %}
+                            <span class="badge bg-secondary">{% trans "Inactive" %}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted text-truncate d-inline-block" style="max-width: 300px;" title="{{ feed.url }}">
+                                {{ feed.url }}
+                            </small>
+                        </td>
+                        <td>
+                            {% if feed.last_sync_status == 'SUCCESS' %}
+                            <span class="badge bg-success">{% trans "OK" %}</span>
+                            {% elif feed.last_sync_status == 'ERROR' %}
+                            <span class="badge bg-danger" title="{{ feed.sync_error }}">{% trans "Error" %}</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{% trans "Never synced" %}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if feed.last_synced %}
+                            {{ feed.last_synced|timesince }} {% trans "ago" %}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="sync">
+                                <input type="hidden" name="feed_id" value="{{ feed.pk }}">
+                                <button type="submit" class="btn btn-sm btn-outline-primary" title="{% trans 'Sync now' %}">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                            </form>
+                            <form method="post" class="d-inline delete-feed-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="feed_id" value="{{ feed.pk }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="{% trans 'Delete' %}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% if feed.sync_error %}
+                    <tr>
+                        <td colspan="5">
+                            <small class="text-danger"><i class="bi bi-exclamation-triangle"></i> {{ feed.sync_error }}</small>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3">{% trans "No external calendars connected yet." %}</p>
+            <p class="text-muted small">{% trans "Add iCal URLs from Airbnb, Booking.com, or other platforms to sync their bookings automatically." %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function copyExportUrl() {
+    const input = document.getElementById('exportUrl');
+    input.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const btn = input.nextElementSibling;
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check"></i> {% trans "Copied!" %}';
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add('btn-success');
+    
+    setTimeout(function() {
+        btn.innerHTML = originalHtml;
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-outline-secondary');
+    }, 2000);
+}
+
+// Confirm delete
+document.querySelectorAll('.delete-feed-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        if (!confirm('{% trans "Delete this feed and all imported blocked dates?" %}')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -215,6 +215,82 @@ class Apartment(models.Model):
             'unavailable_for_checkin': sorted([d.isoformat() for d in unavailable_for_checkin]),
             'unavailable_for_checkout': sorted([d.isoformat() for d in unavailable_for_checkout]),
         }
+    
+    def generate_ical(self):
+        """Generate iCal content for this apartment's bookings and blocked dates."""
+        from datetime import datetime, timedelta
+        from django.utils import timezone
+        
+        lines = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//ApartBook//Apartment Calendar//EN',
+            'CALSCALE:GREGORIAN',
+            'METHOD:PUBLISH',
+            f'X-WR-CALNAME:{self.title}',
+        ]
+        
+        # Add confirmed bookings as events
+        bookings = self.bookings.filter(status__in=['CONFIRMED', 'PENDING'])
+        for booking in bookings:
+            uid = f"booking-{booking.pk}@apartbook"
+            start = booking.check_in.strftime('%Y%m%d')
+            end = booking.check_out.strftime('%Y%m%d')
+            summary = f"Booked - {booking.guests_count} guests"
+            status = "CONFIRMED" if booking.status == 'CONFIRMED' else "TENTATIVE"
+            created = booking.created_at.strftime('%Y%m%dT%H%M%SZ')
+            
+            lines.extend([
+                'BEGIN:VEVENT',
+                f'UID:{uid}',
+                f'DTSTART;VALUE=DATE:{start}',
+                f'DTEND;VALUE=DATE:{end}',
+                f'SUMMARY:{summary}',
+                f'STATUS:{status}',
+                f'DTSTAMP:{created}',
+                'END:VEVENT',
+            ])
+        
+        # Add manually blocked dates as events (group consecutive dates)
+        blocked_dates = list(self.availability.filter(
+            is_available=False,
+            source='MANUAL'
+        ).order_by('date').values_list('date', 'note'))
+        
+        if blocked_dates:
+            # Group consecutive dates
+            groups = []
+            current_group = {'start': blocked_dates[0][0], 'end': blocked_dates[0][0], 'note': blocked_dates[0][1]}
+            
+            for date_val, note in blocked_dates[1:]:
+                if date_val == current_group['end'] + timedelta(days=1):
+                    current_group['end'] = date_val
+                else:
+                    groups.append(current_group)
+                    current_group = {'start': date_val, 'end': date_val, 'note': note}
+            groups.append(current_group)
+            
+            for i, group in enumerate(groups):
+                uid = f"blocked-{self.pk}-{i}@apartbook"
+                start = group['start'].strftime('%Y%m%d')
+                # End date is exclusive in iCal, so add 1 day
+                end = (group['end'] + timedelta(days=1)).strftime('%Y%m%d')
+                summary = group['note'] or 'Blocked'
+                
+                lines.extend([
+                    'BEGIN:VEVENT',
+                    f'UID:{uid}',
+                    f'DTSTART;VALUE=DATE:{start}',
+                    f'DTEND;VALUE=DATE:{end}',
+                    f'SUMMARY:{summary}',
+                    'STATUS:CONFIRMED',
+                    f'DTSTAMP:{timezone.now().strftime("%Y%m%dT%H%M%SZ")}',
+                    'END:VEVENT',
+                ])
+        
+        lines.append('END:VCALENDAR')
+        
+        return '\r\n'.join(lines)
 
 
 class ApartmentImage(models.Model):
@@ -239,12 +315,27 @@ class ApartmentImage(models.Model):
 
 class Availability(models.Model):
     """Tracks availability for specific dates."""
+    SOURCE_CHOICES = [
+        ('MANUAL', _('Manual')),
+        ('ICAL', _('iCal Import')),
+    ]
+    
     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='availability')
     date = models.DateField()
     is_available = models.BooleanField(default=True)
     min_stay_nights = models.PositiveIntegerField(null=True, blank=True)
     max_stay_nights = models.PositiveIntegerField(null=True, blank=True)
     note = models.CharField(max_length=255, blank=True)
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='MANUAL')
+    external_uid = models.CharField(max_length=255, blank=True, help_text=_("UID from external iCal event"))
+    ical_feed = models.ForeignKey(
+        'ICalFeed', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name='blocked_dates',
+        help_text=_("The iCal feed this block came from")
+    )
 
     class Meta:
         ordering = ['date']
@@ -254,6 +345,157 @@ class Availability(models.Model):
     def __str__(self):
         status = _("Available") if self.is_available else _("Unavailable")
         return f"{self.apartment.title} - {self.date} ({status})"
+
+
+class ICalFeed(models.Model):
+    """External iCal feeds to sync with apartment calendars."""
+    apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='ical_feeds')
+    name = models.CharField(max_length=100, help_text=_("e.g., Airbnb, Booking.com"))
+    url = models.URLField(max_length=500, help_text=_("iCal feed URL"))
+    is_active = models.BooleanField(default=True)
+    last_synced = models.DateTimeField(null=True, blank=True)
+    last_sync_status = models.CharField(max_length=50, blank=True)
+    sync_error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = _('iCal Feed')
+        verbose_name_plural = _('iCal Feeds')
+
+    def __str__(self):
+        return f"{self.apartment.title} - {self.name}"
+    
+    def sync(self):
+        """Sync this iCal feed and update blocked dates."""
+        import requests
+        from datetime import datetime, timedelta
+        from django.utils import timezone
+        
+        try:
+            response = requests.get(self.url, timeout=30)
+            response.raise_for_status()
+            
+            # Parse iCal content
+            events = self._parse_ical(response.text)
+            
+            # Remove old entries from this feed (using FK relationship)
+            Availability.objects.filter(ical_feed=self).delete()
+            
+            # Create new blocked dates from events
+            today = datetime.now().date()
+            dates_created = 0
+            for event in events:
+                start_date = event.get('start')
+                end_date = event.get('end')
+                uid = event.get('uid', '')
+                summary = event.get('summary', 'External Booking')
+                
+                if start_date and end_date and start_date >= today:
+                    # Block each night in the event range
+                    current = start_date
+                    while current < end_date:
+                        # Skip if there's already a manual block
+                        if not Availability.objects.filter(
+                            apartment=self.apartment,
+                            date=current,
+                            source='MANUAL'
+                        ).exists():
+                            Availability.objects.update_or_create(
+                                apartment=self.apartment,
+                                date=current,
+                                ical_feed=self,
+                                defaults={
+                                    'is_available': False,
+                                    'note': f"{self.name}: {summary}",
+                                    'source': 'ICAL',
+                                    'external_uid': uid
+                                }
+                            )
+                            dates_created += 1
+                        current += timedelta(days=1)
+            
+            self.last_synced = timezone.now()
+            self.last_sync_status = 'SUCCESS'
+            self.sync_error = ''
+            self.save()
+            
+            return True, f"Synced {len(events)} events, {dates_created} nights blocked"
+            
+        except Exception as e:
+            self.last_synced = timezone.now()
+            self.last_sync_status = 'ERROR'
+            self.sync_error = str(e)
+            self.save()
+            return False, str(e)
+    
+    def _parse_ical(self, ical_content):
+        """Parse iCal content and extract events."""
+        from datetime import datetime, date
+        
+        events = []
+        current_event = None
+        
+        lines = ical_content.replace('\r\n ', '').replace('\r\n\t', '').split('\r\n')
+        if len(lines) <= 1:
+            lines = ical_content.replace('\n ', '').replace('\n\t', '').split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            
+            if line == 'BEGIN:VEVENT':
+                current_event = {}
+            elif line == 'END:VEVENT':
+                if current_event:
+                    events.append(current_event)
+                current_event = None
+            elif current_event is not None:
+                if line.startswith('DTSTART'):
+                    date_str = line.split(':', 1)[-1] if ':' in line else ''
+                    current_event['start'] = self._parse_ical_date(date_str)
+                elif line.startswith('DTEND'):
+                    date_str = line.split(':', 1)[-1] if ':' in line else ''
+                    current_event['end'] = self._parse_ical_date(date_str)
+                elif line.startswith('UID:'):
+                    current_event['uid'] = line[4:]
+                elif line.startswith('SUMMARY:'):
+                    current_event['summary'] = line[8:]
+        
+        return events
+    
+    def _parse_ical_date(self, date_str):
+        """Parse various iCal date formats."""
+        from datetime import datetime, date
+        
+        date_str = date_str.strip()
+        
+        # Try different formats
+        formats = [
+            '%Y%m%d',           # 20251215
+            '%Y%m%dT%H%M%S',    # 20251215T120000
+            '%Y%m%dT%H%M%SZ',   # 20251215T120000Z
+        ]
+        
+        for fmt in formats:
+            try:
+                dt = datetime.strptime(date_str[:len(fmt.replace('%', ''))], fmt.replace('%', '').replace('Y', '1111').replace('m', '11').replace('d', '11').replace('T', 'T').replace('H', '11').replace('M', '11').replace('S', '11').replace('Z', 'Z'))
+            except:
+                pass
+        
+        # Simple parsing
+        try:
+            if 'T' in date_str:
+                date_part = date_str.split('T')[0]
+            else:
+                date_part = date_str[:8]
+            
+            year = int(date_part[:4])
+            month = int(date_part[4:6])
+            day = int(date_part[6:8])
+            return date(year, month, day)
+        except:
+            return None
 
 
 class PricingRule(models.Model):

@@ -814,6 +814,7 @@ def staff_block_dates(request, pk):
 
 
 @staff_member_required
+@staff_member_required
 def staff_unblock_date(request, pk, availability_id):
     """Staff view: unblock a single date."""
     if request.method != 'POST':
@@ -825,6 +826,116 @@ def staff_unblock_date(request, pk, availability_id):
     availability.delete()
     
     return JsonResponse({'success': True, 'message': _('Date unblocked successfully')})
+
+
+# =============================================================================
+# ICAL IMPORT/EXPORT VIEWS
+# =============================================================================
+
+def apartment_ical_export(request, pk):
+    """Public endpoint to export apartment calendar as iCal."""
+    apartment = get_object_or_404(Apartment, pk=pk)
+    
+    ical_content = apartment.generate_ical()
+    
+    response = HttpResponse(ical_content, content_type='text/calendar')
+    response['Content-Disposition'] = f'attachment; filename="{apartment.slug}-calendar.ics"'
+    return response
+
+
+@staff_member_required
+def staff_ical_feeds(request, pk):
+    """Staff view: manage iCal feeds for an apartment."""
+    from .models import ICalFeed
+    
+    apartment = get_object_or_404(Apartment, pk=pk)
+    feeds = apartment.ical_feeds.all()
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            name = request.POST.get('name', '').strip()
+            url = request.POST.get('url', '').strip()
+            
+            if name and url:
+                feed = ICalFeed.objects.create(
+                    apartment=apartment,
+                    name=name,
+                    url=url
+                )
+                # Try initial sync
+                success, message = feed.sync()
+                if success:
+                    messages.success(request, _(f'iCal feed "{name}" added and synced successfully!'))
+                else:
+                    messages.warning(request, _(f'iCal feed "{name}" added but sync failed: {message}'))
+            else:
+                messages.error(request, _('Please provide both name and URL'))
+                
+        elif action == 'delete':
+            feed_id = request.POST.get('feed_id')
+            try:
+                feed = ICalFeed.objects.get(pk=feed_id, apartment=apartment)
+                # Blocked dates with ical_feed FK will be cascade deleted
+                feed.delete()
+                messages.success(request, _('iCal feed deleted!'))
+            except ICalFeed.DoesNotExist:
+                messages.error(request, _('Feed not found'))
+                
+        elif action == 'sync':
+            feed_id = request.POST.get('feed_id')
+            try:
+                feed = ICalFeed.objects.get(pk=feed_id, apartment=apartment)
+                success, message = feed.sync()
+                if success:
+                    messages.success(request, _(f'Feed synced: {message}'))
+                else:
+                    messages.error(request, _(f'Sync failed: {message}'))
+            except ICalFeed.DoesNotExist:
+                messages.error(request, _('Feed not found'))
+                
+        elif action == 'sync_all':
+            for feed in feeds.filter(is_active=True):
+                feed.sync()
+            messages.success(request, _('All feeds synced!'))
+        
+        return redirect('staff_ical_feeds', pk=pk)
+    
+    # Generate export URL
+    export_url = request.build_absolute_uri(
+        reverse('apartment_ical_export', kwargs={'pk': apartment.pk})
+    )
+    
+    return render(request, 'staff/ical_feeds.html', {
+        'apartment': apartment,
+        'feeds': feeds,
+        'export_url': export_url,
+    })
+
+
+@staff_member_required
+def staff_sync_all_ical(request):
+    """Staff view: sync all active iCal feeds (called by cron/management command)."""
+    from .models import ICalFeed
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'})
+    
+    feeds = ICalFeed.objects.filter(is_active=True)
+    results = []
+    
+    for feed in feeds:
+        success, message = feed.sync()
+        results.append({
+            'feed_id': feed.pk,
+            'apartment': feed.apartment.title,
+            'name': feed.name,
+            'success': success,
+            'message': message
+        })
+    
+    return JsonResponse({'success': True, 'results': results})
 
 
 # =============================================================================

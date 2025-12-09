@@ -50,6 +50,11 @@ urlpatterns = [
     path('staff/apartments/<int:pk>/pricing-rules/', views.staff_pricing_rules, name='staff_pricing_rules'),
     path('staff/pricing-rules/<int:pk>/delete/', views.staff_delete_pricing_rule, name='staff_delete_pricing_rule'),
     
+    # iCal Import/Export
+    path('staff/apartments/<int:pk>/ical/', views.staff_ical_feeds, name='staff_ical_feeds'),
+    path('api/apartments/<int:pk>/calendar.ics', views.apartment_ical_export, name='apartment_ical_export'),
+    path('api/staff/sync-ical/', views.staff_sync_all_ical, name='staff_sync_all_ical'),
+    
     # Bookings management
     path('staff/bookings/', views.StaffBookingsListView.as_view(), name='staff_bookings'),
     path('staff/bookings/<int:pk>/', views.staff_booking_detail, name='staff_booking_detail'),

@@ -184,3 +184,19 @@ DEFAULT_FROM_EMAIL = 'ApartBook <noreply@apartbook.com>'
 # EMAIL_USE_SSL = False
 # EMAIL_HOST_USER = 'your@gmail.com'
 # EMAIL_HOST_PASSWORD = 'your_app_password'
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Celery Beat Schedule - runs iCal sync every minute
+CELERY_BEAT_SCHEDULE = {
+    'sync-ical-feeds-every-minute': {
+        'task': 'app.tasks.sync_all_ical_feeds',
+        'schedule': 60.0,  # every 60 seconds
+    },
+}
