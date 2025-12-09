@@ -221,7 +221,10 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-    const unavailableDates = {{ unavailable_dates|safe }};
+    // Calendar availability data
+    const unavailableForCheckin = {{ unavailable_for_checkin|safe }};
+    const unavailableForCheckout = {{ unavailable_for_checkout|safe }};
+    
     const pricingType = "{{ apartment.pricing_type }}";
     const basePrice = parseFloat("{{ apartment.get_display_price }}".replace(',', '.'));
     const apartmentSlug = "{{ apartment.slug }}";
@@ -344,10 +347,11 @@
     const checkOutInput = document.getElementById('id_check_out');
     
     if (checkInInput && checkOutInput) {
+        // For check-in: disable dates where that night is unavailable
         const checkInPicker = flatpickr("#id_check_in", {
             minDate: "today",
             dateFormat: "Y-m-d",
-            disable: unavailableDates,
+            disable: unavailableForCheckin,
             onChange: function(selectedDates, dateStr) {
                 console.log('Check-in changed:', dateStr);
                 if (selectedDates[0]) {
@@ -355,15 +359,21 @@
                     const nextDay = new Date(selectedDates[0]);
                     nextDay.setDate(nextDay.getDate() + 1);
                     checkOutPicker.set('minDate', nextDay);
+                    
+                    // Update checkout picker to also consider check-in date
+                    // Cannot checkout on dates where any night between check-in and checkout-1 is unavailable
+                    updateCheckoutAvailability(selectedDates[0]);
+                    
                     updatePriceBreakdown();
                 }
             }
         });
         
+        // For check-out: disable dates where previous night is unavailable
         const checkOutPicker = flatpickr("#id_check_out", {
             minDate: "today",
             dateFormat: "Y-m-d",
-            disable: unavailableDates,
+            disable: unavailableForCheckout,
             onChange: function(selectedDates, dateStr) {
                 console.log('Check-out changed:', dateStr);
                 if (selectedDates[0]) {
@@ -372,6 +382,42 @@
                 }
             }
         });
+        
+        // Function to update checkout availability based on selected check-in
+        function updateCheckoutAvailability(selectedCheckIn) {
+            // Build list of invalid checkout dates based on check-in
+            // A checkout date is invalid if ANY night between check-in and checkout-1 is unavailable
+            let invalidCheckouts = [...unavailableForCheckout];
+            
+            // Also disable any checkout that would require crossing an unavailable night
+            const checkInStr = formatDate(selectedCheckIn);
+            const allUnavailableNights = [...unavailableForCheckin];
+            
+            // Find all unavailable nights after check-in date
+            // If there's an unavailable night on date D (after check-in), 
+            // then checkout on D+1 or later is invalid
+            for (const unavailableStr of allUnavailableNights) {
+                const unavailableDate = new Date(unavailableStr);
+                if (unavailableDate >= selectedCheckIn) {
+                    // All dates after this unavailable night cannot be checkout
+                    // (if coming from our selected check-in)
+                    let blockDate = new Date(unavailableDate);
+                    blockDate.setDate(blockDate.getDate() + 1);
+                    
+                    // Block this date and all subsequent dates (up to reasonable limit)
+                    for (let i = 0; i < 365; i++) {
+                        const blockStr = formatDate(blockDate);
+                        if (!invalidCheckouts.includes(blockStr)) {
+                            invalidCheckouts.push(blockStr);
+                        }
+                        blockDate.setDate(blockDate.getDate() + 1);
+                    }
+                    break; // First unavailable night blocks all subsequent
+                }
+            }
+            
+            checkOutPicker.set('disable', invalidCheckouts);
+        }
         
         // Fallback: also listen to native change events
         checkInInput.addEventListener('change', function(e) {

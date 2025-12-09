@@ -76,25 +76,10 @@ class BookingForm(forms.ModelForm):
         
         if not self.apartment or not check_in or not check_out:
             return True
-
-        # Check for unavailable dates
-        unavailable_dates = Availability.objects.filter(
-            apartment=self.apartment,
-            date__gte=check_in,
-            date__lt=check_out,
-            is_available=False
-        )
-        if unavailable_dates.exists():
-            return False
-
-        # Check for overlapping confirmed bookings
-        overlapping = Booking.objects.filter(
-            apartment=self.apartment,
-            status='CONFIRMED',
-            check_in__lt=check_out,
-            check_out__gt=check_in
-        )
-        return not overlapping.exists()
+        
+        # Use the new clean model method
+        is_available, message = self.apartment.is_available_for_booking(check_in, check_out)
+        return is_available
 
 
 class ApartmentForm(forms.ModelForm):

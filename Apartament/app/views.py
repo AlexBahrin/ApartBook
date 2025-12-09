@@ -115,33 +115,23 @@ class ApartmentDetailView(DetailView):
         # Initialize booking form
         context['booking_form'] = BookingForm(apartment=apartment)
         
-        # Get upcoming unavailable dates for calendar
+        # Get calendar data for availability
         today = date.today()
         three_months_later = today + timedelta(days=90)
         
-        unavailable_dates = list(
-            Availability.objects.filter(
-                apartment=apartment,
-                date__gte=today,
-                date__lte=three_months_later,
-                is_available=False
-            ).values_list('date', flat=True)
-        )
+        # Use the new clean calendar data method
+        calendar_data = apartment.get_calendar_data(today, three_months_later)
         
-        # Also get dates from confirmed bookings
-        confirmed_bookings = Booking.objects.filter(
-            apartment=apartment,
-            status='CONFIRMED',
-            check_out__gte=today
-        )
-        for booking in confirmed_bookings:
-            current = booking.check_in
-            while current < booking.check_out:
-                if current not in unavailable_dates:
-                    unavailable_dates.append(current)
-                current += timedelta(days=1)
+        # For flatpickr:
+        # - Check-in picker: disable dates where that night is unavailable
+        # - Check-out picker: disable dates where the previous night is unavailable
+        context['unavailable_for_checkin'] = calendar_data['unavailable_for_checkin']
+        context['unavailable_for_checkout'] = calendar_data['unavailable_for_checkout']
         
-        context['unavailable_dates'] = [d.isoformat() for d in unavailable_dates]
+        # Legacy support - keep unavailable_dates for any other usage
+        context['unavailable_dates'] = calendar_data['unavailable_for_checkin']
+        context['blocked_checkin_dates'] = calendar_data['blocked_nights']
+        context['booked_dates'] = calendar_data['booked_nights']
         
         return context
 
@@ -196,30 +186,14 @@ def apartment_availability_api(request, slug):
     today = date.today()
     end_date = today + timedelta(days=365)
     
-    # Get unavailable dates
-    unavailable = Availability.objects.filter(
-        apartment=apartment,
-        date__gte=today,
-        date__lte=end_date,
-        is_available=False
-    ).values_list('date', flat=True)
-    
-    # Get booked dates
-    booked_dates = []
-    confirmed_bookings = Booking.objects.filter(
-        apartment=apartment,
-        status='CONFIRMED',
-        check_out__gte=today
-    )
-    for booking in confirmed_bookings:
-        current = booking.check_in
-        while current < booking.check_out:
-            booked_dates.append(current.isoformat())
-            current += timedelta(days=1)
+    # Use the clean model method
+    calendar_data = apartment.get_calendar_data(today, end_date)
     
     return JsonResponse({
-        'unavailable': [d.isoformat() for d in unavailable],
-        'booked': booked_dates,
+        'unavailable_for_checkin': calendar_data['unavailable_for_checkin'],
+        'unavailable_for_checkout': calendar_data['unavailable_for_checkout'],
+        'blocked_nights': calendar_data['blocked_nights'],
+        'booked_nights': calendar_data['booked_nights'],
         'base_price': str(apartment.base_price_per_night),
     })
 
@@ -777,8 +751,9 @@ def staff_delete_availability(request, pk):
 
 
 @staff_member_required
+@staff_member_required
 def staff_block_dates(request, pk):
-    """Staff view: block date range for an apartment."""
+    """Staff view: block date range for an apartment (blocking nights)."""
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'POST required'})
     
@@ -798,21 +773,23 @@ def staff_block_dates(request, pk):
         if start_date < date.today():
             return JsonResponse({'success': False, 'error': _('Cannot block past dates')})
         
-        # Check for existing bookings in this range
+        # Check for existing bookings that occupy any of the nights we want to block
+        # A booking occupies nights from check_in to check_out-1
+        # So we check if any booking's nights overlap with our range
         existing_bookings = Booking.objects.filter(
             apartment=apartment,
             status__in=['PENDING', 'CONFIRMED'],
-            check_in__lte=end_date,
-            check_out__gte=start_date
+            check_in__lte=end_date,  # Booking starts on or before our end
+            check_out__gt=start_date  # Booking ends after our start (so it occupies at least one night in range)
         )
         
         if existing_bookings.exists():
             return JsonResponse({
                 'success': False, 
-                'error': _('Cannot block dates with existing bookings')
+                'error': _('Cannot block nights that have existing bookings')
             })
         
-        # Create blocked dates
+        # Create blocked dates (each date represents a blocked NIGHT)
         current_date = start_date
         blocked_count = 0
         while current_date <= end_date:
@@ -829,7 +806,7 @@ def staff_block_dates(request, pk):
         
         return JsonResponse({
             'success': True,
-            'message': _(f'{blocked_count} date(s) blocked successfully')
+            'message': _(f'{blocked_count} night(s) blocked successfully')
         })
         
     except Exception as e:

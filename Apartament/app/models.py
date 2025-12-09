@@ -87,6 +87,134 @@ class Apartment(models.Model):
             return self.base_price_per_night
         else:  # GUEST pricing - show price for 1 guest
             return self.get_price_for_guests(1)
+    
+    def get_blocked_nights(self, start_date, end_date):
+        """
+        Get all nights that are blocked between start_date and end_date.
+        A 'night' is represented by its start date (the night of that date).
+        """
+        from datetime import timedelta
+        blocked = set()
+        
+        # Get blocked dates from Availability model
+        blocked_availability = self.availability.filter(
+            date__gte=start_date,
+            date__lt=end_date,  # A night is blocked if that DATE is blocked
+            is_available=False
+        ).values_list('date', flat=True)
+        blocked.update(blocked_availability)
+        
+        return blocked
+    
+    def get_booked_nights(self, start_date, end_date):
+        """
+        Get all nights that are booked between start_date and end_date.
+        A booking from check_in to check_out occupies nights: check_in, check_in+1, ..., check_out-1
+        """
+        from datetime import timedelta
+        booked = set()
+        
+        # Get confirmed bookings that overlap with the date range
+        bookings = self.bookings.filter(
+            status__in=['CONFIRMED', 'PENDING'],
+            check_in__lt=end_date,
+            check_out__gt=start_date
+        )
+        
+        for booking in bookings:
+            current = max(booking.check_in, start_date)
+            end = min(booking.check_out, end_date)
+            while current < end:
+                booked.add(current)
+                current += timedelta(days=1)
+        
+        return booked
+    
+    def get_unavailable_nights(self, start_date, end_date):
+        """
+        Get all nights that are unavailable (blocked OR booked).
+        """
+        blocked = self.get_blocked_nights(start_date, end_date)
+        booked = self.get_booked_nights(start_date, end_date)
+        return blocked.union(booked)
+    
+    def is_available_for_booking(self, check_in, check_out, exclude_booking_id=None):
+        """
+        Check if apartment is available for a booking from check_in to check_out.
+        
+        A booking occupies the nights: check_in, check_in+1, ..., check_out-1
+        So we need to check if any of those nights are blocked or booked.
+        """
+        from datetime import timedelta
+        
+        if check_out <= check_in:
+            return False, "Check-out must be after check-in"
+        
+        # Check each night from check_in to check_out-1
+        current = check_in
+        while current < check_out:
+            # Check if this night is blocked
+            if self.availability.filter(date=current, is_available=False).exists():
+                return False, f"Night of {current} is blocked"
+            
+            # Check if this night is already booked
+            conflicting = self.bookings.filter(
+                status__in=['CONFIRMED', 'PENDING'],
+                check_in__lte=current,
+                check_out__gt=current
+            )
+            if exclude_booking_id:
+                conflicting = conflicting.exclude(pk=exclude_booking_id)
+            
+            if conflicting.exists():
+                return False, f"Night of {current} is already booked"
+            
+            current += timedelta(days=1)
+        
+        return True, "Available"
+    
+    def get_calendar_data(self, start_date, end_date):
+        """
+        Get calendar data for displaying availability.
+        
+        Returns dict with:
+        - blocked_nights: dates where nights are blocked (cannot check-in on these dates)
+        - booked_nights: dates where nights are booked (cannot check-in on these dates)
+        - unavailable_for_checkin: all dates where you cannot start a stay
+        - unavailable_for_checkout: all dates where you cannot end a stay
+        """
+        from datetime import timedelta
+        
+        blocked_nights = self.get_blocked_nights(start_date, end_date)
+        booked_nights = self.get_booked_nights(start_date, end_date)
+        unavailable_nights = blocked_nights.union(booked_nights)
+        
+        # Cannot check-in on any date where that night is unavailable
+        unavailable_for_checkin = unavailable_nights.copy()
+        
+        # Cannot check-out on a date if ANY previous night (back to some check-in) is unavailable
+        # This is complex - we need to determine which checkout dates are valid
+        # A checkout date D is INVALID if there's no valid check-in date before it
+        # that doesn't cross an unavailable night
+        
+        # Simple rule: A date D cannot be a checkout if:
+        # 1. The night before D (date D-1) is unavailable
+        # This handles the basic case - you can only checkout on D if you stayed night D-1
+        unavailable_for_checkout = set()
+        
+        current = start_date
+        while current <= end_date:
+            prev_night = current - timedelta(days=1)
+            if prev_night in unavailable_nights:
+                unavailable_for_checkout.add(current)
+            current += timedelta(days=1)
+        
+        return {
+            'blocked_nights': sorted([d.isoformat() for d in blocked_nights]),
+            'booked_nights': sorted([d.isoformat() for d in booked_nights]),
+            'unavailable_for_checkin': sorted([d.isoformat() for d in unavailable_for_checkin]),
+            'unavailable_for_checkout': sorted([d.isoformat() for d in unavailable_for_checkout]),
+        }
 
 
 class ApartmentImage(models.Model):
