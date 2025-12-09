@@ -7,9 +7,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.utils.translation import gettext as _
 from django.urls import reverse_lazy, reverse
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Max
 from datetime import date, timedelta
 from decimal import Decimal
+import json
 
 from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Conversation, Message
 from .forms import (
@@ -81,8 +82,6 @@ class ApartmentListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['cities'] = Apartment.objects.filter(is_active=True).values_list('city', flat=True).distinct()
-        context['countries'] = Apartment.objects.filter(is_active=True).values_list('country', flat=True).distinct()
         # Pass guest filter value to template for pricing display
         guests = self.request.GET.get('guests')
         filtered_guests = int(guests) if guests and guests.isdigit() else 1
@@ -401,27 +400,92 @@ class StaffApartmentDeleteView(StaffRequiredMixin, DeleteView):
 
 
 @staff_member_required
+@staff_member_required
 def staff_apartment_images(request, pk):
-    """Staff view: manage apartment images."""
+    """Staff view: manage apartment images with drag-and-drop upload."""
     apartment = get_object_or_404(Apartment, pk=pk)
     
     if request.method == 'POST':
-        form = ApartmentImageForm(request.POST, request.FILES)
-        if form.is_valid():
-            image = form.save(commit=False)
-            image.apartment = apartment
-            image.save()
-            messages.success(request, _('Image uploaded successfully!'))
+        # Handle multiple image upload via AJAX
+        images_files = request.FILES.getlist('images')
+        if images_files:
+            uploaded_count = 0
+            errors = []
+            
+            # Get current max order
+            from django.db.models import Max
+            max_order_result = apartment.images.aggregate(Max('order'))['order__max']
+            max_order = max_order_result if max_order_result is not None else -1
+            
+            for uploaded_file in images_files:
+                try:
+                    max_order += 1
+                    image = ApartmentImage.objects.create(
+                        apartment=apartment,
+                        image=uploaded_file,
+                        order=max_order,
+                        is_main=False  # Will be set by reordering
+                    )
+                    uploaded_count += 1
+                except Exception as e:
+                    errors.append(str(e))
+            
+            # Set first image as main if no main image exists
+            if not apartment.images.filter(is_main=True).exists():
+                first_image = apartment.images.order_by('order').first()
+                if first_image:
+                    first_image.is_main = True
+                    first_image.save()
+            
+            # Check if AJAX request
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': uploaded_count > 0,
+                    'uploaded': uploaded_count,
+                    'errors': errors
+                })
+            
+            # Regular form submission
+            if uploaded_count > 0:
+                messages.success(request, _(f'{uploaded_count} image(s) uploaded successfully!'))
+            if errors:
+                messages.warning(request, _('Some images failed to upload.'))
+            
             return redirect('staff_apartment_images', pk=pk)
-    else:
-        form = ApartmentImageForm()
     
-    images = apartment.images.all()
+    images = apartment.images.all().order_by('order')
     return render(request, 'staff/apartment_images.html', {
         'apartment': apartment,
         'images': images,
-        'form': form,
     })
+
+
+@staff_member_required
+def staff_reorder_images(request, pk):
+    """Staff view: handle image reordering via AJAX."""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'})
+    
+    apartment = get_object_or_404(Apartment, pk=pk)
+    
+    try:
+        import json
+        data = json.loads(request.body)
+        order = data.get('order', [])
+        
+        # Update order and set main image
+        for index, image_id in enumerate(order):
+            try:
+                image = ApartmentImage.objects.get(pk=image_id, apartment=apartment)
+                image.order = index
+                image.is_main = (index == 0)  # First image is main
+                image.save()
+            except ApartmentImage.DoesNotExist:
+                pass
+        
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 
 @staff_member_required

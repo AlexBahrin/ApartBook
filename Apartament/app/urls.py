@@ -33,6 +33,7 @@ urlpatterns = [
     path('staff/apartments/<int:pk>/edit/', views.StaffApartmentUpdateView.as_view(), name='staff_apartment_edit'),
     path('staff/apartments/<int:pk>/delete/', views.StaffApartmentDeleteView.as_view(), name='staff_apartment_delete'),
     path('staff/apartments/<int:pk>/images/', views.staff_apartment_images, name='staff_apartment_images'),
+    path('staff/apartments/<int:pk>/images/reorder/', views.staff_reorder_images, name='staff_reorder_images'),
     path('staff/images/<int:pk>/delete/', views.staff_delete_image, name='staff_delete_image'),
     
     # Availability & Pricing
