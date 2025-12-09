@@ -1,0 +1,209 @@
+{% extends 'staff/base_staff.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Calendar" %} - {% trans "Staff Dashboard" %}{% endblock %}
+
+{% block extra_css %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+<style>
+    #calendar {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    .fc-event {
+        cursor: pointer;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-right: 1.5rem;
+    }
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+    }
+    .apartment-filter {
+        margin-bottom: 1rem;
+    }
+    .apartment-chip {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        margin: 0.25rem;
+        border-radius: 1rem;
+        background-color: #e9ecef;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .apartment-chip:hover {
+        background-color: #dee2e6;
+    }
+    .apartment-chip.active {
+        background-color: var(--bs-primary);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block staff_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-calendar3"></i> {% trans "Calendar Overview" %}</h2>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <h5 class="mb-0">{% trans "All Bookings" %}</h5>
+            <div class="d-flex align-items-center flex-wrap">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #198754;"></div>
+                    <small>{% trans "Confirmed" %}</small>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffc107;"></div>
+                    <small>{% trans "Pending" %}</small>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #dc3545;"></div>
+                    <small>{% trans "Blocked" %}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Apartment Filter -->
+        <div class="apartment-filter mb-3">
+            <h6 class="mb-2">{% trans "Filter by Apartment" %}:</h6>
+            <div id="apartmentFilters">
+                <span class="apartment-chip active" data-apartment="all">
+                    <i class="bi bi-check-circle-fill"></i> {% trans "All Apartments" %}
+                </span>
+                {% for apartment in apartments %}
+                <span class="apartment-chip" data-apartment="{{ apartment.pk }}">
+                    {{ apartment.title }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Calendar -->
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> {% trans "Quick Stats" %}</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h3 class="text-primary" id="totalBookings">-</h3>
+                        <p class="text-muted mb-0">{% trans "Total Bookings" %}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-success" id="confirmedBookings">-</h3>
+                        <p class="text-muted mb-0">{% trans "Confirmed" %}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-warning" id="pendingBookings">-</h3>
+                        <p class="text-muted mb-0">{% trans "Pending" %}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-info" id="totalApartments">{{ apartments.count }}</h3>
+                        <p class="text-muted mb-0">{% trans "Apartments" %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        let allEvents = [];
+        let selectedApartment = 'all';
+        
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            events: function(info, successCallback, failureCallback) {
+                fetch('{% url "staff_global_calendar_events" %}')
+                    .then(response => response.json())
+                    .then(data => {
+                        allEvents = data;
+                        updateStats(data);
+                        const filteredEvents = filterEvents(data, selectedApartment);
+                        successCallback(filteredEvents);
+                    })
+                    .catch(error => {
+                        console.error('Error loading events:', error);
+                        failureCallback(error);
+                    });
+            },
+            eventClick: function(info) {
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                    info.jsEvent.preventDefault();
+                }
+            },
+            eventDidMount: function(info) {
+                // Add tooltip
+                const apartment = info.event.extendedProps.apartment;
+                if (apartment) {
+                    info.el.setAttribute('title', apartment);
+                }
+            }
+        });
+        
+        calendar.render();
+        
+        // Apartment filter functionality
+        const filterChips = document.querySelectorAll('.apartment-chip');
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                // Update active state
+                filterChips.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update selected apartment
+                selectedApartment = this.dataset.apartment;
+                
+                // Refetch events with filter
+                calendar.refetchEvents();
+            });
+        });
+        
+        function filterEvents(events, apartmentId) {
+            if (apartmentId === 'all') {
+                return events;
+            }
+            return events.filter(event => {
+                return event.extendedProps && 
+                       event.extendedProps.apartmentId == apartmentId;
+            });
+        }
+        
+        function updateStats(events) {
+            const bookingEvents = events.filter(e => e.extendedProps && e.extendedProps.type === 'booking');
+            const confirmed = bookingEvents.filter(e => e.extendedProps.status === 'CONFIRMED');
+            const pending = bookingEvents.filter(e => e.extendedProps.status === 'PENDING');
+            
+            document.getElementById('totalBookings').textContent = bookingEvents.length;
+            document.getElementById('confirmedBookings').textContent = confirmed.length;
+            document.getElementById('pendingBookings').textContent = pending.length;
+        }
+    });
+</script>
+{% endblock %}

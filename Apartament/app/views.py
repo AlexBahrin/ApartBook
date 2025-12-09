@@ -672,6 +672,65 @@ def staff_calendar_events_api(request, pk):
 
 
 @staff_member_required
+def staff_global_calendar(request):
+    """Staff view: global calendar showing all apartments' bookings."""
+    apartments = Apartment.objects.all().order_by('title')
+    return render(request, 'staff/global_calendar.html', {
+        'apartments': apartments,
+    })
+
+
+@staff_member_required
+def staff_global_calendar_events_api(request):
+    """API endpoint for global calendar events across all apartments."""
+    events = []
+    
+    # Get all confirmed and pending bookings
+    bookings = Booking.objects.filter(
+        status__in=['PENDING', 'CONFIRMED']
+    ).select_related('apartment', 'user')
+    
+    for booking in bookings:
+        color = '#198754' if booking.status == 'CONFIRMED' else '#ffc107'
+        events.append({
+            'id': f'booking-{booking.pk}',
+            'title': f'{booking.apartment.title} - {booking.user.username} ({booking.guests_count} guests)',
+            'start': booking.check_in.isoformat(),
+            'end': booking.check_out.isoformat(),
+            'color': color,
+            'url': f'/en/staff/bookings/{booking.pk}/',
+            'extendedProps': {
+                'type': 'booking',
+                'status': booking.status,
+                'apartment': booking.apartment.title,
+                'apartmentId': booking.apartment.pk,
+            }
+        })
+    
+    # Get all blocked dates
+    blocked_dates = Availability.objects.filter(
+        is_available=False
+    ).select_related('apartment')
+    
+    for blocked in blocked_dates:
+        events.append({
+            'id': f'blocked-{blocked.pk}',
+            'title': f'{blocked.apartment.title} - {blocked.note or "Blocked"}',
+            'start': blocked.date.isoformat(),
+            'end': blocked.date.isoformat(),
+            'color': '#dc3545',
+            'display': 'background',
+            'extendedProps': {
+                'type': 'blocked',
+                'apartment': blocked.apartment.title,
+                'apartmentId': blocked.apartment.pk,
+            }
+        })
+    
+    return JsonResponse(events, safe=False)
+
+
+@staff_member_required
 def staff_pricing_rules(request, pk):
     """Staff view: manage pricing rules."""
     apartment = get_object_or_404(Apartment, pk=pk)

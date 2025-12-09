@@ -26,6 +26,10 @@ urlpatterns = [
     # ==========================================================================
     # STAFF DASHBOARD URLS
     # ==========================================================================
+    # Calendar
+    path('staff/calendar/', views.staff_global_calendar, name='staff_calendar'),
+    path('api/staff/calendar-events/', views.staff_global_calendar_events_api, name='staff_global_calendar_events'),
+    
     # Apartments management
     path('staff/', views.StaffBookingsListView.as_view(), name='staff_dashboard'),
     path('staff/apartments/', views.StaffApartmentListView.as_view(), name='staff_apartments'),
