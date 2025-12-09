@@ -125,9 +125,18 @@
         <div class="col-lg-4">
             <div class="card shadow-sm sticky-top" style="top: 100px;">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <span class="price-tag fs-4">{% price apartment.base_price_per_night %}</span>
-                        <span class="text-muted">/ {% trans "night" %}</span>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-baseline">
+                            <span class="price-tag fs-4" id="displayedPrice">{% price apartment.get_display_price %}</span>
+                            <small class="text-muted">/ {% trans "night" %}</small>
+                        </div>
+                        <small class="text-muted d-block mt-1" id="pricingTypeLabel">
+                            {% if apartment.pricing_type == 'GUEST' %}
+                                {% trans "Price varies by number of guests" %}
+                            {% else %}
+                                {% trans "Fixed price for the entire apartment" %}
+                            {% endif %}
+                        </small>
                     </div>
                     
                     {% if user.is_authenticated and not user.is_staff %}
@@ -213,7 +222,8 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     const unavailableDates = {{ unavailable_dates|safe }};
-    const basePrice = parseFloat("{{ apartment.base_price_per_night }}".replace(',', '.'));
+    const pricingType = "{{ apartment.pricing_type }}";
+    const basePrice = parseFloat("{{ apartment.get_display_price }}".replace(',', '.'));
     const apartmentSlug = "{{ apartment.slug }}";
     const currencySymbol = "{{ currency_symbol }}";
     const currencyRate = parseFloat("{{ currency_rate }}".replace(',', '.'));
@@ -230,6 +240,29 @@
         } else {
             return currencySymbol + converted.toFixed(2);
         }
+    }
+    
+    // Update displayed price per night when guest count changes (for GUEST pricing type)
+    function updateDisplayedPrice() {
+        if (pricingType !== 'GUEST') return; // Only update for guest-based pricing
+        
+        const guestsInput = document.getElementById('id_guests_count');
+        const guestsCount = guestsInput ? parseInt(guestsInput.value) || 1 : 1;
+        const displayedPriceElement = document.getElementById('displayedPrice');
+        
+        if (!displayedPriceElement) return;
+        
+        // Fetch the price for this guest count from API (no dates needed, just guest count)
+        fetch(`/api/apartments/${apartmentSlug}/price/?check_in=2025-01-01&check_out=2025-01-02&guests_count=${guestsCount}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.error && data.base_price_per_night) {
+                    displayedPriceElement.textContent = formatPrice(data.base_price_per_night);
+                }
+            })
+            .catch(err => {
+                console.log('Error fetching guest price:', err);
+            });
     }
     
     // Initialize location map if coordinates exist
@@ -362,8 +395,12 @@
         if (guestsInput) {
             guestsInput.addEventListener('change', function(e) {
                 console.log('Guest count changed:', e.target.value);
-                updatePriceBreakdown();
+                updateDisplayedPrice(); // Update the displayed price per night
+                updatePriceBreakdown(); // Update the total breakdown
             });
+            
+            // Also update on page load if guest pricing
+            updateDisplayedPrice();
         }
         
         console.log('Flatpickr initialized');

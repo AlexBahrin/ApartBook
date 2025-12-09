@@ -22,6 +22,13 @@
                 <form method="post">
                     {% csrf_token %}
                     
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>{% trans "Please correct the errors below:" %}</strong>
+                            {{ form.errors }}
+                        </div>
+                    {% endif %}
+                    
                     <div class="mb-3">
                         <label class="form-label">{% trans "Title" %}</label>
                         {{ form.title }}
@@ -35,33 +42,9 @@
                         {{ form.description }}
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">{% trans "Address" %}</label>
-                            {{ form.address }}
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">{% trans "City" %}</label>
-                            {{ form.city }}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">{% trans "Country" %}</label>
-                            {{ form.country }}
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Latitude (optional)</label>
-                            {{ form.latitude }}
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Longitude (optional)</label>
-                            {{ form.longitude }}
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Address" %}</label>
+                        {{ form.address }}
                     </div>
                     
                     <hr>
@@ -204,10 +187,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (selectedType === 'GUEST') {
             apartmentPriceSection.style.display = 'none';
+            // Set a placeholder value so form validation passes
+            basePriceInput.value = '1.00';
             guestPriceSection.style.display = 'block';
             generateGuestPriceInputs();
         } else {
             apartmentPriceSection.style.display = 'block';
+            // Clear the placeholder if switching back to apartment pricing
+            if (basePriceInput.value === '1.00') {
+                basePriceInput.value = '';
+            }
             guestPriceSection.style.display = 'none';
         }
     }

@@ -10,7 +10,7 @@ Build a Booking-style platform for a single owner where guests can browse apartm
 
 ### 1.1 User Roles
 - **Guest**: Default `User` (can browse, book, review, message)
-- **Admin/Owner**: `User` with `is_staff=True` (can manage everything)
+- **Admin/Owner**: `User` with `is_staff=True` (can manage everything, cannot create bookings)
 
 ### 1.2 Core Models
 
@@ -88,18 +88,6 @@ Build a Booking-style platform for a single owner where guests can browse apartm
 | | `created_at` |
 
 > One conversation per booking (guest ↔ admin).
-
-#### Review
-| Field | Type | Notes |
-|-------|------|-------|
-| `booking` | OneToOneField | 1 review per booking |
-| `user` | ForeignKey | |
-| `apartment` | ForeignKey | |
-| `rating` | PositiveIntegerField | 1–5 |
-| `comment` | TextField | |
-| `created_at` | DateTimeField | |
-
-> User can review only if `booking.status == COMPLETED`.
 
 ---
 
@@ -209,7 +197,6 @@ templates/
 | `AvailabilityForm` | date, is_available, notes | |
 | `PricingRuleForm` | date range, rule_type, price | |
 | `MessageForm` | body | |
-| `ReviewForm` | rating, comment | Only for COMPLETED bookings |
 
 ---
 
@@ -218,26 +205,25 @@ templates/
 ### Phase 1: MVP ✅
 > Goal: Guest can browse, request booking; Admin can confirm.
 
-- [ ] **Models:** Apartment, ApartmentImage, Booking, Availability (basic)
-- [ ] **Public:** Apartment list & detail, booking request form
-- [ ] **User Dashboard:** My bookings list + detail
-- [ ] **Admin Dashboard:** Apartment CRUD, booking list (change status)
-- [ ] **Emails:** New booking → admin, status change → user
-- [ ] No payments, no reviews, no messaging (just "notes" field in booking)
+- [x] **Models:** Apartment, ApartmentImage, Booking, Availability (basic)
+- [x] **Public:** Apartment list & detail, booking request form
+- [x] **User Dashboard:** My bookings list + detail
+- [x] **Admin Dashboard:** Apartment CRUD, booking list (change status)
+- [x] **Emails:** New booking → admin, status change → user
+- No payments, no reviews, no messaging (just "notes" field in booking)
 
 ### Phase 2: v1 🚀
-> Goal: Complete product with messaging & reviews.
+> Goal: Complete product with messaging.
 
-- [ ] **Messaging:** Conversations tied to bookings
-- [ ] **Reviews:** Users review after COMPLETED stays
-- [ ] **Availability UI:** Better calendar (flatpickr for guests, FullCalendar for admin)
-- [ ] **Pricing Rules:** Seasonal/weekend pricing in price calculation
+- [x] **Messaging:** Conversations tied to bookings
+- [x] **Availability UI:** Better calendar (flatpickr for guests, FullCalendar for admin)
+- [x] **Pricing Rules:** Seasonal/weekend pricing in price calculation
 
 ### Phase 3: Nice-to-Have 🌟
 - [ ] **Payments:** Stripe Checkout integration
 - [ ] **Real-time Chat:** Django Channels WebSocket
-- [ ] **Map View:** Apartments on map (Leaflet/Google Maps)
-- [ ] **Discount Codes:** Promo system
+- [x] **Map View:** Apartments on map (Leaflet.js)
+- [x] **Discount Codes:** Promo system with percentage/fixed discounts
 - [ ] **Multi-language/currency:** i18n support
 
 ---

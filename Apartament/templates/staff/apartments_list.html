@@ -45,7 +45,13 @@
                         </td>
                         <td>{{ apartment.city }}, {{ apartment.country }}</td>
                         <td>{{ apartment.capacity }}</td>
-                        <td>{% price apartment.base_price_per_night %}</td>
+                        <td>
+                            {% if apartment.pricing_type == 'GUEST' %}
+                                {% price apartment.get_display_price %} <small class="text-muted">(1 guest)</small>
+                            {% else %}
+                                {% price apartment.get_display_price %}
+                            {% endif %}
+                        </td>
                         <td>
                             {% if apartment.is_active %}
                                 <span class="badge bg-success">Active</span>
@@ -69,6 +75,9 @@
                                 </a>
                                 <a href="{% url 'staff_pricing_rules' apartment.pk %}" class="btn btn-outline-warning" title="Pricing">
                                     <i class="bi bi-currency-euro"></i>
+                                </a>
+                                <a href="{% url 'staff_apartment_delete' apartment.pk %}" class="btn btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
                                 </a>
                             </div>
                         </td>

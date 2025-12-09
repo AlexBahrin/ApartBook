@@ -80,6 +80,13 @@ class Apartment(models.Model):
                 return Decimal(str(self.price_per_guest[guest_count_str]))
             # Fallback to base price for 1 guest, multiply by guest count
             return self.base_price_per_night * guest_count
+    
+    def get_display_price(self):
+        """Get the price to display in listings (for 1 guest if guest-based pricing)."""
+        if self.pricing_type == 'APARTMENT':
+            return self.base_price_per_night
+        else:  # GUEST pricing - show price for 1 guest
+            return self.get_price_for_guests(1)
 
 
 class ApartmentImage(models.Model):

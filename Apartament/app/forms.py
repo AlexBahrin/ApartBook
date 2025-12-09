@@ -103,18 +103,13 @@ class ApartmentForm(forms.ModelForm):
     class Meta:
         model = Apartment
         fields = [
-            'title', 'description', 'address', 'city', 'country',
-            'latitude', 'longitude', 'capacity', 'bedrooms', 'bathrooms',
+            'title', 'description', 'address', 'capacity', 'bedrooms', 'bathrooms',
             'amenities', 'pricing_type', 'base_price_per_night', 'price_per_guest', 'is_active'
         ]
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'address': forms.TextInput(attrs={'class': 'form-control'}),
-            'city': forms.TextInput(attrs={'class': 'form-control'}),
-            'country': forms.TextInput(attrs={'class': 'form-control'}),
-            'latitude': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.000001'}),
-            'longitude': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.000001'}),
             'capacity': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
             'bedrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
             'bathrooms': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
@@ -140,6 +135,34 @@ class ApartmentForm(forms.ModelForm):
         if not amenities_str:
             return []
         return [a.strip() for a in amenities_str.split(',') if a.strip()]
+    
+    def clean(self):
+        """Validate pricing configuration."""
+        cleaned_data = super().clean()
+        pricing_type = cleaned_data.get('pricing_type')
+        base_price = cleaned_data.get('base_price_per_night')
+        price_per_guest = cleaned_data.get('price_per_guest')
+        
+        if pricing_type == 'GUEST':
+            # For guest pricing, validate that we have guest prices
+            if not price_per_guest or price_per_guest == {}:
+                raise ValidationError('Please set prices for each guest count when using per-guest pricing.')
+            # Set a minimal base price (required by model but not used for GUEST pricing)
+            if not base_price or base_price <= 0:
+                # Get the price for 1 guest from price_per_guest
+                if price_per_guest and '1' in price_per_guest:
+                    from decimal import Decimal
+                    cleaned_data['base_price_per_night'] = Decimal(str(price_per_guest['1']))
+                else:
+                    cleaned_data['base_price_per_night'] = Decimal('1.00')
+        else:
+            # For apartment pricing, ensure base price is set
+            if not base_price or base_price <= 0:
+                raise ValidationError('Please set a base price per night.')
+            # Clear guest prices for apartment pricing
+            cleaned_data['price_per_guest'] = {}
+        
+        return cleaned_data
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
