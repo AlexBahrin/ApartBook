@@ -158,10 +158,14 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center mt-3">
                                         <span class="price-tag">
-                                            {% price apartment.get_display_price %}
-                                            {% if apartment.pricing_type == 'GUEST' %}
-                                                <small class="text-muted">/{% trans "night" %} (1 guest)</small>
+                                            {% if apartment.pricing_type == 'GUEST' and filtered_guests > 1 %}
+                                                {% price apartment.display_price_for_filter %}
+                                                <small class="text-muted">/{% trans "night" %} ({{ filtered_guests }} {% trans "guests" %})</small>
+                                            {% elif apartment.pricing_type == 'GUEST' %}
+                                                {% price apartment.get_display_price %}
+                                                <small class="text-muted">/{% trans "night" %} (1 {% trans "guest" %})</small>
                                             {% else %}
+                                                {% price apartment.get_display_price %}
                                                 /{% trans "night" %}
                                             {% endif %}
                                         </span>
@@ -236,6 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let map = null;
     let markers = [];
+    const filteredGuests = {{ filtered_guests|default:1 }};
     
     // Apartment data for map
     const apartments = [
@@ -245,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
             title: "{{ apartment.title|escapejs }}",
             slug: "{{ apartment.slug }}",
             city: "{{ apartment.city|escapejs }}",
-            price: "{{ apartment.get_display_price }}",
+            price: "{% if apartment.display_price_for_filter %}{{ apartment.display_price_for_filter }}{% else %}{{ apartment.get_display_price }}{% endif %}",
             pricingType: "{{ apartment.pricing_type }}",
             image: "{% if apartment.get_main_image %}{{ apartment.get_main_image.image.url }}{% else %}https://via.placeholder.com/200x100?text=No+Image{% endif %}",
             lat: {{ apartment.latitude|default:'null' }},
@@ -280,9 +285,14 @@ document.addEventListener('DOMContentLoaded', function() {
         validApartments.forEach(apartment => {
             const marker = L.marker([apartment.lat, apartment.lng]).addTo(map);
             
-            const priceLabel = apartment.pricingType === 'GUEST' 
-                ? `{{ currency_symbol }}${apartment.price}/night (1 guest)` 
-                : `{{ currency_symbol }}${apartment.price}/night`;
+            let priceLabel;
+            if (apartment.pricingType === 'GUEST' && filteredGuests > 1) {
+                priceLabel = `{{ currency_symbol }}${apartment.price}/night (${filteredGuests} guests)`;
+            } else if (apartment.pricingType === 'GUEST') {
+                priceLabel = `{{ currency_symbol }}${apartment.price}/night (1 guest)`;
+            } else {
+                priceLabel = `{{ currency_symbol }}${apartment.price}/night`;
+            }
             
             const popupContent = `
                 <div class="apartment-popup">

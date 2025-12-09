@@ -83,6 +83,17 @@ class ApartmentListView(ListView):
         context = super().get_context_data(**kwargs)
         context['cities'] = Apartment.objects.filter(is_active=True).values_list('city', flat=True).distinct()
         context['countries'] = Apartment.objects.filter(is_active=True).values_list('country', flat=True).distinct()
+        # Pass guest filter value to template for pricing display
+        guests = self.request.GET.get('guests')
+        filtered_guests = int(guests) if guests and guests.isdigit() else 1
+        context['filtered_guests'] = filtered_guests
+        
+        # Add price for filtered guest count to each apartment
+        apartments = context['apartments']
+        for apartment in apartments:
+            apartment.display_price_for_filter = apartment.get_price_for_guests(filtered_guests)
+        
+        return context
         return context
 
 
