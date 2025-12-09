@@ -1,32 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'authentication/base_auth.html' %}
+{% load i18n %}
 
-<p>Register Page</p>
+{% block title %}{% trans "Create Account" %} - ApartBook{% endblock %}
 
-{% if messages %}
-<ul class="messages">
-  {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
+{% block content %}
+<div class="auth-card">
+    <div class="auth-header">
+        <a href="{% url 'landing' %}" class="auth-logo">
+            <i class="bi bi-house-heart-fill"></i> ApartBook
+        </a>
+        <h1 class="auth-title">{% trans "Create your account" %}</h1>
+        <p class="auth-subtitle">{% trans "Join us to book amazing apartments" %}</p>
+    </div>
+    
+    <div class="auth-body">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} mb-3">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username" class="form-label">{% trans "Username" %}</label>
+                <input type="text" name="username" id="id_username" class="form-control" 
+                       value="{{ form.username.value|default:'' }}"
+                       placeholder="{% trans 'Choose a username' %}" required autofocus>
+                {% if form.username.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.username.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_email" class="form-label">{% trans "Email address" %}</label>
+                <input type="email" name="email" id="id_email" class="form-control"
+                       value="{{ form.email.value|default:'' }}"
+                       placeholder="{% trans 'your@email.com' %}" required>
+                {% if form.email.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.email.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_first_name" class="form-label">{% trans "First name" %}</label>
+                        <input type="text" name="first_name" id="id_first_name" class="form-control"
+                               value="{{ form.first_name.value|default:'' }}"
+                               placeholder="{% trans 'John' %}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="id_last_name" class="form-label">{% trans "Last name" %}</label>
+                        <input type="text" name="last_name" id="id_last_name" class="form-control"
+                               value="{{ form.last_name.value|default:'' }}"
+                               placeholder="{% trans 'Doe' %}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password1" class="form-label">{% trans "Password" %}</label>
+                <div class="input-group-password">
+                    <input type="password" name="password1" id="id_password1" class="form-control" 
+                           placeholder="{% trans 'Create a strong password' %}" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('id_password1', this)">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                {% if form.password1.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.password1.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+                <div class="helptext">
+                    <small>{% trans "At least 8 characters with letters and numbers" %}</small>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password2" class="form-label">{% trans "Confirm password" %}</label>
+                <div class="input-group-password">
+                    <input type="password" name="password2" id="id_password2" class="form-control" 
+                           placeholder="{% trans 'Repeat your password' %}" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('id_password2', this)">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                {% if form.password2.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.password2.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+            
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-2"></i>{% trans "Create Account" %}
+                </button>
+            </div>
+            
+            <p class="text-center mt-3 mb-0" style="font-size: 0.8rem; color: var(--text-secondary);">
+                {% trans "By signing up, you agree to our" %}
+                <a href="#" style="color: var(--primary-color);">{% trans "Terms of Service" %}</a>
+                {% trans "and" %}
+                <a href="#" style="color: var(--primary-color);">{% trans "Privacy Policy" %}</a>
+            </p>
+        </form>
+    </div>
+    
+    <div class="auth-footer">
+        <p>{% trans "Already have an account?" %} <a href="{% url 'login' %}">{% trans "Sign in" %}</a></p>
+    </div>
+</div>
+{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form }}
-
-    <input type="submit" value="Submit">
-
-
-</form>
-
-<p>To login: <a href="{% url 'login' %}">Click Here</a></p>
-
-
-</body>
-</html>
+{% block extra_js %}
+<script>
+function togglePassword(inputId, button) {
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+</script>
+{% endblock %}

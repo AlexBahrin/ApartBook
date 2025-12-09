@@ -1,10 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'authentication/base_auth.html' %}
+{% load i18n %}
 
-</body>
-</html>
+{% block title %}{% trans "Verify Your Email" %} - ApartBook{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <div class="auth-header">
+        <a href="{% url 'landing' %}" class="auth-logo">
+            <i class="bi bi-house-heart-fill"></i> ApartBook
+        </a>
+        <div class="mt-3">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle" 
+                  style="width: 64px; height: 64px; background: #eff6ff;">
+                <i class="bi bi-envelope-paper" style="font-size: 1.75rem; color: #2563eb;"></i>
+            </span>
+        </div>
+        <h1 class="auth-title">{% trans "Verify your email" %}</h1>
+        <p class="auth-subtitle">{% trans "We've sent a verification link to your email address" %}</p>
+    </div>
+    
+    <div class="auth-body text-center">
+        <div class="alert alert-info" style="text-align: left;">
+            <strong>{% trans "What's next?" %}</strong>
+            <ol class="mb-0 mt-2 ps-3" style="font-size: 0.9rem;">
+                <li>{% trans "Check your email inbox" %}</li>
+                <li>{% trans "Click the verification link" %}</li>
+                <li>{% trans "Start booking amazing apartments!" %}</li>
+            </ol>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.85rem;">
+            {% trans "Didn't receive the email? Check your spam folder." %}
+        </p>
+    </div>
+    
+    <div class="auth-footer">
+        <p><a href="{% url 'login' %}"><i class="bi bi-arrow-left me-1"></i>{% trans "Back to sign in" %}</a></p>
+    </div>
+</div>
+{% endblock %}
