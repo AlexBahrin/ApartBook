@@ -46,6 +46,26 @@ class ApartmentListView(ListView):
     def get_queryset(self):
         queryset = Apartment.objects.filter(is_active=True)
         
+        # Filter by availability dates
+        check_in = self.request.GET.get('check_in')
+        check_out = self.request.GET.get('check_out')
+        if check_in and check_out:
+            try:
+                from datetime import datetime
+                check_in_date = datetime.strptime(check_in, '%Y-%m-%d').date()
+                check_out_date = datetime.strptime(check_out, '%Y-%m-%d').date()
+                
+                # Filter to only available apartments
+                available_apartment_ids = []
+                for apartment in queryset:
+                    is_available, _ = apartment.is_available_for_booking(check_in_date, check_out_date)
+                    if is_available:
+                        available_apartment_ids.append(apartment.pk)
+                
+                queryset = queryset.filter(pk__in=available_apartment_ids)
+            except ValueError:
+                pass
+        
         # Filter by city
         city = self.request.GET.get('city')
         if city:
