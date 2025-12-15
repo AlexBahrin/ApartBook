@@ -61,9 +61,9 @@ def format_price(value, currency_code=None):
     value = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     
     # Format based on currency
-    if currency_code in ['EUR', 'GBP', 'CHF', 'USD']:
+    if currency_code in ['EUR', 'GBP', 'USD']:
         return f"{symbol}{value}"
-    elif currency_code == 'RON':
+    elif currency_code in ['RON', 'UAH']:
         return f"{value} {symbol}"
     else:
         return f"{symbol}{value}"

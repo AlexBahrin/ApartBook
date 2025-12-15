@@ -1,10 +1,37 @@
 """
-Celery tasks for iCal synchronization.
+Celery tasks for iCal synchronization and booking management.
 """
 import logging
+from datetime import date
 from celery import shared_task
 
 logger = logging.getLogger(__name__)
+
+
+@shared_task
+def auto_complete_bookings():
+    """
+    Automatically mark bookings as completed when check-out date has passed.
+    This task runs daily at 11:00 AM (GMT+2) / 09:00 UTC.
+    """
+    from app.models import Booking
+    
+    today = date.today()
+    
+    # Find all confirmed bookings where check-out date is before today
+    bookings_to_complete = Booking.objects.filter(
+        status='CONFIRMED',
+        check_out__lt=today
+    )
+    
+    count = bookings_to_complete.count()
+    if count > 0:
+        bookings_to_complete.update(status='COMPLETED')
+        logger.info(f"Auto-completed {count} bookings")
+    else:
+        logger.info("No bookings to auto-complete")
+    
+    return f"Completed {count} bookings"
 
 
 @shared_task

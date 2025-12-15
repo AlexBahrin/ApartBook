@@ -35,13 +35,20 @@
         background-color: #e9ecef;
         cursor: pointer;
         transition: all 0.2s;
+        text-decoration: none;
+        color: #333;
     }
     .apartment-chip:hover {
-        background-color: #dee2e6;
+        background-color: #0d6efd;
+        color: white;
+        text-decoration: none;
     }
     .apartment-chip.active {
         background-color: var(--bs-primary);
         color: white;
+    }
+    .apartment-chip i {
+        margin-right: 0.25rem;
     }
 </style>
 {% endblock %}
@@ -74,17 +81,20 @@
     <div class="card-body">
         <!-- Apartment Filter -->
         <div class="apartment-filter mb-3">
-            <h6 class="mb-2">{% trans "Filter by Apartment" %}:</h6>
+            <h6 class="mb-2">{% trans "Select Apartment" %}:</h6>
             <div id="apartmentFilters">
                 <span class="apartment-chip active" data-apartment="all">
-                    <i class="bi bi-check-circle-fill"></i> {% trans "All Apartments" %}
+                    <i class="bi bi-grid-3x3-gap-fill"></i> {% trans "All Apartments" %}
                 </span>
                 {% for apartment in apartments %}
-                <span class="apartment-chip" data-apartment="{{ apartment.pk }}">
-                    {{ apartment.title }}
-                </span>
+                <a href="{% url 'staff_calendar' apartment.pk %}" class="apartment-chip" data-apartment="{{ apartment.pk }}">
+                    <i class="bi bi-house"></i> {{ apartment.title }}
+                </a>
                 {% endfor %}
             </div>
+            <small class="text-muted mt-2 d-block">
+                <i class="bi bi-info-circle"></i> {% trans "Click on an apartment to view its detailed calendar" %}
+            </small>
         </div>
         
         <!-- Calendar -->
@@ -129,14 +139,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');
         let allEvents = [];
-        let selectedApartment = 'all';
         
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
+            initialView: 'listMonth',
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,listMonth'
+                right: ''
             },
             events: function(info, successCallback, failureCallback) {
                 fetch('{% url "staff_global_calendar_events" %}')
@@ -144,8 +153,7 @@
                     .then(data => {
                         allEvents = data;
                         updateStats(data);
-                        const filteredEvents = filterEvents(data, selectedApartment);
-                        successCallback(filteredEvents);
+                        successCallback(data);
                     })
                     .catch(error => {
                         console.error('Error loading events:', error);
@@ -164,45 +172,40 @@
                 if (apartment) {
                     info.el.setAttribute('title', apartment);
                 }
+                
+                // Replace "all-day" text with day type (Check-in, Stay-over, Check-out)
+                const dayType = info.event.extendedProps.dayType;
+                if (dayType) {
+                    const timeEl = info.el.querySelector('.fc-list-event-time');
+                    if (timeEl) {
+                        timeEl.textContent = dayType;
+                    }
+                }
             }
         });
         
         calendar.render();
         
-        // Apartment filter functionality
-        const filterChips = document.querySelectorAll('.apartment-chip');
-        filterChips.forEach(chip => {
-            chip.addEventListener('click', function() {
-                // Update active state
-                filterChips.forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Update selected apartment
-                selectedApartment = this.dataset.apartment;
-                
-                // Refetch events with filter
-                calendar.refetchEvents();
-            });
-        });
-        
-        function filterEvents(events, apartmentId) {
-            if (apartmentId === 'all') {
-                return events;
-            }
-            return events.filter(event => {
-                return event.extendedProps && 
-                       event.extendedProps.apartmentId == apartmentId;
-            });
-        }
-        
         function updateStats(events) {
             const bookingEvents = events.filter(e => e.extendedProps && e.extendedProps.type === 'booking');
-            const confirmed = bookingEvents.filter(e => e.extendedProps.status === 'CONFIRMED');
-            const pending = bookingEvents.filter(e => e.extendedProps.status === 'PENDING');
+            // Count unique bookings by extracting booking ID
+            const uniqueBookingIds = new Set();
+            const confirmedIds = new Set();
+            const pendingIds = new Set();
             
-            document.getElementById('totalBookings').textContent = bookingEvents.length;
-            document.getElementById('confirmedBookings').textContent = confirmed.length;
-            document.getElementById('pendingBookings').textContent = pending.length;
+            bookingEvents.forEach(e => {
+                const bookingId = e.id.split('-')[1];
+                uniqueBookingIds.add(bookingId);
+                if (e.extendedProps.status === 'CONFIRMED') {
+                    confirmedIds.add(bookingId);
+                } else if (e.extendedProps.status === 'PENDING') {
+                    pendingIds.add(bookingId);
+                }
+            });
+            
+            document.getElementById('totalBookings').textContent = uniqueBookingIds.size;
+            document.getElementById('confirmedBookings').textContent = confirmedIds.size;
+            document.getElementById('pendingBookings').textContent = pendingIds.size;
         }
     });
 </script>

@@ -67,6 +67,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',  # For i18n template tags
                 'app.context_processors.currency_context',  # Custom currency context
+                'app.context_processors.staff_unread_messages',  # Staff unread messages
+                'app.context_processors.user_unread_messages',  # User unread messages
             ],
         },
     },
@@ -150,7 +152,7 @@ CURRENCIES = {
     'EUR': {'symbol': '€', 'name': 'Euro', 'rate': 1/5.10},
     'USD': {'symbol': '$', 'name': 'US Dollar', 'rate': 1/5.50},
     'GBP': {'symbol': '£', 'name': 'British Pound', 'rate': 1/6.20},
-    'CHF': {'symbol': 'CHF', 'name': 'Swiss Franc', 'rate': 1/5.35},
+    'UAH': {'symbol': '₴', 'name': 'Ukrainian Hryvnia', 'rate': 1/0.12},
 }
 DEFAULT_CURRENCY = 'RON'
 
@@ -193,10 +195,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
-# Celery Beat Schedule - runs iCal sync every minute
+# Celery Beat Schedule
+from celery.schedules import crontab
+
 CELERY_BEAT_SCHEDULE = {
     'sync-ical-feeds-every-minute': {
         'task': 'app.tasks.sync_all_ical_feeds',
         'schedule': 60.0,  # every 60 seconds
+    },
+    'auto-complete-bookings-daily': {
+        'task': 'app.tasks.auto_complete_bookings',
+        'schedule': crontab(hour=9, minute=0),  # 09:00 UTC = 11:00 GMT+2
     },
 }

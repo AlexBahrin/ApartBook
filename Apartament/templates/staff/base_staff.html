@@ -32,6 +32,16 @@
             <h5 class="px-3 mb-3">
                 <i class="bi bi-gear"></i> {% trans "Staff Panel" %}
             </h5>
+            
+            {% if staff_unread_messages_count > 0 %}
+            <div class="alert alert-warning mx-2 mb-3 py-2 px-3" role="alert">
+                <a href="{% url 'staff_messages' %}" class="text-decoration-none text-dark">
+                    <i class="bi bi-envelope-exclamation"></i>
+                    <strong>{{ staff_unread_messages_count }}</strong> {% trans "unread message" %}{% if staff_unread_messages_count > 1 %}s{% endif %}
+                </a>
+            </div>
+            {% endif %}
+            
             <nav class="nav flex-column">
                 <a class="nav-link {% if 'bookings' in request.path and 'calendar' not in request.path %}active{% endif %}" href="{% url 'staff_bookings' %}">
                     <i class="bi bi-calendar-check"></i> {% trans "Bookings" %}
@@ -44,6 +54,9 @@
                 </a>
                 <a class="nav-link {% if 'messages' in request.path %}active{% endif %}" href="{% url 'staff_messages' %}">
                     <i class="bi bi-chat-dots"></i> {% trans "Messages" %}
+                    {% if staff_unread_messages_count > 0 %}
+                    <span class="badge bg-danger ms-1">{{ staff_unread_messages_count }}</span>
+                    {% endif %}
                 </a>
             </nav>
         </div>

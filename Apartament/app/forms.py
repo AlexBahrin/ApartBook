@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from datetime import date
 from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Message
 
@@ -224,13 +225,53 @@ class BookingStatusForm(forms.Form):
     STATUS_CHOICES = [
         ('CONFIRMED', 'Confirm Booking'),
         ('CANCELLED_BY_ADMIN', 'Cancel Booking'),
-        ('COMPLETED', 'Mark as Completed'),
     ]
     
     status = forms.ChoiceField(
         choices=STATUS_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+
+class BookingEditForm(forms.ModelForm):
+    """Form for staff to edit booking details (dates and guests)."""
+    
+    class Meta:
+        model = Booking
+        fields = ['check_in', 'check_out', 'guests_count']
+        widgets = {
+            'check_in': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'check_out': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'guests_count': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1'
+            }),
+        }
+    
+    def clean_guests_count(self):
+        guests_count = self.cleaned_data.get('guests_count')
+        if guests_count is not None and guests_count < 1:
+            raise forms.ValidationError(_('Guest count must be at least 1.'))
+        return guests_count
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        check_in = cleaned_data.get('check_in')
+        check_out = cleaned_data.get('check_out')
+        
+        if check_in and check_out:
+            if check_out <= check_in:
+                raise forms.ValidationError(
+                    _('Check-out date must be after check-in date.')
+                )
+        
+        return cleaned_data
 
 
 class MessageForm(forms.ModelForm):

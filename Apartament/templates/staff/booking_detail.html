@@ -4,6 +4,12 @@
 
 {% block title %}{% trans "Booking" %} #{{ booking.pk }} - {% trans "Staff" %}{% endblock %}
 
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+{% endblock %}
+
 {% block staff_content %}
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
@@ -93,17 +99,69 @@
     </div>
     
     <div class="col-lg-4">
+        <!-- Edit Booking Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-pencil-square"></i> {% trans "Edit Booking" %}</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% if edit_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in edit_form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="id_check_in" class="form-label">{% trans "Check-in" %}</label>
+                        {{ edit_form.check_in }}
+                        {% if edit_form.check_in.errors %}
+                            <div class="text-danger small">{{ edit_form.check_in.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_check_out" class="form-label">{% trans "Check-out" %}</label>
+                        {{ edit_form.check_out }}
+                        {% if edit_form.check_out.errors %}
+                            <div class="text-danger small">{{ edit_form.check_out.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_guests_count" class="form-label">{% trans "Number of Guests" %}</label>
+                        {{ edit_form.guests_count }}
+                        {% if edit_form.guests_count.errors %}
+                            <div class="text-danger small">{{ edit_form.guests_count.errors.0 }}</div>
+                        {% endif %}
+                        <small class="text-muted">{% trans "Max capacity:" %} {{ booking.apartment.capacity }}</small>
+                    </div>
+                    
+                    <div class="alert alert-info small py-2">
+                        <i class="bi bi-info-circle"></i> {% trans "Price will be recalculated automatically based on dates, guests, and pricing rules." %}
+                    </div>
+                    
+                    <button type="submit" name="update_booking" class="btn btn-primary w-100">
+                        <i class="bi bi-check-lg"></i> {% trans "Update Booking" %}
+                    </button>
+                </form>
+            </div>
+        </div>
+        
         <!-- Status Update -->
         <div class="card mb-4">
             <div class="card-header">
-                <h6 class="mb-0">Update Status</h6>
+                <h6 class="mb-0"><i class="bi bi-arrow-repeat"></i> {% trans "Update Status" %}</h6>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
                     {{ form.status }}
-                    <button type="submit" class="btn btn-primary w-100 mt-3">
-                        Update Status
+                    <button type="submit" name="update_status" class="btn btn-primary w-100 mt-3">
+                        {% trans "Update Status" %}
                     </button>
                 </form>
             </div>
@@ -112,17 +170,94 @@
         <!-- Quick Actions -->
         <div class="card">
             <div class="card-header">
-                <h6 class="mb-0">Quick Actions</h6>
+                <h6 class="mb-0">{% trans "Quick Actions" %}</h6>
             </div>
             <div class="card-body">
                 <a href="{% url 'staff_availability' booking.apartment.pk %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
-                    <i class="bi bi-calendar"></i> View Apartment Calendar
+                    <i class="bi bi-calendar"></i> {% trans "View Apartment Calendar" %}
                 </a>
                 <a href="{% url 'staff_apartment_edit' booking.apartment.pk %}" class="btn btn-outline-secondary btn-sm w-100">
-                    <i class="bi bi-pencil"></i> Edit Apartment
+                    <i class="bi bi-pencil"></i> {% trans "Edit Apartment" %}
                 </a>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Calendar availability data (excluding current booking dates)
+    const unavailableForCheckin = {{ unavailable_for_checkin|safe }};
+    const unavailableForCheckout = {{ unavailable_for_checkout|safe }};
+    
+    const checkInInput = document.getElementById('id_check_in');
+    const checkOutInput = document.getElementById('id_check_out');
+    
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+    
+    if (checkInInput && checkOutInput) {
+        // Calculate max date (1 year from today)
+        const maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() + 1);
+        
+        // Initialize check-in picker
+        const checkInPicker = flatpickr(checkInInput, {
+            dateFormat: "Y-m-d",
+            maxDate: maxDate,
+            disable: unavailableForCheckin,
+            onChange: function(selectedDates, dateStr) {
+                if (selectedDates[0]) {
+                    const nextDay = new Date(selectedDates[0]);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    checkOutPicker.set('minDate', nextDay);
+                    
+                    // Update checkout availability based on selected check-in
+                    updateCheckoutAvailability(selectedDates[0]);
+                }
+            }
+        });
+        
+        // Initialize check-out picker
+        const checkOutPicker = flatpickr(checkOutInput, {
+            dateFormat: "Y-m-d",
+            maxDate: maxDate,
+            disable: unavailableForCheckout
+        });
+        
+        // Function to update checkout availability based on selected check-in
+        function updateCheckoutAvailability(selectedCheckIn) {
+            let invalidCheckouts = [...unavailableForCheckout];
+            
+            // Find unavailable nights after check-in
+            // If there's an unavailable night on date D (after check-in),
+            // then checkout on D+1 or later would require crossing that unavailable night
+            for (const unavailableStr of unavailableForCheckin) {
+                const unavailableDate = new Date(unavailableStr);
+                if (unavailableDate >= selectedCheckIn) {
+                    // Block all dates after this unavailable night
+                    let blockDate = new Date(unavailableDate);
+                    blockDate.setDate(blockDate.getDate() + 1);
+                    
+                    // Block this date and all subsequent dates
+                    for (let i = 0; i < 365; i++) {
+                        const blockStr = formatDate(blockDate);
+                        if (!invalidCheckouts.includes(blockStr)) {
+                            invalidCheckouts.push(blockStr);
+                        }
+                        blockDate.setDate(blockDate.getDate() + 1);
+                    }
+                    break; // Only need to find the first unavailable night after check-in
+                }
+            }
+            
+            checkOutPicker.set('disable', invalidCheckouts);
+        }
+    }
+});
+</script>
 {% endblock %}

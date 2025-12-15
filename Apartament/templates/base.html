@@ -140,6 +140,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'my_messages' %}">
                                     <i class="bi bi-chat-dots"></i> {% trans "Messages" %}
+                                    {% if user_unread_messages_count > 0 %}
+                                    <span class="badge bg-danger">{{ user_unread_messages_count }}</span>
+                                    {% endif %}
                                 </a>
                             </li>
                         {% endif %}

@@ -19,7 +19,7 @@ urlpatterns = [
     path('dashboard/bookings/', views.MyBookingsListView.as_view(), name='my_bookings'),
     path('dashboard/bookings/<int:pk>/', views.MyBookingDetailView.as_view(), name='my_booking_detail'),
     path('dashboard/bookings/<int:pk>/cancel/', views.cancel_booking, name='cancel_booking'),
-    path('dashboard/bookings/<int:pk>/message/', views.start_conversation, name='start_conversation'),
+    path('dashboard/bookings/<int:booking_pk>/message/', views.start_conversation, name='start_conversation'),
     path('dashboard/messages/', views.MyConversationsListView.as_view(), name='my_messages'),
     path('dashboard/messages/<int:pk>/', views.conversation_detail, name='conversation_detail'),
 

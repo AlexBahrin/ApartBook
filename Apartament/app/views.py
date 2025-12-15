@@ -15,7 +15,7 @@ import json
 from .models import Apartment, ApartmentImage, Availability, PricingRule, Booking, Conversation, Message
 from .forms import (
     BookingForm, ApartmentForm, ApartmentImageForm, 
-    AvailabilityForm, PricingRuleForm, BookingStatusForm, MessageForm
+    AvailabilityForm, PricingRuleForm, BookingStatusForm, BookingEditForm, MessageForm
 )
 from .emails import (
     send_new_booking_notification,
@@ -523,33 +523,84 @@ class StaffBookingsListView(StaffRequiredMixin, ListView):
 
 @staff_member_required
 def staff_booking_detail(request, pk):
-    """Staff view: booking detail with status management."""
+    """Staff view: booking detail with status management and editing."""
     booking = get_object_or_404(Booking, pk=pk)
     old_status = booking.status
     
     if request.method == 'POST':
-        form = BookingStatusForm(request.POST)
-        if form.is_valid():
-            new_status = form.cleaned_data['status']
-            booking.status = new_status
-            booking.save()
+        # Check which form was submitted
+        if 'update_status' in request.POST:
+            status_form = BookingStatusForm(request.POST)
+            edit_form = BookingEditForm(instance=booking)
             
-            # Send email notifications based on status change
-            if new_status == 'CONFIRMED' and old_status != 'CONFIRMED':
-                send_booking_confirmed_notification(booking)
-            elif new_status == 'CANCELLED_BY_ADMIN':
-                send_booking_cancelled_notification(booking, cancelled_by='admin')
+            if status_form.is_valid():
+                new_status = status_form.cleaned_data['status']
+                booking.status = new_status
+                booking.save()
+                
+                # Send email notifications based on status change
+                if new_status == 'CONFIRMED' and old_status != 'CONFIRMED':
+                    send_booking_confirmed_notification(booking)
+                elif new_status == 'CANCELLED_BY_ADMIN':
+                    send_booking_cancelled_notification(booking, cancelled_by='admin')
+                
+                messages.success(request, _('Booking status updated to %(status)s!') % {
+                    'status': booking.get_status_display()
+                })
+                return redirect('staff_booking_detail', pk=pk)
+        
+        elif 'update_booking' in request.POST:
+            edit_form = BookingEditForm(request.POST, instance=booking)
+            status_form = BookingStatusForm()
             
-            messages.success(request, _('Booking status updated to %(status)s!') % {
-                'status': booking.get_status_display()
-            })
-            return redirect('staff_booking_detail', pk=pk)
+            if edit_form.is_valid():
+                # Save the form but don't commit yet
+                booking = edit_form.save(commit=False)
+                
+                # Recalculate total price
+                try:
+                    total_price, price_breakdown = booking.calculate_total_price()
+                    booking.total_price = total_price
+                    booking.price_breakdown = price_breakdown
+                    booking.save()
+                    
+                    messages.success(request, _('Booking updated successfully! New total: %(price)s') % {
+                        'price': total_price
+                    })
+                    return redirect('staff_booking_detail', pk=pk)
+                except Exception as e:
+                    messages.error(request, _('Error calculating price: %(error)s') % {
+                        'error': str(e)
+                    })
+        else:
+            status_form = BookingStatusForm()
+            edit_form = BookingEditForm(instance=booking)
     else:
-        form = BookingStatusForm()
+        status_form = BookingStatusForm()
+        edit_form = BookingEditForm(instance=booking)
+    
+    # Get calendar availability data for the apartment (excluding current booking)
+    start_date = date.today()
+    end_date = start_date + timedelta(days=365)
+    calendar_data = booking.apartment.get_calendar_data(start_date, end_date)
+    
+    # Exclude current booking's dates from unavailable dates
+    current_booking_dates = []
+    current = booking.check_in
+    while current < booking.check_out:
+        current_booking_dates.append(current.isoformat())
+        current += timedelta(days=1)
+    
+    # Remove current booking dates from unavailable lists
+    unavailable_for_checkin = [d for d in calendar_data['unavailable_for_checkin'] if d not in current_booking_dates]
+    unavailable_for_checkout = [d for d in calendar_data['unavailable_for_checkout'] if d not in current_booking_dates]
     
     return render(request, 'staff/booking_detail.html', {
         'booking': booking,
-        'form': form,
+        'form': status_form,
+        'edit_form': edit_form,
+        'unavailable_for_checkin': unavailable_for_checkin,
+        'unavailable_for_checkout': unavailable_for_checkout,
     })
 
 
@@ -677,6 +728,7 @@ def staff_global_calendar(request):
 @staff_member_required
 def staff_global_calendar_events_api(request):
     """API endpoint for global calendar events across all apartments."""
+    from datetime import timedelta
     events = []
     
     # Get all confirmed and pending bookings
@@ -686,20 +738,35 @@ def staff_global_calendar_events_api(request):
     
     for booking in bookings:
         color = '#198754' if booking.status == 'CONFIRMED' else '#ffc107'
-        events.append({
-            'id': f'booking-{booking.pk}',
-            'title': f'{booking.apartment.title} - {booking.user.username} ({booking.guests_count} guests)',
-            'start': booking.check_in.isoformat(),
-            'end': booking.check_out.isoformat(),
-            'color': color,
-            'url': f'/en/staff/bookings/{booking.pk}/',
-            'extendedProps': {
-                'type': 'booking',
-                'status': booking.status,
-                'apartment': booking.apartment.title,
-                'apartmentId': booking.apartment.pk,
-            }
-        })
+        base_title = f'{booking.apartment.title} - {booking.user.username} ({booking.guests_count} guests)'
+        
+        # Create events for each day of the booking
+        current_date = booking.check_in
+        while current_date <= booking.check_out:
+            if current_date == booking.check_in:
+                day_type = 'Check-in'
+            elif current_date == booking.check_out:
+                day_type = 'Check-out'
+            else:
+                day_type = 'Stay-over'
+            
+            events.append({
+                'id': f'booking-{booking.pk}-{current_date.isoformat()}',
+                'title': f'{base_title}',
+                'start': current_date.isoformat(),
+                'end': current_date.isoformat(),
+                'color': color,
+                'url': f'/en/staff/bookings/{booking.pk}/',
+                'allDay': True,
+                'extendedProps': {
+                    'type': 'booking',
+                    'status': booking.status,
+                    'apartment': booking.apartment.title,
+                    'apartmentId': booking.apartment.pk,
+                    'dayType': day_type,
+                }
+            })
+            current_date += timedelta(days=1)
     
     # Get all blocked dates
     blocked_dates = Availability.objects.filter(

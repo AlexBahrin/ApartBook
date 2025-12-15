@@ -17,7 +17,7 @@
         <div class="col-lg-8">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">{% trans "Booking Details" %}</h5>tails" %}</h5>
+                    <h5 class="mb-0">{% trans "Booking Details" %}</h5>
                     {% if booking.status == 'PENDING' %}
                         <span class="badge badge-pending fs-6">{% trans "Pending" %}</span>
                     {% elif booking.status == 'CONFIRMED' %}
@@ -37,7 +37,7 @@
                                     {{ booking.apartment.title }}
                                 </a>
                             </p>
-                            <small class="text-muted">{{ booking.apartment.city }}, {{ booking.apartment.country }}</small>
+                            <small class="text-muted">{{ booking.apartment.address }}{% if booking.apartment.city %}, {{ booking.apartment.city }}{% endif %}</small>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted">{% trans "Booking Created" %}</h6>
