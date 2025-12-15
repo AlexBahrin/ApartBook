@@ -146,13 +146,8 @@ USE_TZ = True
 
 # Currency settings
 # Rates are relative to RON (base currency with rate 1.0)
-# Example: 5.10 RON = 1 EUR, so EUR rate = 1/5.10 ≈ 0.196
 CURRENCIES = {
     'RON': {'symbol': 'lei', 'name': 'Romanian Leu', 'rate': 1.0},
-    'EUR': {'symbol': '€', 'name': 'Euro', 'rate': 1/5.10},
-    'USD': {'symbol': '$', 'name': 'US Dollar', 'rate': 1/5.50},
-    'GBP': {'symbol': '£', 'name': 'British Pound', 'rate': 1/6.20},
-    'UAH': {'symbol': '₴', 'name': 'Ukrainian Hryvnia', 'rate': 1/0.12},
 }
 DEFAULT_CURRENCY = 'RON'
 

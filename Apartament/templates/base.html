@@ -90,23 +90,6 @@
                 </ul>
                 
                 <ul class="navbar-nav align-items-center">
-                    <!-- Currency Selector -->
-                    <li class="nav-item dropdown me-2">
-                        <a class="nav-link dropdown-toggle" href="#" id="currencyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-currency-exchange"></i> {{ currency_symbol }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="currencyDropdown">
-                            {% for code, info in available_currencies.items %}
-                                <li>
-                                    <a class="dropdown-item {% if code == current_currency %}active{% endif %}" 
-                                       href="{% url 'set_currency' %}?currency={{ code }}&next={{ request.path }}">
-                                        {{ info.symbol }} {{ code }}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    
                     <!-- Language Selector -->
                     <li class="nav-item dropdown me-3">
                         <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
