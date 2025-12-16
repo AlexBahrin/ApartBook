@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+wpby&ge4yzx((y@7)pu_w7!9)o1)2z1tqdtw6_&rt48pmmztv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -83,11 +83,14 @@ WSGI_APPLICATION = 'Apartament.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ap_db",
-        "USER": "postgres",
-        "PASSWORD": "admin",
-        "HOST": "localhost",
+        "NAME": "ap_db_yuqw",
+        "USER": "postgress",
+        "PASSWORD": "dG1hWcTzn5b7XAcfuqvjRKuDQ6HHladS",
+        "HOST": "postgresql://postgress:dG1hWcTzn5b7XAcfuqvjRKuDQ6HHladS@dpg-d50ht03uibrs73dtb97g-a/ap_db_yuqw",
         "PORT": "5432",
+        "OPTIONS": {
+            "sslmode": "require",  # important on Render
+        },
     }
 }
 
