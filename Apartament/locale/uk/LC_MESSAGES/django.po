@@ -65,13 +65,13 @@ msgid "List of amenities"
 msgstr "Список зручностей"
 
 msgid "Pricing model: per apartment or per guest"
-msgstr ""
+msgstr "Модель ціноутворення: за квартиру або за гостя"
 
 msgid "Base price per night (for apartment) or price for 1 guest"
-msgstr ""
+msgstr "Базова ціна за ніч (для квартири) або ціна за 1 гостя"
 
 msgid "Price per guest count: {1: 100, 2: 150, 3: 200, etc.}"
-msgstr ""
+msgstr "Ціна за кількість гостя:   PH0  "
 
 msgid "Manual"
 msgstr "Вручну"
@@ -80,10 +80,10 @@ msgid "iCal Import"
 msgstr "Імпорт iCal"
 
 msgid "UID from external iCal event"
-msgstr ""
+msgstr "UID від зовнішнього заходу iCal"
 
 msgid "The iCal feed this block came from"
-msgstr ""
+msgstr "Цей блок iCal пішов з"
 
 msgid "Availabilities"
 msgstr "Доступність"
@@ -95,10 +95,10 @@ msgid "Unavailable"
 msgstr "Недоступно"
 
 msgid "e.g., Airbnb, Booking.com"
-msgstr ""
+msgstr "Наприклад, Airbnb, Booking.com"
 
 msgid "iCal feed URL"
-msgstr ""
+msgstr "URL-адреса iCal"
 
 msgid "iCal Feed"
 msgstr "Стрічка iCal"
@@ -160,7 +160,7 @@ msgstr "Кількість гостей перевищує місткість к
 
 msgid ""
 "Staff members cannot create bookings. Please use a regular user account."
-msgstr ""
+msgstr "Користувачі не можуть створювати бронювання. Будь ласка, використовуйте звичайний обліковий запис користувача."
 
 msgid "The apartment is not available for the selected dates."
 msgstr "Квартира недоступна на вибрані дати."
@@ -171,12 +171,12 @@ msgstr "Ваш запит на бронювання надіслано! Влас
 
 msgid ""
 "Staff members cannot access user bookings. Please use the Staff Dashboard."
-msgstr ""
+msgstr "Користувачі не можуть отримувати доступ до Особистого кабінету. Будь ласка, використовуйте панель інструментів для персоналу."
 
 msgid ""
 "Staff members cannot cancel bookings through this interface. Please use the "
 "Staff Dashboard."
-msgstr ""
+msgstr "Користувачі не можуть скасувати бронювання через цей інтерфейс. Будь ласка, використовуйте панель інструментів для персоналу."
 
 msgid "Your booking has been cancelled."
 msgstr "Ваше бронювання скасовано."
@@ -194,7 +194,7 @@ msgid "Apartment deleted successfully!"
 msgstr "Квартиру успішно видалено!"
 
 msgid "Some images failed to upload."
-msgstr ""
+msgstr "Деякі зображення не вдалося завантажити."
 
 msgid "Image deleted successfully!"
 msgstr "Зображення успішно видалено!"
@@ -205,11 +205,11 @@ msgstr "Статус бронювання оновлено на %(status)s!"
 
 #, python-format
 msgid "Booking updated successfully! New total: %(price)s"
-msgstr ""
+msgstr "Бронювання успішно оновлено! Нова сума: %(price)s"
 
 #, python-format
 msgid "Error calculating price: %(error)s"
-msgstr ""
+msgstr "Помилка при розрахунку ціни: %(error)s"
 
 msgid "Availability updated!"
 msgstr "Доступність оновлено!"
@@ -232,10 +232,10 @@ msgid "Start date must be before end date"
 msgstr "Дата виїзду повинна бути після дати заїзду."
 
 msgid "Cannot block past dates"
-msgstr ""
+msgstr "Не блокувати останні дати"
 
 msgid "Cannot block nights that have existing bookings"
-msgstr ""
+msgstr "Не блокувати ночі, які мають існуючі бронювання"
 
 #, fuzzy
 #| msgid "Image uploaded successfully!"
@@ -243,7 +243,7 @@ msgid "Date unblocked successfully"
 msgstr "Зображення успішно завантажено!"
 
 msgid "Please provide both name and URL"
-msgstr ""
+msgstr "Будь ласка, вкажіть ім'я та URL"
 
 #, fuzzy
 #| msgid "Availability entry deleted!"
@@ -251,13 +251,13 @@ msgid "iCal feed deleted!"
 msgstr "Запис про доступність видалено!"
 
 msgid "Feed not found"
-msgstr ""
+msgstr "Не знайдено"
 
 msgid "All feeds synced!"
-msgstr ""
+msgstr "Всі корми скопіювали!"
 
 msgid "Staff members should use the Staff Dashboard to manage conversations."
-msgstr ""
+msgstr "Для управління бесідами необхідно використовувати кадровий щит."
 
 msgid "Message sent!"
 msgstr "Повідомлення надіслано!"
@@ -269,31 +269,31 @@ msgstr "Повернутися до бронювань"
 
 #, python-format
 msgid "Hello %(username)s,"
-msgstr ""
+msgstr "Привіт %(username)s,"
 
 msgid "Thank you for registering with ApartBook!"
-msgstr ""
+msgstr "Дякую за реєстрацію з АпартКниги!"
 
 msgid ""
 "Please click the link below to verify your email address and activate your "
 "account:"
-msgstr ""
+msgstr "Введіть номер мобільного, який Ви вказали при укладаннi договору з банком - для ідентифікації."
 
 msgid "This link will expire in 24 hours."
-msgstr ""
+msgstr "Ця посилання буде завершена протягом 24 годин."
 
 msgid ""
 "If you didn't create an account with ApartBook, please ignore this email."
-msgstr ""
+msgstr "Якщо ви не змогли створити обліковий запис, будь ласка, проігноруйте цю електронну пошту."
 
 msgid "Best regards,"
-msgstr ""
+msgstr "Найкращі переваги,"
 
 msgid "The ApartBook Team"
-msgstr ""
+msgstr "Команда Апарт-Книги"
 
 msgid "This is an automated message. Please do not reply to this email."
-msgstr ""
+msgstr "Це автоматизоване повідомлення. Будь ласка, не відповідайте на цю електронну пошту."
 
 msgid "Email Verified"
 msgstr "Email підтверджено"
@@ -302,7 +302,7 @@ msgid "Email verified!"
 msgstr "Email підтверджено!"
 
 msgid "Your account is now active and ready to use"
-msgstr ""
+msgstr "Ваш обліковий запис зараз активний і готовий до використання"
 
 #, fuzzy
 #| msgid "Sign in to book this apartment"
@@ -313,18 +313,18 @@ msgid "Verification Failed"
 msgstr "Помилка перевірки"
 
 msgid "Verification failed"
-msgstr ""
+msgstr "Перевірка не вдалося"
 
 msgid "This verification link is invalid or has expired"
-msgstr ""
+msgstr "Це посилання перевірки недійсним або має вибух"
 
 msgid ""
 "The link may have already been used or has expired. Please try registering "
 "again or contact support if you need assistance."
-msgstr ""
+msgstr "У зв'язку з тим, що вже було використано або було вилучено. Якщо вам потрібна допомога."
 
 msgid "Register again"
-msgstr ""
+msgstr "Реєстрація"
 
 #, fuzzy
 #| msgid "Back to Bookings"
@@ -335,19 +335,19 @@ msgid "Verify Your Email"
 msgstr "Підтвердіть ваш Email"
 
 msgid "Verify your email"
-msgstr ""
+msgstr "Перевірити електронну пошту"
 
 msgid "We've sent a verification link to your email address"
-msgstr ""
+msgstr "Ми відправили посилання на перевірку на електронну адресу"
 
 msgid "What's next?"
-msgstr ""
+msgstr "Що далі?"
 
 msgid "Check your email inbox"
-msgstr ""
+msgstr "Перевірити електронну скриньку"
 
 msgid "Click the verification link"
-msgstr ""
+msgstr "Натисніть посилання на перевірку"
 
 #, fuzzy
 #| msgid "Sign in to book this apartment"
@@ -355,7 +355,7 @@ msgid "Start booking amazing apartments!"
 msgstr "Увійдіть, щоб забронювати цю квартиру"
 
 msgid "Didn't receive the email? Check your spam folder."
-msgstr ""
+msgstr "Чи не отримувати повідомлення електронної пошти? Перевірити папку спаму."
 
 #, fuzzy
 #| msgid "Sign Up"
@@ -366,13 +366,13 @@ msgid "Welcome back"
 msgstr "З поверненням"
 
 msgid "Sign in to continue to your account"
-msgstr ""
+msgstr "Введіть номер мобільного, який Ви вказали при укладаннi договору з нами"
 
 msgid "Username"
 msgstr "Ім'я користувача"
 
 msgid "Enter your username"
-msgstr ""
+msgstr "Ім'я користувача"
 
 msgid "Password"
 msgstr "Пароль"
@@ -381,7 +381,7 @@ msgid "Forgot password?"
 msgstr "Забули пароль?"
 
 msgid "Enter your password"
-msgstr ""
+msgstr "Введіть пароль"
 
 msgid "Don't have an account?"
 msgstr "Немає облікового запису?"
@@ -395,10 +395,10 @@ msgid "Reset Password"
 msgstr "Скинути пароль"
 
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Забули пароль?"
 
 msgid "No worries, we'll send you reset instructions"
-msgstr ""
+msgstr "Ми надішлемо вам скидання інструкцій"
 
 #, fuzzy
 #| msgid "Address"
@@ -406,16 +406,16 @@ msgid "Email address"
 msgstr "Адреса"
 
 msgid "Enter your registered email"
-msgstr ""
+msgstr "Введіть номер мобільного, який Ви вказали при укладаннi договору з нами"
 
 msgid "Send Reset Link"
-msgstr ""
+msgstr "Надіслати посилання"
 
 msgid "Password Reset Complete"
-msgstr ""
+msgstr "Заміна пароля"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Скинути пароль завершено"
 
 #, fuzzy
 #| msgid "Your booking has been cancelled."
@@ -423,22 +423,22 @@ msgid "Your password has been successfully changed"
 msgstr "Ваше бронювання скасовано."
 
 msgid "Sign in with new password"
-msgstr ""
+msgstr "Підписатися на новий пароль"
 
 msgid "Set New Password"
-msgstr ""
+msgstr "Встановити новий пароль"
 
 msgid "Set new password"
-msgstr ""
+msgstr "Написати пароль"
 
 msgid "Your new password must be different from previous passwords"
-msgstr ""
+msgstr "Ваш новий пароль повинен відрізнятися від попередніх паролів"
 
 msgid "New password"
-msgstr ""
+msgstr "Новий пароль"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Введіть новий пароль"
 
 #, fuzzy
 #| msgid "Confirmed"
@@ -446,13 +446,13 @@ msgid "Confirm new password"
 msgstr "Підтверджено"
 
 msgid "Repeat new password"
-msgstr ""
+msgstr "Повторити новий пароль"
 
 msgid "Invalid or expired link"
-msgstr ""
+msgstr "Інвалід або розірваний посилання"
 
 msgid "This password reset link has expired or is invalid."
-msgstr ""
+msgstr "Це посилання на скидання пароля, що закінчується або є недійсним."
 
 #, fuzzy
 #| msgid "Request to Book"
@@ -460,19 +460,19 @@ msgid "Request a new link"
 msgstr "Запитати бронювання"
 
 msgid "Check Your Email"
-msgstr ""
+msgstr "Перевірити електронну пошту"
 
 msgid "Check your email"
-msgstr ""
+msgstr "Перевірити електронну пошту"
 
 msgid "We've sent password reset instructions to your email"
-msgstr ""
+msgstr "Ми надішлемо інструкції з скидання паролів на вашу електронну пошту"
 
 msgid "Didn't receive the email? Check your spam folder or"
-msgstr ""
+msgstr "Чи не отримувати повідомлення електронної пошти? Перевірити папку спаму або"
 
 msgid "try again"
-msgstr ""
+msgstr "знову"
 
 #, fuzzy
 #| msgid "Create"
@@ -480,7 +480,7 @@ msgid "Create Account"
 msgstr "Створити"
 
 msgid "Create your account"
-msgstr ""
+msgstr "Створити обліковий запис"
 
 #, fuzzy
 #| msgid "Sign in to book this apartment"
@@ -488,28 +488,28 @@ msgid "Join us to book amazing apartments"
 msgstr "Увійдіть, щоб забронювати цю квартиру"
 
 msgid "Choose a username"
-msgstr ""
+msgstr "Виберіть ім'я користувача"
 
 msgid "your@email.com"
-msgstr ""
+msgstr "Веб-сайт: http://www.facebook.com"
 
 msgid "First name"
 msgstr "Ім'я"
 
 msgid "John"
-msgstr ""
+msgstr "Іван"
 
 msgid "Last name"
 msgstr "Прізвище"
 
 msgid "Doe"
-msgstr ""
+msgstr "До"
 
 msgid "Create a strong password"
 msgstr "Створіть надійний пароль"
 
 msgid "At least 8 characters with letters and numbers"
-msgstr ""
+msgstr "принаймні 8 символів з літерами та цифрами"
 
 #, fuzzy
 #| msgid "Confirmed"
@@ -517,10 +517,10 @@ msgid "Confirm password"
 msgstr "Підтверджено"
 
 msgid "Repeat your password"
-msgstr ""
+msgstr "Повторити пароль"
 
 msgid "By signing up, you agree to our"
-msgstr ""
+msgstr "Підписуйтесь на нашу розсилку"
 
 msgid "Terms of Service"
 msgstr "Умови використання"
@@ -736,7 +736,7 @@ msgid "night"
 msgstr "ніч"
 
 msgid "Price varies by guests"
-msgstr ""
+msgstr "Ціна змінюється гостям"
 
 #, fuzzy
 #| msgid "Max"
@@ -760,7 +760,7 @@ msgid "You won't be charged yet"
 msgstr "Ви ще не будете списані"
 
 msgid "Staff cannot create bookings"
-msgstr ""
+msgstr "Персонал не може створювати бронювання"
 
 msgid "Sign in to book this apartment"
 msgstr "Увійдіть, щоб забронювати цю квартиру"
@@ -781,7 +781,7 @@ msgid "Select date"
 msgstr "Виберіть дату"
 
 msgid "Both check-in and check-out dates are required"
-msgstr ""
+msgstr "Вартість реєстрації та виїзду"
 
 msgid "Number of guests"
 msgstr "Кількість гостей"
@@ -832,7 +832,7 @@ msgstr "Знайдіть свою ідеальну квартиру"
 msgid ""
 "Discover beautiful apartments for your next trip. Book directly with the "
 "owner for the best experience."
-msgstr ""
+msgstr "Відкрийте для себе красиві квартири. Книга безпосередньо з власником найкращого досвіду."
 
 msgid "Featured Apartments"
 msgstr "Обрані квартири"
@@ -892,7 +892,7 @@ msgid "New Apartment"
 msgstr "Нова квартира"
 
 msgid "Please correct the errors below:"
-msgstr ""
+msgstr "Виправте помилки нижче:"
 
 msgid "Title"
 msgstr "Назва"
@@ -919,16 +919,16 @@ msgid "Price per Night"
 msgstr "Ціна/Ніч"
 
 msgid "Fixed price per night regardless of guest count"
-msgstr ""
+msgstr "Фіксована ціна за ніч незалежно від кількості гостя"
 
 msgid "Price per Night by Guest Count"
-msgstr ""
+msgstr "Ціна за ніч за Гість"
 
 msgid "Set the capacity first to configure per-guest pricing"
-msgstr ""
+msgstr "Настроювання потужностей в першу чергу для налаштувань"
 
 msgid "Please set the maximum guest capacity first"
-msgstr ""
+msgstr "Будь ласка, встановіть максимальну ємність гостя"
 
 #, fuzzy
 #| msgid "Price/Night"
@@ -949,22 +949,22 @@ msgid "Upload Images"
 msgstr "Завантажити зображення"
 
 msgid "Drop images here or click to browse"
-msgstr ""
+msgstr "Перевірити зображення тут або натисніть, щоб переглянути"
 
 msgid "You can upload multiple images at once"
-msgstr ""
+msgstr "Ви можете завантажувати декілька зображень одночасно"
 
 msgid "Current Images"
 msgstr "Поточні зображення"
 
 msgid "Drag to reorder - First image is the main photo"
-msgstr ""
+msgstr "Перетягніть на переадресацію - Перше зображення є основною фото"
 
 msgid "Main Photo"
 msgstr "Головне фото"
 
 msgid "Delete this image?"
-msgstr ""
+msgstr "Видалити цей образ?"
 
 #, fuzzy
 #| msgid "Message sent!"
@@ -990,7 +990,7 @@ msgid "Staff Panel"
 msgstr "Панель персоналу"
 
 msgid "unread message"
-msgstr ""
+msgstr "Переглянути повідомлення"
 
 msgid "Bookings"
 msgstr "Бронювання"
@@ -1019,7 +1019,7 @@ msgstr "Місткість"
 msgid ""
 "Price will be recalculated automatically based on dates, guests, and pricing "
 "rules."
-msgstr ""
+msgstr "Вартість буде перерахована автоматично на основі дат, гостей та правила ціноутворення."
 
 #, fuzzy
 #| msgid "Cancel Booking"
@@ -1058,7 +1058,7 @@ msgid "Block Dates"
 msgstr "Заблоковано"
 
 msgid "Click on any date to block it. Click on a blocked date to unblock it."
-msgstr ""
+msgstr "Натисніть на будь-яку дату, щоб заблокувати його. Натисніть на заблоковану дату, щоб розблокувати його."
 
 msgid "Block Date Range"
 msgstr "Блокування діапазону дат"
@@ -1082,7 +1082,7 @@ msgid "Cancel"
 msgstr "Скасовано користувачем"
 
 msgid "Unblock Date"
-msgstr ""
+msgstr "Дата розблокування"
 
 #, fuzzy
 #| msgid "Are you sure you want to cancel this booking?"
@@ -1111,19 +1111,19 @@ msgid "Base price"
 msgstr "Базова ціна"
 
 msgid "Block this date?"
-msgstr ""
+msgstr "Блок цієї дати?"
 
 msgid "Error blocking date"
-msgstr ""
+msgstr "дата блокування помилок"
 
 msgid "Click to unblock"
-msgstr ""
+msgstr "Натисніть, щоб розблокувати"
 
 msgid "Error blocking dates"
-msgstr ""
+msgstr "дата блокування помилок"
 
 msgid "Error unblocking date"
-msgstr ""
+msgstr "дата розблокування помилки"
 
 msgid "Calendar Overview"
 msgstr "Огляд календаря"
@@ -1144,7 +1144,7 @@ msgid "All Apartments"
 msgstr "Переглянути всі квартири"
 
 msgid "Click on an apartment to view its detailed calendar"
-msgstr ""
+msgstr "Натисніть на квартиру, щоб переглянути його детальний календар"
 
 msgid "Quick Stats"
 msgstr "Швидка статистика"
@@ -1160,19 +1160,19 @@ msgstr "Експорт календаря"
 msgid ""
 "Use this URL to share your calendar with other platforms like Airbnb, "
 "Booking.com, or any service that supports iCal."
-msgstr ""
+msgstr "Використовуйте цю URL, щоб поділитися своїм календарем з іншими платформами, такими як Airbnb, Booking.com або будь-який сервіс, який підтримує iCal."
 
 msgid "Your iCal URL"
-msgstr ""
+msgstr "Веб-сайт"
 
 msgid "Copy"
 msgstr "Копіювати"
 
 msgid "This URL will always show the latest bookings and blocked dates."
-msgstr ""
+msgstr "Ця URL завжди покаже останні бронювання та заблоковані дати."
 
 msgid "Download .ics file"
-msgstr ""
+msgstr "Завантажити файл .ics"
 
 msgid "Import Calendars"
 msgstr "Імпорт календарів"
@@ -1180,13 +1180,13 @@ msgstr "Імпорт календарів"
 msgid ""
 "Add iCal URLs from other platforms to automatically sync their bookings. "
 "Calendars are synced every minute."
-msgstr ""
+msgstr "Додати URL-адреси iCal з інших платформ для автоматичного синхронізації їх бронювання. Календарі скопіюють кожну хвилину."
 
 msgid "Name (e.g., Airbnb)"
-msgstr ""
+msgstr "Назва (наприклад, Airbnb)"
 
 msgid "iCal URL"
-msgstr ""
+msgstr "Статус на сервери"
 
 #, fuzzy
 #| msgid "Address"
@@ -1194,10 +1194,10 @@ msgid "Add"
 msgstr "Адреса"
 
 msgid "Sync All Now"
-msgstr ""
+msgstr "Синхронізація"
 
 msgid "Connected Calendars"
-msgstr ""
+msgstr "З'єднані календарі"
 
 msgid "Name"
 msgstr "Назва"
@@ -1206,10 +1206,10 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Last Synced"
-msgstr ""
+msgstr "Остання синхронізація"
 
 msgid "Inactive"
-msgstr ""
+msgstr "Неактивний"
 
 msgid "OK"
 msgstr "OK"
@@ -1218,27 +1218,27 @@ msgid "Error"
 msgstr "Помилка"
 
 msgid "Never synced"
-msgstr ""
+msgstr "Ніколи не закручені"
 
 msgid "Sync now"
-msgstr ""
+msgstr "Sync тепер"
 
 msgid "Delete"
 msgstr "Видалити"
 
 msgid "No external calendars connected yet."
-msgstr ""
+msgstr "Не підключено зовнішні календарі."
 
 msgid ""
 "Add iCal URLs from Airbnb, Booking.com, or other platforms to sync their "
 "bookings automatically."
-msgstr ""
+msgstr "Додавання URL-адрес iCal від Airbnb, Booking.com або інших платформ для синхронізації їх бронювання автоматично."
 
 msgid "Copied!"
 msgstr "Скопійовано!"
 
 msgid "Delete this feed and all imported blocked dates?"
-msgstr ""
+msgstr "Видаліть цей корм і всі імпортні заблоковані дати?"
 
 #~ msgid "Discount"
 #~ msgstr "Знижка"

@@ -62,13 +62,13 @@ msgid "List of amenities"
 msgstr "Liste des équipements"
 
 msgid "Pricing model: per apartment or per guest"
-msgstr ""
+msgstr "Modèle de prix: par appartement ou par client"
 
 msgid "Base price per night (for apartment) or price for 1 guest"
-msgstr ""
+msgstr "Prix de base par nuit (pour appartement) ou prix pour 1 invité"
 
 msgid "Price per guest count: {1: 100, 2: 150, 3: 200, etc.}"
-msgstr ""
+msgstr "Prix par invité:   PH0  "
 
 msgid "Manual"
 msgstr "Manuel"
@@ -77,10 +77,10 @@ msgid "iCal Import"
 msgstr "Import iCal"
 
 msgid "UID from external iCal event"
-msgstr ""
+msgstr "UID de l'événement iCal externe"
 
 msgid "The iCal feed this block came from"
-msgstr ""
+msgstr "L'iCal alimente ce bloc vient de"
 
 msgid "Availabilities"
 msgstr "Disponibilités"
@@ -92,10 +92,10 @@ msgid "Unavailable"
 msgstr "Indisponible"
 
 msgid "e.g., Airbnb, Booking.com"
-msgstr ""
+msgstr "Par exemple, Airbnb, Booking.com"
 
 msgid "iCal feed URL"
-msgstr ""
+msgstr "URL de flux iCal"
 
 msgid "iCal Feed"
 msgstr "Flux iCal"
@@ -153,30 +153,30 @@ msgstr "Message de l'invité au propriétaire"
 
 #, python-format
 msgid "Guests count exceeds apartment capacity (%(capacity)s)."
-msgstr ""
+msgstr "Le nombre d'invités dépasse la capacité de l'appartement (%(capacity)s)."
 "Le nombre d'invités dépasse la capacité de l'appartement (%(capacity)s)."
 
 msgid ""
 "Staff members cannot create bookings. Please use a regular user account."
-msgstr ""
+msgstr "Les fonctionnaires ne peuvent pas créer de réservations. Veuillez utiliser un compte utilisateur régulier."
 
 msgid "The apartment is not available for the selected dates."
 msgstr "L'appartement n'est pas disponible pour les dates sélectionnées."
 
 msgid ""
 "Your booking request has been submitted! The owner will review it shortly."
-msgstr ""
+msgstr "Votre demande de réservation a été soumise! Le propriétaire l'examinera bientôt."
 "Votre demande de réservation a été envoyée! Le propriétaire l'examinera sous "
 "peu."
 
 msgid ""
 "Staff members cannot access user bookings. Please use the Staff Dashboard."
-msgstr ""
+msgstr "Les fonctionnaires ne peuvent pas accéder aux réservations des utilisateurs. Veuillez utiliser le tableau de bord du personnel."
 
 msgid ""
 "Staff members cannot cancel bookings through this interface. Please use the "
 "Staff Dashboard."
-msgstr ""
+msgstr "Les fonctionnaires ne peuvent pas annuler les réservations via cette interface. Veuillez utiliser le tableau de bord du personnel."
 
 msgid "Your booking has been cancelled."
 msgstr "Votre réservation a été annulée."
@@ -194,7 +194,7 @@ msgid "Apartment deleted successfully!"
 msgstr "Appartement supprimé avec succès!"
 
 msgid "Some images failed to upload."
-msgstr ""
+msgstr "Certaines images n'ont pas été téléchargées."
 
 msgid "Image deleted successfully!"
 msgstr "Image supprimée avec succès!"
@@ -205,11 +205,11 @@ msgstr "Statut de réservation mis à jour à %(status)s!"
 
 #, python-format
 msgid "Booking updated successfully! New total: %(price)s"
-msgstr ""
+msgstr "Réservation mise à jour avec succès ! Nouveau total: %(price)s"
 
 #, python-format
 msgid "Error calculating price: %(error)s"
-msgstr ""
+msgstr "Erreur lors du calcul du prix: %(error)s"
 
 msgid "Availability updated!"
 msgstr "Disponibilité mise à jour!"
@@ -232,10 +232,10 @@ msgid "Start date must be before end date"
 msgstr "La date de départ doit être après la date d'arrivée."
 
 msgid "Cannot block past dates"
-msgstr ""
+msgstr "Impossible de bloquer les dates passées"
 
 msgid "Cannot block nights that have existing bookings"
-msgstr ""
+msgstr "Impossible de bloquer les nuits qui ont des réservations existantes"
 
 #, fuzzy
 #| msgid "Image uploaded successfully!"
@@ -243,7 +243,7 @@ msgid "Date unblocked successfully"
 msgstr "Image téléchargée avec succès!"
 
 msgid "Please provide both name and URL"
-msgstr ""
+msgstr "Veuillez fournir à la fois le nom et l'URL"
 
 #, fuzzy
 #| msgid "Availability entry deleted!"
@@ -251,13 +251,13 @@ msgid "iCal feed deleted!"
 msgstr "Entrée de disponibilité supprimée!"
 
 msgid "Feed not found"
-msgstr ""
+msgstr "Aliments non trouvés"
 
 msgid "All feeds synced!"
-msgstr ""
+msgstr "Tous les flux sont synchronisés !"
 
 msgid "Staff members should use the Staff Dashboard to manage conversations."
-msgstr ""
+msgstr "Les fonctionnaires devraient utiliser le tableau de bord pour gérer les conversations."
 
 msgid "Message sent!"
 msgstr "Message envoyé!"
@@ -269,31 +269,31 @@ msgstr "Retour aux réservations"
 
 #, python-format
 msgid "Hello %(username)s,"
-msgstr ""
+msgstr "Bonjour %(username)s,"
 
 msgid "Thank you for registering with ApartBook!"
-msgstr ""
+msgstr "Merci de vous être inscrit à ApartBook!"
 
 msgid ""
 "Please click the link below to verify your email address and activate your "
 "account:"
-msgstr ""
+msgstr "Veuillez cliquer sur le lien ci-dessous pour vérifier votre adresse e-mail et activer votre compte:"
 
 msgid "This link will expire in 24 hours."
-msgstr ""
+msgstr "Ce lien expirera dans 24 heures."
 
 msgid ""
 "If you didn't create an account with ApartBook, please ignore this email."
-msgstr ""
+msgstr "Si vous n'avez pas créé de compte avec ApartBook, veuillez ignorer cet email."
 
 msgid "Best regards,"
-msgstr ""
+msgstr "Mes salutations,"
 
 msgid "The ApartBook Team"
-msgstr ""
+msgstr "L'équipe d'ApartBook"
 
 msgid "This is an automated message. Please do not reply to this email."
-msgstr ""
+msgstr "C'est un message automatisé. Veuillez ne pas répondre à ce courriel."
 
 msgid "Email Verified"
 msgstr "Email vérifié"
@@ -302,7 +302,7 @@ msgid "Email verified!"
 msgstr "Email vérifié !"
 
 msgid "Your account is now active and ready to use"
-msgstr ""
+msgstr "Votre compte est maintenant actif et prêt à l'emploi"
 
 #, fuzzy
 #| msgid "Sign in to book this apartment"
@@ -313,18 +313,18 @@ msgid "Verification Failed"
 msgstr "Échec de la vérification"
 
 msgid "Verification failed"
-msgstr ""
+msgstr "La vérification a échoué"
 
 msgid "This verification link is invalid or has expired"
-msgstr ""
+msgstr "Ce lien de vérification est invalide ou a expiré"
 
 msgid ""
 "The link may have already been used or has expired. Please try registering "
 "again or contact support if you need assistance."
-msgstr ""
+msgstr "Le lien peut avoir déjà été utilisé ou a expiré. Veuillez vous inscrire à nouveau ou contacter le support si vous avez besoin d'aide."
 
 msgid "Register again"
-msgstr ""
+msgstr "Inscrivez-vous à nouveau"
 
 #, fuzzy
 #| msgid "Back to Bookings"
@@ -335,19 +335,19 @@ msgid "Verify Your Email"
 msgstr "Vérifiez votre email"
 
 msgid "Verify your email"
-msgstr ""
+msgstr "Vérifiez votre email"
 
 msgid "We've sent a verification link to your email address"
-msgstr ""
+msgstr "Nous avons envoyé un lien de vérification à votre adresse email"
 
 msgid "What's next?"
-msgstr ""
+msgstr "Et ensuite ?"
 
 msgid "Check your email inbox"
-msgstr ""
+msgstr "Vérifiez votre boîte de réception"
 
 msgid "Click the verification link"
-msgstr ""
+msgstr "Cliquez sur le lien de vérification"
 
 #, fuzzy
 #| msgid "Sign in to book this apartment"
@@ -355,7 +355,7 @@ msgid "Start booking amazing apartments!"
 msgstr "Connectez-vous pour réserver cet appartement"
 
 msgid "Didn't receive the email? Check your spam folder."
-msgstr ""
+msgstr "Vous n'avez pas reçu l'e-mail ? Vérifiez votre dossier spam."
 
 #, fuzzy
 #| msgid "Sign Up"
@@ -366,13 +366,13 @@ msgid "Welcome back"
 msgstr "Bienvenue"
 
 msgid "Sign in to continue to your account"
-msgstr ""
+msgstr "Connectez-vous pour continuer sur votre compte"
 
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
 msgid "Enter your username"
-msgstr ""
+msgstr "Saisissez votre nom d'utilisateur"
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -381,7 +381,7 @@ msgid "Forgot password?"
 msgstr "Mot de passe oublié ?"
 
 msgid "Enter your password"
-msgstr ""
+msgstr "Saisissez votre mot de passe"
 
 msgid "Don't have an account?"
 msgstr "Vous n'avez pas de compte?"
@@ -395,10 +395,10 @@ msgid "Reset Password"
 msgstr "Réinitialiser le mot de passe"
 
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Vous avez oublié votre mot de passe ?"
 
 msgid "No worries, we'll send you reset instructions"
-msgstr ""
+msgstr "Pas de soucis, nous vous enverrons des instructions de réinitialisation"
 
 #, fuzzy
 #| msgid "Address"
@@ -406,16 +406,16 @@ msgid "Email address"
 msgstr "Adresse"
 
 msgid "Enter your registered email"
-msgstr ""
+msgstr "Entrez votre email enregistré"
 
 msgid "Send Reset Link"
-msgstr ""
+msgstr "Envoyer Reset Link"
 
 msgid "Password Reset Complete"
-msgstr ""
+msgstr "Mot de passe Réinitialiser Terminé"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Réinitialisation du mot de passe terminée"
 
 #, fuzzy
 #| msgid "Your booking has been cancelled."
@@ -423,22 +423,22 @@ msgid "Your password has been successfully changed"
 msgstr "Votre réservation a été annulée."
 
 msgid "Sign in with new password"
-msgstr ""
+msgstr "Se connecter avec un nouveau mot de passe"
 
 msgid "Set New Password"
-msgstr ""
+msgstr "Définir un nouveau mot de passe"
 
 msgid "Set new password"
-msgstr ""
+msgstr "Définir un nouveau mot de passe"
 
 msgid "Your new password must be different from previous passwords"
-msgstr ""
+msgstr "Votre nouveau mot de passe doit être différent des mots de passe précédents"
 
 msgid "New password"
-msgstr ""
+msgstr "Nouveau mot de passe"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Saisissez un nouveau mot de passe"
 
 #, fuzzy
 #| msgid "Confirmed"
@@ -446,13 +446,13 @@ msgid "Confirm new password"
 msgstr "Confirmé"
 
 msgid "Repeat new password"
-msgstr ""
+msgstr "Répéter le nouveau mot de passe"
 
 msgid "Invalid or expired link"
-msgstr ""
+msgstr "Lien non valide ou expiré"
 
 msgid "This password reset link has expired or is invalid."
-msgstr ""
+msgstr "Ce lien de réinitialisation du mot de passe a expiré ou est invalide."
 
 #, fuzzy
 #| msgid "Request to Book"
@@ -460,19 +460,19 @@ msgid "Request a new link"
 msgstr "Demander à réserver"
 
 msgid "Check Your Email"
-msgstr ""
+msgstr "Vérifiez votre courriel"
 
 msgid "Check your email"
-msgstr ""
+msgstr "Vérifiez votre email"
 
 msgid "We've sent password reset instructions to your email"
-msgstr ""
+msgstr "Nous avons envoyé des instructions de réinitialisation du mot de passe à votre email"
 
 msgid "Didn't receive the email? Check your spam folder or"
-msgstr ""
+msgstr "Vous n'avez pas reçu l'e-mail ? Vérifiez votre dossier spam ou"
 
 msgid "try again"
-msgstr ""
+msgstr "Essayez encore"
 
 #, fuzzy
 #| msgid "Create"
@@ -480,7 +480,7 @@ msgid "Create Account"
 msgstr "Créer"
 
 msgid "Create your account"
-msgstr ""
+msgstr "Créer votre compte"
 
 #, fuzzy
 #| msgid "Sign in to book this apartment"
@@ -488,28 +488,28 @@ msgid "Join us to book amazing apartments"
 msgstr "Connectez-vous pour réserver cet appartement"
 
 msgid "Choose a username"
-msgstr ""
+msgstr "Choisissez un nom d'utilisateur"
 
 msgid "your@email.com"
-msgstr ""
+msgstr "Votre@email.com"
 
 msgid "First name"
 msgstr "Prénom"
 
 msgid "John"
-msgstr ""
+msgstr "- Oui."
 
 msgid "Last name"
 msgstr "Nom de famille"
 
 msgid "Doe"
-msgstr ""
+msgstr "Doe"
 
 msgid "Create a strong password"
 msgstr "Créez un mot de passe fort"
 
 msgid "At least 8 characters with letters and numbers"
-msgstr ""
+msgstr "Au moins 8 caractères avec lettres et chiffres"
 
 #, fuzzy
 #| msgid "Confirmed"
@@ -517,10 +517,10 @@ msgid "Confirm password"
 msgstr "Confirmé"
 
 msgid "Repeat your password"
-msgstr ""
+msgstr "Répétez votre mot de passe"
 
 msgid "By signing up, you agree to our"
-msgstr ""
+msgstr "En vous inscrivant, vous acceptez notre"
 
 msgid "Terms of Service"
 msgstr "Conditions d'utilisation"
@@ -613,7 +613,7 @@ msgstr "En attente de confirmation"
 msgid ""
 "Your booking request is being reviewed by the owner. You'll receive a "
 "notification once it's confirmed."
-msgstr ""
+msgstr "Votre demande de réservation est examinée par le propriétaire. Vous recevrez une notification une fois qu'elle aura été confirmée."
 "Votre demande de réservation est en cours d'examen par le propriétaire. Vous "
 "recevrez une notification une fois qu'elle sera confirmée."
 
@@ -663,7 +663,7 @@ msgid "No bookings yet"
 msgstr "Aucune réservation pour le moment"
 
 msgid "Start exploring apartments to make your first booking!"
-msgstr ""
+msgstr "Commencez à explorer des appartements pour faire votre première réservation!"
 "Commencez à explorer les appartements pour faire votre première réservation!"
 
 msgid "Conversation"
@@ -724,7 +724,7 @@ msgid "night"
 msgstr "nuit"
 
 msgid "Price varies by guests"
-msgstr ""
+msgstr "Le prix varie selon les clients"
 
 #, fuzzy
 #| msgid "Max"
@@ -748,7 +748,7 @@ msgid "You won't be charged yet"
 msgstr "Vous ne serez pas encore facturé"
 
 msgid "Staff cannot create bookings"
-msgstr ""
+msgstr "Le personnel ne peut pas créer de réservations"
 
 msgid "Sign in to book this apartment"
 msgstr "Connectez-vous pour réserver cet appartement"
@@ -769,7 +769,7 @@ msgid "Select date"
 msgstr "Sélectionner une date"
 
 msgid "Both check-in and check-out dates are required"
-msgstr ""
+msgstr "Les dates d'arrivée et de départ sont obligatoires"
 
 msgid "Number of guests"
 msgstr "Nombre d'invités"
@@ -820,7 +820,7 @@ msgstr "Trouvez votre appartement parfait"
 msgid ""
 "Discover beautiful apartments for your next trip. Book directly with the "
 "owner for the best experience."
-msgstr ""
+msgstr "Découvrez de beaux appartements pour votre prochain voyage. Réservez directement avec le propriétaire pour la meilleure expérience."
 "Découvrez de beaux appartements pour votre prochain voyage. Réservez "
 "directement auprès du propriétaire pour la meilleure expérience."
 
@@ -882,7 +882,7 @@ msgid "New Apartment"
 msgstr "Nouvel appartement"
 
 msgid "Please correct the errors below:"
-msgstr ""
+msgstr "Veuillez corriger les erreurs ci-dessous:"
 
 msgid "Title"
 msgstr "Titre"
@@ -909,16 +909,16 @@ msgid "Price per Night"
 msgstr "Prix/Nuit"
 
 msgid "Fixed price per night regardless of guest count"
-msgstr ""
+msgstr "Prix fixe par nuit quel que soit le nombre d'invités"
 
 msgid "Price per Night by Guest Count"
-msgstr ""
+msgstr "Prix par nuit par invité Count"
 
 msgid "Set the capacity first to configure per-guest pricing"
-msgstr ""
+msgstr "Définir la capacité d'abord pour configurer le prix par invité"
 
 msgid "Please set the maximum guest capacity first"
-msgstr ""
+msgstr "Veuillez d'abord définir la capacité maximale des clients"
 
 #, fuzzy
 #| msgid "Price/Night"
@@ -939,22 +939,22 @@ msgid "Upload Images"
 msgstr "Télécharger des images"
 
 msgid "Drop images here or click to browse"
-msgstr ""
+msgstr "Déposer des images ici ou cliquer pour parcourir"
 
 msgid "You can upload multiple images at once"
-msgstr ""
+msgstr "Vous pouvez télécharger plusieurs images à la fois"
 
 msgid "Current Images"
 msgstr "Images actuelles"
 
 msgid "Drag to reorder - First image is the main photo"
-msgstr ""
+msgstr "Faites glisser pour réorganiser - La première image est la photo principale"
 
 msgid "Main Photo"
 msgstr "Photo principale"
 
 msgid "Delete this image?"
-msgstr ""
+msgstr "Supprimer cette image ?"
 
 #, fuzzy
 #| msgid "No messages yet"
@@ -980,7 +980,7 @@ msgid "Staff Panel"
 msgstr "Panneau du personnel"
 
 msgid "unread message"
-msgstr ""
+msgstr "message non lu"
 
 msgid "Bookings"
 msgstr "Réservations"
@@ -1009,7 +1009,7 @@ msgstr "Capacité"
 msgid ""
 "Price will be recalculated automatically based on dates, guests, and pricing "
 "rules."
-msgstr ""
+msgstr "Le prix sera recalculé automatiquement en fonction des dates, des clients et des règles de prix."
 
 #, fuzzy
 #| msgid "Cancel Booking"
@@ -1048,7 +1048,7 @@ msgid "Block Dates"
 msgstr "Bloqué"
 
 msgid "Click on any date to block it. Click on a blocked date to unblock it."
-msgstr ""
+msgstr "Cliquez sur n'importe quelle date pour la bloquer. Cliquez sur une date bloquée pour la débloquer."
 
 msgid "Block Date Range"
 msgstr "Bloquer une plage de dates"
@@ -1072,7 +1072,7 @@ msgid "Cancel"
 msgstr "Annulé"
 
 msgid "Unblock Date"
-msgstr ""
+msgstr "Débloquer la date"
 
 #, fuzzy
 #| msgid "Are you sure you want to cancel this booking?"
@@ -1101,19 +1101,19 @@ msgid "Base price"
 msgstr "Prix de base"
 
 msgid "Block this date?"
-msgstr ""
+msgstr "Bloquer cette date ?"
 
 msgid "Error blocking date"
-msgstr ""
+msgstr "Date de blocage de l'erreur"
 
 msgid "Click to unblock"
-msgstr ""
+msgstr "Cliquez pour débloquer"
 
 msgid "Error blocking dates"
-msgstr ""
+msgstr "Dates de blocage des erreurs"
 
 msgid "Error unblocking date"
-msgstr ""
+msgstr "Erreur lors du déblocage"
 
 msgid "Calendar Overview"
 msgstr "Aperçu du calendrier"
@@ -1134,7 +1134,7 @@ msgid "All Apartments"
 msgstr "Voir tous les appartements"
 
 msgid "Click on an apartment to view its detailed calendar"
-msgstr ""
+msgstr "Cliquez sur un appartement pour voir son calendrier détaillé"
 
 msgid "Quick Stats"
 msgstr "Statistiques rapides"
@@ -1150,19 +1150,19 @@ msgstr "Exporter le calendrier"
 msgid ""
 "Use this URL to share your calendar with other platforms like Airbnb, "
 "Booking.com, or any service that supports iCal."
-msgstr ""
+msgstr "Utilisez cette URL pour partager votre agenda avec d'autres plateformes comme Airbnb, Booking.com, ou tout service prenant en charge iCal."
 
 msgid "Your iCal URL"
-msgstr ""
+msgstr "Votre URL iCal"
 
 msgid "Copy"
 msgstr "Copier"
 
 msgid "This URL will always show the latest bookings and blocked dates."
-msgstr ""
+msgstr "Cette URL affichera toujours les dernières réservations et les dates bloquées."
 
 msgid "Download .ics file"
-msgstr ""
+msgstr "Télécharger le fichier .ics"
 
 msgid "Import Calendars"
 msgstr "Importer des calendriers"
@@ -1170,13 +1170,13 @@ msgstr "Importer des calendriers"
 msgid ""
 "Add iCal URLs from other platforms to automatically sync their bookings. "
 "Calendars are synced every minute."
-msgstr ""
+msgstr "Ajouter des URLs iCal d'autres plateformes pour synchroniser automatiquement leurs réservations. Les calendriers sont synchronisés chaque minute."
 
 msgid "Name (e.g., Airbnb)"
-msgstr ""
+msgstr "Nom (par exemple Airbnb)"
 
 msgid "iCal URL"
-msgstr ""
+msgstr "URL iCal"
 
 #, fuzzy
 #| msgid "Address"
@@ -1184,10 +1184,10 @@ msgid "Add"
 msgstr "Adresse"
 
 msgid "Sync All Now"
-msgstr ""
+msgstr "Synchronisez tout maintenant"
 
 msgid "Connected Calendars"
-msgstr ""
+msgstr "Calendriers connectés"
 
 msgid "Name"
 msgstr "Nom"
@@ -1196,10 +1196,10 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Last Synced"
-msgstr ""
+msgstr "Dernière fusion"
 
 msgid "Inactive"
-msgstr ""
+msgstr "Inactif"
 
 msgid "OK"
 msgstr "OK"
@@ -1208,27 +1208,27 @@ msgid "Error"
 msgstr "Erreur"
 
 msgid "Never synced"
-msgstr ""
+msgstr "Jamais synchronisé"
 
 msgid "Sync now"
-msgstr ""
+msgstr "Synchronisez maintenant"
 
 msgid "Delete"
 msgstr "Supprimer"
 
 msgid "No external calendars connected yet."
-msgstr ""
+msgstr "Pas encore de calendriers externes connectés."
 
 msgid ""
 "Add iCal URLs from Airbnb, Booking.com, or other platforms to sync their "
 "bookings automatically."
-msgstr ""
+msgstr "Ajoutez des URL iCal depuis Airbnb, Booking.com ou d'autres plateformes pour synchroniser automatiquement leurs réservations."
 
 msgid "Copied!"
 msgstr "Copié !"
 
 msgid "Delete this feed and all imported blocked dates?"
-msgstr ""
+msgstr "Supprimer ce flux et toutes les dates bloquées importées?"
 
 #~ msgid "Discount"
 #~ msgstr "Réduction"

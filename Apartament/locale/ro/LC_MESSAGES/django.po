@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: ApartBook 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-15 13:04+0000\n"
-"PO-Revision-Date: 2025-12-03 13:10+0000\n"
+"PO-Revision-Date: 2025-12-16 10:34+0200\n"
 "Last-Translator: ApartBook Team\n"
 "Language-Team: Romanian\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
-"2:1));\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
+"X-Generator: Poedit 3.8\n"
 
 msgid "English"
 msgstr "Engleză"
@@ -46,10 +46,10 @@ msgid "Check-out date must be after check-in date."
 msgstr "Data de check-out trebuie să fie după data de check-in."
 
 msgid "Per Apartment"
-msgstr "Apartament"
+msgstr "Per Apartament"
 
 msgid "Per Guest"
-msgstr "Oaspeți"
+msgstr "Per Oaspete"
 
 msgid "Maximum number of guests"
 msgstr "Număr de oaspeți"
@@ -79,7 +79,7 @@ msgid "The iCal feed this block came from"
 msgstr "Feed-ul iCal din care provine acest bloc"
 
 msgid "Availabilities"
-msgstr "Toate Orașele"
+msgstr "Disponibilități"
 
 msgid "Available"
 msgstr "Disponibil"
@@ -150,29 +150,21 @@ msgstr "Mesaj de la oaspete către proprietar"
 #, python-format
 msgid "Guests count exceeds apartment capacity (%(capacity)s)."
 msgstr "Numărul de oaspeți depășește capacitatea apartamentului (%(capacity)s)."
-"Numărul de oaspeți depășește capacitatea apartamentului (%(capacity)s)."
 
-msgid ""
-"Staff members cannot create bookings. Please use a regular user account."
-msgstr ""
+msgid "Staff members cannot create bookings. Please use a regular user account."
+msgstr "Membrii personalului nu pot crea rezervări. Vă rugăm să utilizați un cont de utilizator."
 
 msgid "The apartment is not available for the selected dates."
 msgstr "Apartamentul nu este disponibil pentru datele selectate."
 
-msgid ""
-"Your booking request has been submitted! The owner will review it shortly."
-msgstr ""
-"Cererea dvs. de rezervare a fost trimisă! Proprietarul o va examina în "
-"curând."
+msgid "Your booking request has been submitted! The owner will review it shortly."
+msgstr "Cererea ta de rezervare a fost trimisă! Proprietarul o va examina în scurt timp."
 
-msgid ""
-"Staff members cannot access user bookings. Please use the Staff Dashboard."
-msgstr ""
+msgid "Staff members cannot access user bookings. Please use the Staff Dashboard."
+msgstr "Membrii staff nu pot accesa rezervările utilizatorilor. Vă rugăm să utilizați Staff Dashboard."
 
-msgid ""
-"Staff members cannot cancel bookings through this interface. Please use the "
-"Staff Dashboard."
-msgstr ""
+msgid "Staff members cannot cancel bookings through this interface. Please use the Staff Dashboard."
+msgstr "Membrii personalului nu pot anula rezervările prin această interfață. Vă rugăm să utilizați Staff Dashboard."
 
 msgid "Your booking has been cancelled."
 msgstr "Rezervarea dvs. a fost anulată."
@@ -253,7 +245,7 @@ msgid "Message sent!"
 msgstr "Mesaje"
 
 msgid "Back to home"
-msgstr "Rezervările Mele"
+msgstr "Înapoi la pagina principală"
 
 #, python-format
 msgid "Hello %(username)s,"
@@ -262,17 +254,14 @@ msgstr "Bună %(username)s,"
 msgid "Thank you for registering with ApartBook!"
 msgstr "Vă mulțumim că v-ați înregistrat la ApartBook!"
 
-msgid ""
-"Please click the link below to verify your email address and activate your "
-"account:"
-msgstr ""
+msgid "Please click the link below to verify your email address and activate your account:"
+msgstr "Vă rugăm să faceți clic pe link-ul de mai jos pentru a verifica adresa de e-mail și să activați contul:"
 
 msgid "This link will expire in 24 hours."
 msgstr "Acest link va expira în 24 de ore."
 
-msgid ""
-"If you didn't create an account with ApartBook, please ignore this email."
-msgstr ""
+msgid "If you didn't create an account with ApartBook, please ignore this email."
+msgstr "Dacă nu ați creat un cont cu ApartBook, vă rugăm să ignorați acest e-mail."
 
 msgid "Best regards,"
 msgstr "Cu stimă,"
@@ -304,16 +293,14 @@ msgstr "Verificare eșuată"
 msgid "This verification link is invalid or has expired"
 msgstr "Acest link de verificare este invalid sau a expirat"
 
-msgid ""
-"The link may have already been used or has expired. Please try registering "
-"again or contact support if you need assistance."
-msgstr ""
+msgid "The link may have already been used or has expired. Please try registering again or contact support if you need assistance."
+msgstr "Legătura poate fi deja utilizată sau a expirat. Vă rugăm să încercaţi să vă înregistraţi din nou sau să contactaţi suportul dacă aveţi nevoie de asistenţă."
 
 msgid "Register again"
 msgstr "Înregistrați-vă din nou"
 
 msgid "Back to sign in"
-msgstr "Rezervările Mele"
+msgstr "Înapoi la pagina de sign in"
 
 msgid "Verify Your Email"
 msgstr "Verificați-vă Email-ul"
@@ -334,7 +321,7 @@ msgid "Click the verification link"
 msgstr "Faceți clic pe linkul de verificare"
 
 msgid "Start booking amazing apartments!"
-msgstr "Autentifică-te pentru a rezerva acest apartament"
+msgstr "Începeți să rezervați apartamente uimitoare!"
 
 msgid "Didn't receive the email? Check your spam folder."
 msgstr "Nu ați primit email-ul? Verificați folderul de spam."
@@ -394,7 +381,7 @@ msgid "Password reset complete"
 msgstr "Resetare parolă completă"
 
 msgid "Your password has been successfully changed"
-msgstr "Rezervarea dvs. a fost anulată."
+msgstr "Parola dumneavoastră a fost modificată cu succes"
 
 msgid "Sign in with new password"
 msgstr "Autentificați-vă cu noua parolă"
@@ -571,14 +558,11 @@ msgid "Awaiting Confirmation"
 msgstr "În Așteptarea Confirmării"
 
 #, fuzzy
-#| msgid ""
-#| "Your booking request has been submitted! The owner will review it shortly."
-msgid ""
-"Your booking request is being reviewed by the owner. You'll receive a "
-"notification once it's confirmed."
+#| msgid "Your booking request has been submitted! The owner will review it shortly."
+msgid "Your booking request is being reviewed by the owner. You'll receive a notification once it's confirmed."
 msgstr ""
-"Cererea dvs. de rezervare a fost trimisă! Proprietarul o va examina în "
-"curând."
+"Cererea ta de rezervare este revizuită de proprietar. Vei primi o notificare după ce se confirmă.Cererea dvs. de rezervare a fost trimisă! Proprietarul o va "
+"examina în curând."
 
 msgid "Are you sure you want to cancel this booking?"
 msgstr "Sigur doriți să anulați această rezervare?"
@@ -587,13 +571,13 @@ msgid "Cancel Booking"
 msgstr "Rezervările Mele"
 
 msgid "Booking Confirmed!"
-msgstr "Confirmat"
+msgstr "Rezervare Confirmată"
 
 msgid "Your booking has been confirmed. We look forward to hosting you!"
 msgstr "Rezervarea dvs. a fost confirmată. Ne bucurăm să vă găzduim!"
 
 msgid "guests max"
-msgstr "oaspeți"
+msgstr "max oaspeți"
 
 msgid "View Apartment"
 msgstr "Vezi Toate Apartamentele"
@@ -695,7 +679,7 @@ msgid "Notes"
 msgstr "Notele Dvs."
 
 msgid "optional"
-msgstr "Locație"
+msgstr "Opțional"
 
 msgid "Request to Book"
 msgstr "Solicită Rezervare"
@@ -742,16 +726,14 @@ msgstr "Șterge"
 msgid "results"
 msgstr "rezultate"
 
-#, fuzzy
-#| msgid "No apartments available yet"
 msgid "Showing apartments available from"
-msgstr "Încă nu există apartamente disponibile"
+msgstr "Se afișează apartamente disponibile de la"
 
 msgid "to"
 msgstr "până la"
 
 msgid "guest"
-msgstr "oaspeți"
+msgstr "oaspete"
 
 msgid "Previous"
 msgstr "Anterior"
@@ -771,12 +753,10 @@ msgstr "Găsește Cazarea Perfectă"
 msgid "Find Your Perfect Apartment"
 msgstr "Găsește Apartamentul Perfect"
 
-msgid ""
-"Discover beautiful apartments for your next trip. Book directly with the "
-"owner for the best experience."
+msgid "Discover beautiful apartments for your next trip. Book directly with the owner for the best experience."
 msgstr ""
-"Descoperă apartamente frumoase pentru următoarea ta călătorie. Rezervă "
-"direct cu proprietarul pentru cea mai bună experiență."
+"Descoperă apartamente frumoase pentru următoarea călătorie. Rezervați direct cu proprietarul pentru cea mai bună experiență.Descoperă apartamente frumoase pentru "
+"următoarea ta călătorie. Rezervă direct cu proprietarul pentru cea mai bună experiență."
 
 msgid "Featured Apartments"
 msgstr "Apartamente Recomandate"
@@ -830,10 +810,10 @@ msgid "Staff"
 msgstr "Personal"
 
 msgid "Edit Apartment"
-msgstr "Apartament"
+msgstr "Edit Apartament"
 
 msgid "New Apartment"
-msgstr "Apartament"
+msgstr "New Apartament"
 
 msgid "Please correct the errors below:"
 msgstr "Vă rugăm să corectați erorile de mai jos:"
@@ -899,13 +879,13 @@ msgid "Delete this image?"
 msgstr "Ștergeți această imagine?"
 
 msgid "No images uploaded yet"
-msgstr "Mesaje"
+msgstr "Nicio imagine încărcată"
 
 msgid "Manage Apartments"
-msgstr "Apartamente"
+msgstr "Gestionează Apartamente"
 
 msgid "Add Apartment"
-msgstr "Apartament"
+msgstr "Adaugă Apartament"
 
 msgid "Image"
 msgstr "Imagine"
@@ -917,7 +897,7 @@ msgid "Price/Night"
 msgstr "Preț/Noapte"
 
 msgid "Staff Panel"
-msgstr "Panou Personal"
+msgstr "Panou Staff"
 
 msgid "unread message"
 msgstr "mesaj necitit"
@@ -929,10 +909,10 @@ msgid "Calendar"
 msgstr "Calendar"
 
 msgid "Guest"
-msgstr "Oaspeți"
+msgstr "Oaspete"
 
 msgid "Edit Booking"
-msgstr "Rezervările Mele"
+msgstr "Modifică Rezervarea"
 
 msgid "Number of Guests"
 msgstr "Număr de oaspeți"
@@ -940,34 +920,32 @@ msgstr "Număr de oaspeți"
 msgid "Max capacity:"
 msgstr "Capacitate"
 
-msgid ""
-"Price will be recalculated automatically based on dates, guests, and pricing "
-"rules."
-msgstr ""
+msgid "Price will be recalculated automatically based on dates, guests, and pricing rules."
+msgstr "Pretul va fi recalculat automat pe baza datelor, oaspeților, și normele de stabilire a prețurilor."
 
 msgid "Update Booking"
-msgstr "Rezervările Mele"
+msgstr "Modifică Rezervarea"
 
 msgid "Update Status"
-msgstr "Status Plată"
+msgstr "Modifică Status"
 
 msgid "Quick Actions"
-msgstr "Locație"
+msgstr "Acțiuni rapide"
 
 msgid "View Apartment Calendar"
-msgstr "Vezi Toate Apartamentele"
+msgstr "Vezi Calendar Apartament"
 
 msgid "Manage Bookings"
-msgstr "Rezervările Mele"
+msgstr "Gestionează Rezervări"
 
 msgid "Booking Calendar"
-msgstr "Confirmat"
+msgstr "Calendar Rezervare"
 
 msgid "iCal Sync"
 msgstr "Sincronizare iCal"
 
 msgid "Block Dates"
-msgstr "Blocat"
+msgstr "Blochează Data"
 
 msgid "Click on any date to block it. Click on a blocked date to unblock it."
 msgstr "Faceți clic pe orice dată pentru a o bloca. Faceți clic pe o dată blocată pentru a o debloca."
@@ -985,7 +963,7 @@ msgid "Note (optional)"
 msgstr "Note pentru proprietar (opțional)"
 
 msgid "Cancel"
-msgstr "Anulat de utilizator"
+msgstr "Anulare"
 
 msgid "Unblock Date"
 msgstr "Deblocare Dată"
@@ -997,13 +975,13 @@ msgid "Unblock"
 msgstr "Deblochează"
 
 msgid "Manage Availability"
-msgstr "Toate Orașele"
+msgstr "Modifică disponibilitate"
 
 msgid "Pricing Rules"
 msgstr "Regulă de preț adăugată!"
 
 msgid "Apartment Info"
-msgstr "Apartament"
+msgstr "Detalii Apartament"
 
 msgid "Base price"
 msgstr "Preț de bază"
@@ -1047,10 +1025,8 @@ msgstr "Rezervările Mele"
 msgid "Export Calendar"
 msgstr "Export Calendar"
 
-msgid ""
-"Use this URL to share your calendar with other platforms like Airbnb, "
-"Booking.com, or any service that supports iCal."
-msgstr ""
+msgid "Use this URL to share your calendar with other platforms like Airbnb, Booking.com, or any service that supports iCal."
+msgstr "Utilizați acest URL pentru a partaja calendarul cu alte platforme, cum ar fi Airbnb, Booking.com, sau orice serviciu care suportă iCal."
 
 msgid "Your iCal URL"
 msgstr "URL-ul dvs. iCal"
@@ -1067,10 +1043,8 @@ msgstr "Descarcă fișier .ics"
 msgid "Import Calendars"
 msgstr "Import Calendare"
 
-msgid ""
-"Add iCal URLs from other platforms to automatically sync their bookings. "
-"Calendars are synced every minute."
-msgstr ""
+msgid "Add iCal URLs from other platforms to automatically sync their bookings. Calendars are synced every minute."
+msgstr "Adăugați URL-uri iCal de la alte platforme pentru a sincroniza automat rezervările lor. Calendarele sunt sincronizate în fiecare minut."
 
 msgid "Name (e.g., Airbnb)"
 msgstr "Nume (ex., Airbnb)"
@@ -1117,10 +1091,8 @@ msgstr "Șterge"
 msgid "No external calendars connected yet."
 msgstr "Încă nu există calendare externe conectate."
 
-msgid ""
-"Add iCal URLs from Airbnb, Booking.com, or other platforms to sync their "
-"bookings automatically."
-msgstr ""
+msgid "Add iCal URLs from Airbnb, Booking.com, or other platforms to sync their bookings automatically."
+msgstr "Adăugați URL-uri iCal de la Airbnb, Booking.com, sau alte platforme pentru a sincroniza automat rezervările lor."
 
 msgid "Copied!"
 msgstr "Copiat!"
