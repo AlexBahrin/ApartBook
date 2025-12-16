@@ -1,0 +1,56 @@
+"""
+Production settings for Apartament project.
+Use this for Render.com deployment.
+"""
+
+import os
+from .base import *
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
+
+
+# Database - Render PostgreSQL
+DATABASES = {
+    'default': {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get('DB_NAME', 'ap_db_yuqw'),
+        "USER": os.environ.get('DB_USER', 'postgress'),
+        "PASSWORD": os.environ.get('DB_PASSWORD', 'dG1hWcTzn5b7XAcfuqvjRKuDQ6HHladS'),
+        "HOST": os.environ.get('DB_HOST', 'dpg-d50ht03uibrs73dtb97g-a.oregon-postgres.render.com'),
+        "PORT": os.environ.get('DB_PORT', '5432'),
+        "OPTIONS": {
+            "sslmode": "require",  # important on Render
+        },
+    }
+}
+
+
+# Email - Console backend (change to SMTP for real emails)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Uncomment and configure for real email sending:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
+# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+
+# Celery - Redis (configure if using Redis on Render)
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+
+
+# Security settings for production
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
