@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+wpby&ge4yzx((y@7)pu_w7!9)o1)2z1tqdtw6_&rt48pmmztv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
 
 
 # Application definition
@@ -86,7 +86,7 @@ DATABASES = {
         "NAME": "ap_db_yuqw",
         "USER": "postgress",
         "PASSWORD": "dG1hWcTzn5b7XAcfuqvjRKuDQ6HHladS",
-        "HOST": "postgresql://postgress:dG1hWcTzn5b7XAcfuqvjRKuDQ6HHladS@dpg-d50ht03uibrs73dtb97g-a/ap_db_yuqw",
+        "HOST": "dpg-d50ht03uibrs73dtb97g-a.oregon-postgres.render.com",
         "PORT": "5432",
         "OPTIONS": {
             "sslmode": "require",  # important on Render
@@ -159,7 +159,11 @@ DEFAULT_CURRENCY = 'RON'
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Only add to STATICFILES_DIRS if the directory exists
+_static_dir = BASE_DIR / 'static'
+STATICFILES_DIRS = [_static_dir] if _static_dir.exists() else []
 
 # Media files (User uploads)
 MEDIA_URL = '/media/'
