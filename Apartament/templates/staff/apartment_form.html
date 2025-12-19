@@ -149,11 +149,8 @@
                     <a href="{% url 'staff_apartment_images' object.pk %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
                         <i class="bi bi-images"></i> Manage Images
                     </a>
-                    <a href="{% url 'staff_availability' object.pk %}" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                    <a href="{% url 'staff_availability' object.pk %}" class="btn btn-outline-secondary btn-sm w-100">
                         <i class="bi bi-calendar"></i> Set Availability
-                    </a>
-                    <a href="{% url 'staff_pricing_rules' object.pk %}" class="btn btn-outline-secondary btn-sm w-100">
-                        <i class="bi bi-currency-euro"></i> Pricing Rules
                     </a>
                 {% endif %}
             </div>

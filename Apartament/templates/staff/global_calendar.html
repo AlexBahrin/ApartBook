@@ -4,6 +4,7 @@
 {% block title %}{% trans "Calendar" %} - {% trans "Staff Dashboard" %}{% endblock %}
 
 {% block extra_css %}
+{{ block.super }}
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
 <style>
     #calendar {

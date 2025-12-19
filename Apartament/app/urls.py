@@ -47,8 +47,6 @@ urlpatterns = [
     path('staff/apartments/<int:pk>/block-dates/', views.staff_block_dates, name='staff_block_dates'),
     path('staff/apartments/<int:pk>/unblock-date/<int:availability_id>/', views.staff_unblock_date, name='staff_unblock_date'),
     path('staff/availability/<int:pk>/delete/', views.staff_delete_availability, name='staff_delete_availability'),
-    path('staff/apartments/<int:pk>/pricing-rules/', views.staff_pricing_rules, name='staff_pricing_rules'),
-    path('staff/pricing-rules/<int:pk>/delete/', views.staff_delete_pricing_rule, name='staff_delete_pricing_rule'),
     
     # iCal Import/Export
     path('staff/apartments/<int:pk>/ical/', views.staff_ical_feeds, name='staff_ical_feeds'),

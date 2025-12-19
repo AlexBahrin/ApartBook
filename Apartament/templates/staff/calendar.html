@@ -5,6 +5,7 @@
 {% block title %}{% trans "Calendar" %} - {{ apartment.title }}{% endblock %}
 
 {% block extra_css %}
+{{ block.super }}
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
 <style>
     #calendar {
@@ -164,11 +165,8 @@
                 <h6 class="mb-0">{% trans "Quick Actions" %}</h6>
             </div>
             <div class="card-body">
-                <a href="{% url 'staff_availability' apartment.pk %}" class="btn btn-outline-primary btn-sm me-2">
+                <a href="{% url 'staff_availability' apartment.pk %}" class="btn btn-outline-primary btn-sm">
                     <i class="bi bi-calendar-x"></i> {% trans "Manage Availability" %}
-                </a>
-                <a href="{% url 'staff_pricing_rules' apartment.pk %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-currency-euro"></i> {% trans "Pricing Rules" %}
                 </a>
             </div>
         </div>
@@ -181,7 +179,20 @@
             <div class="card-body">
                 <p class="mb-1"><strong>{{ apartment.title }}</strong></p>
                 <p class="mb-1 text-muted">{{ apartment.address }}</p>
-                <p class="mb-0">{% trans "Base price" %}: <strong>{% price apartment.base_price_per_night %}/{% trans "night" %}</strong></p>
+                {% if apartment.pricing_type == 'APARTMENT' %}
+                    <p class="mb-0">{% trans "Price" %}: <strong>{% price apartment.base_price_per_night %}/{% trans "night" %}</strong></p>
+                {% else %}
+                    <p class="mb-1">{% trans "Pricing" %}: <span class="badge bg-info">{% trans "Per Guest" %}</span></p>
+                    {% if apartment.price_per_guest %}
+                        <ul class="list-unstyled mb-0 small">
+                            {% for guests, price in apartment.price_per_guest.items %}
+                                <li>{{ guests }} {% if guests == "1" %}{% trans "guest" %}{% else %}{% trans "guests" %}{% endif %}: <strong>{% price price %}/{% trans "night" %}</strong></li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="mb-0">{% trans "Base price" %}: <strong>{% price apartment.base_price_per_night %}/{% trans "guest" %}/{% trans "night" %}</strong></p>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
     </div>

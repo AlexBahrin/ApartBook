@@ -3,6 +3,7 @@
 {% block title %}Conversation with {{ conversation.user.username }} - Staff{% endblock %}
 
 {% block extra_css %}
+{{ block.super }}
 <style>
     .message-container {
         max-height: 450px;

@@ -792,42 +792,6 @@ def staff_global_calendar_events_api(request):
 
 
 @staff_member_required
-def staff_pricing_rules(request, pk):
-    """Staff view: manage pricing rules."""
-    apartment = get_object_or_404(Apartment, pk=pk)
-    
-    if request.method == 'POST':
-        form = PricingRuleForm(request.POST)
-        if form.is_valid():
-            rule = form.save(commit=False)
-            rule.apartment = apartment
-            rule.save()
-            messages.success(request, _('Pricing rule added!'))
-            return redirect('staff_pricing_rules', pk=pk)
-    else:
-        form = PricingRuleForm()
-    
-    rules = apartment.pricing_rules.all().order_by('-priority', 'start_date')
-    
-    return render(request, 'staff/pricing_rules.html', {
-        'apartment': apartment,
-        'form': form,
-        'pricing_rules': rules,
-    })
-
-
-@staff_member_required
-def staff_delete_pricing_rule(request, pk):
-    """Staff view: delete pricing rule."""
-    rule = get_object_or_404(PricingRule, pk=pk)
-    apartment_pk = rule.apartment.pk
-    rule.delete()
-    messages.success(request, _('Pricing rule deleted!'))
-    return redirect('staff_pricing_rules', pk=apartment_pk)
-
-
-@staff_member_required
-@staff_member_required
 def staff_delete_availability(request, pk):
     """Staff view: delete availability entry."""
     availability = get_object_or_404(Availability, pk=pk)
