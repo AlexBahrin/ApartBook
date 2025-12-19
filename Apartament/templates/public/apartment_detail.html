@@ -55,6 +55,23 @@
     .booking-card textarea.form-control {
         min-height: 60px;
     }
+    
+    /* Mobile booking card fixes */
+    @media (max-width: 991.98px) {
+        .booking-card {
+            position: relative;
+            top: 0;
+        }
+        .carousel-item img {
+            height: 250px !important;
+        }
+    }
+    
+    @media (max-width: 575.98px) {
+        .carousel-item img {
+            height: 200px !important;
+        }
+    }
     /* Lightbox styles */
     .carousel-item img {
         cursor: pointer;

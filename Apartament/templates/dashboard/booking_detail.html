@@ -48,33 +48,33 @@
                     
                     <hr>
                     
-                    <div class="row mb-4">
-                        <div class="col-md-4">
+                    <div class="row mb-4 g-3">
+                        <div class="col-6 col-md-4">
                             <h6 class="text-muted">{% trans "Check-in" %}</h6>
-                            <p class="fs-5 mb-0">{{ booking.check_in|date:"M d, Y" }}</p>
+                            <p class="fs-6 fs-md-5 mb-0">{{ booking.check_in|date:"M d, Y" }}</p>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-6 col-md-4">
                             <h6 class="text-muted">{% trans "Check-out" %}</h6>
-                            <p class="fs-5 mb-0">{{ booking.check_out|date:"M d, Y" }}</p>
+                            <p class="fs-6 fs-md-5 mb-0">{{ booking.check_out|date:"M d, Y" }}</p>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4">
                             <h6 class="text-muted">{% trans "Duration" %}</h6>
-                            <p class="fs-5 mb-0">{{ booking.get_nights }} {% trans "nights" %}</p>
+                            <p class="fs-6 fs-md-5 mb-0">{{ booking.get_nights }} {% trans "nights" %}</p>
                         </div>
                     </div>
                     
-                    <div class="row mb-4">
-                        <div class="col-md-4">
+                    <div class="row mb-4 g-3">
+                        <div class="col-4">
                             <h6 class="text-muted">{% trans "Guests" %}</h6>
-                            <p class="fs-5 mb-0">{{ booking.guests_count }}</p>
+                            <p class="fs-6 fs-md-5 mb-0">{{ booking.guests_count }}</p>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-4">
                             <h6 class="text-muted">{% trans "Total Price" %}</h6>
-                            <p class="fs-5 mb-0 text-primary fw-bold">{% price booking.total_price %}</p>
+                            <p class="fs-6 fs-md-5 mb-0 text-primary fw-bold">{% price booking.total_price %}</p>
                         </div>
-                        <div class="col-md-4">
-                            <h6 class="text-muted">{% trans "Payment Status" %}</h6>
-                            <p class="fs-5 mb-0">{{ booking.get_payment_status_display }}</p>
+                        <div class="col-4">
+                            <h6 class="text-muted">{% trans "Payment" %}</h6>
+                            <p class="fs-6 fs-md-5 mb-0">{{ booking.get_payment_status_display }}</p>
                         </div>
                     </div>
                     

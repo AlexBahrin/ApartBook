@@ -9,55 +9,107 @@
     <h1 class="mb-4">{% trans "My Bookings" %}</h1>
     
     {% if bookings %}
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>{% trans "Apartment" %}</th>
-                        <th>{% trans "Dates" %}</th>
-                        <th>{% trans "Guests" %}</th>
-                        <th>{% trans "Total" %}</th>
-                        <th>{% trans "Status" %}</th>
-                        <th>{% trans "Actions" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for booking in bookings %}
+        <!-- Desktop Table View -->
+        <div class="d-none d-md-block">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
                         <tr>
-                            <td>
-                                <a href="{% url 'apartment_detail' booking.apartment.slug %}">
-                                    {{ booking.apartment.title }}
-                                </a>
-                                <br>
-                                <small class="text-muted">{{ booking.apartment.city }}</small>
-                            </td>
-                            <td>
-                                {{ booking.check_in|date:"M d" }} - {{ booking.check_out|date:"M d, Y" }}
-                                <br>
-                                <small class="text-muted">{{ booking.get_nights }} {% trans "nights" %}</small>
-                            </td>
-                            <td>{{ booking.guests_count }}</td>
-                            <td>{% price booking.total_price %}</td>
-                            <td>
-                                {% if booking.status == 'PENDING' %}
-                                    <span class="badge badge-pending">{% trans "Pending" %}</span>
-                                {% elif booking.status == 'CONFIRMED' %}
-                                    <span class="badge badge-confirmed">{% trans "Confirmed" %}</span>
-                                {% elif booking.status == 'COMPLETED' %}
-                                    <span class="badge badge-completed">{% trans "Completed" %}</span>
-                                {% else %}
-                                    <span class="badge badge-cancelled">{% trans "Cancelled" %}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <a href="{% url 'my_booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
-                                    {% trans "View" %}
-                                </a>
-                            </td>
+                            <th>{% trans "Apartment" %}</th>
+                            <th>{% trans "Dates" %}</th>
+                            <th>{% trans "Guests" %}</th>
+                            <th>{% trans "Total" %}</th>
+                            <th>{% trans "Status" %}</th>
+                            <th>{% trans "Actions" %}</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'apartment_detail' booking.apartment.slug %}">
+                                        {{ booking.apartment.title }}
+                                    </a>
+                                    <br>
+                                    <small class="text-muted">{{ booking.apartment.city }}</small>
+                                </td>
+                                <td>
+                                    {{ booking.check_in|date:"M d" }} - {{ booking.check_out|date:"M d, Y" }}
+                                    <br>
+                                    <small class="text-muted">{{ booking.get_nights }} {% trans "nights" %}</small>
+                                </td>
+                                <td>{{ booking.guests_count }}</td>
+                                <td>{% price booking.total_price %}</td>
+                                <td>
+                                    {% if booking.status == 'PENDING' %}
+                                        <span class="badge badge-pending">{% trans "Pending" %}</span>
+                                    {% elif booking.status == 'CONFIRMED' %}
+                                        <span class="badge badge-confirmed">{% trans "Confirmed" %}</span>
+                                    {% elif booking.status == 'COMPLETED' %}
+                                        <span class="badge badge-completed">{% trans "Completed" %}</span>
+                                    {% else %}
+                                        <span class="badge badge-cancelled">{% trans "Cancelled" %}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'my_booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
+                                        {% trans "View" %}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Mobile Card View -->
+        <div class="d-md-none">
+            <div class="row g-3">
+                {% for booking in bookings %}
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="card-title mb-1">
+                                            <a href="{% url 'apartment_detail' booking.apartment.slug %}" class="text-decoration-none">
+                                                {{ booking.apartment.title }}
+                                            </a>
+                                        </h6>
+                                        <small class="text-muted">{{ booking.apartment.city }}</small>
+                                    </div>
+                                    {% if booking.status == 'PENDING' %}
+                                        <span class="badge badge-pending">{% trans "Pending" %}</span>
+                                    {% elif booking.status == 'CONFIRMED' %}
+                                        <span class="badge badge-confirmed">{% trans "Confirmed" %}</span>
+                                    {% elif booking.status == 'COMPLETED' %}
+                                        <span class="badge badge-completed">{% trans "Completed" %}</span>
+                                    {% else %}
+                                        <span class="badge badge-cancelled">{% trans "Cancelled" %}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="row text-muted small mb-3">
+                                    <div class="col-7">
+                                        <i class="bi bi-calendar"></i> {{ booking.check_in|date:"M d" }} - {{ booking.check_out|date:"M d" }}
+                                        <br>
+                                        <small>{{ booking.get_nights }} {% trans "nights" %}</small>
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        <i class="bi bi-people"></i> {{ booking.guests_count }}
+                                    </div>
+                                    <div class="col-3 text-end fw-bold text-dark">
+                                        {% price booking.total_price %}
+                                    </div>
+                                </div>
+                                <a href="{% url 'my_booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                                    {% trans "View Details" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     {% else %}
         <div class="text-center py-5">

@@ -53,21 +53,21 @@
                 
                 <hr>
                 
-                <div class="row mb-4">
-                    <div class="col-md-3">
+                <div class="row mb-4 g-3">
+                    <div class="col-6 col-md-3">
                         <h6 class="text-muted">{% trans "Check-in" %}</h6>
                         <p class="fs-5 mb-0">{{ booking.check_in|date:"M d, Y" }}</p>
                     </div>
-                    <div class="col-md-3">
-                        <h6 class="text-muted">Check-out</h6>
+                    <div class="col-6 col-md-3">
+                        <h6 class="text-muted">{% trans "Check-out" %}</h6>
                         <p class="fs-5 mb-0">{{ booking.check_out|date:"M d, Y" }}</p>
                     </div>
-                    <div class="col-md-3">
-                        <h6 class="text-muted">Nights</h6>
+                    <div class="col-6 col-md-3">
+                        <h6 class="text-muted">{% trans "Nights" %}</h6>
                         <p class="fs-5 mb-0">{{ booking.get_nights }}</p>
                     </div>
-                    <div class="col-md-3">
-                        <h6 class="text-muted">Guests</h6>
+                    <div class="col-6 col-md-3">
+                        <h6 class="text-muted">{% trans "Guests" %}</h6>
                         <p class="fs-5 mb-0">{{ booking.guests_count }}</p>
                     </div>
                 </div>

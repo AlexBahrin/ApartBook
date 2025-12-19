@@ -21,17 +21,84 @@
     .staff-sidebar .nav-link i {
         width: 24px;
     }
+    
+    /* Mobile sidebar toggle button */
+    .sidebar-toggle {
+        display: none;
+    }
+    
+    @media (max-width: 991.98px) {
+        .sidebar-toggle {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .staff-sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            z-index: 1040;
+            padding-top: 80px !important;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .staff-sidebar.show {
+            left: 0;
+        }
+        
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1035;
+        }
+        
+        .sidebar-backdrop.show {
+            display: block;
+        }
+        
+        .staff-content {
+            width: 100% !important;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Mobile sidebar backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+<!-- Mobile sidebar toggle button -->
+<button class="btn btn-primary sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+    <i class="bi bi-list fs-4"></i>
+</button>
+
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-lg-2 staff-sidebar py-4">
-            <h5 class="px-3 mb-3">
-                <i class="bi bi-gear"></i> {% trans "Staff Panel" %}
-            </h5>
+        <div class="col-lg-2 staff-sidebar py-4" id="staffSidebar">
+            <div class="d-flex justify-content-between align-items-center px-3 mb-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-gear"></i> {% trans "Staff Panel" %}
+                </h5>
+                <button class="btn btn-sm btn-light d-lg-none" onclick="toggleSidebar()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
             
             {% if staff_unread_messages_count > 0 %}
             <div class="alert alert-warning mx-2 mb-3 py-2 px-3" role="alert">
@@ -62,9 +129,16 @@
         </div>
         
         <!-- Main Content -->
-        <div class="col-lg-10 py-4">
+        <div class="col-lg-10 staff-content py-4">
             {% block staff_content %}{% endblock %}
         </div>
     </div>
 </div>
+
+<script>
+function toggleSidebar() {
+    document.getElementById('staffSidebar').classList.toggle('show');
+    document.getElementById('sidebarBackdrop').classList.toggle('show');
+}
+</script>
 {% endblock %}

@@ -5,94 +5,156 @@
 {% block title %}{% trans "Manage Apartments" %} - {% trans "Staff" %}{% endblock %}
 
 {% block staff_content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{% trans "Apartments" %}</h2>
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 gap-2">
+    <h2 class="mb-0">{% trans "Apartments" %}</h2>
     <a href="{% url 'staff_apartment_create' %}" class="btn btn-primary">
         <i class="bi bi-plus-lg"></i> {% trans "Add Apartment" %}
     </a>
 </div>
 
 {% if apartments %}
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>{% trans "Image" %}</th>
-                    <th>{% trans "Title" %}</th>
-                    <th>{% trans "Location" %}</th>
-                    <th>{% trans "Capacity" %}</th>
-                    <th>{% trans "Price/Night" %}</th>
-                    <th>{% trans "Status" %}</th>
-                    <th>{% trans "Actions" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for apartment in apartments %}
+    <!-- Desktop Table View -->
+    <div class="d-none d-lg-block">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
                     <tr>
-                        <td>
-                            {% if apartment.get_main_image %}
-                                <img src="{{ apartment.get_main_image.image.url }}" 
-                                     width="60" height="40" style="object-fit: cover;" 
-                                     class="rounded" alt="{{ apartment.title }}">
-                            {% else %}
-                                <div class="bg-secondary rounded" style="width: 60px; height: 40px;"></div>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <strong>{{ apartment.title }}</strong>
-                            <br>
-                            <small class="text-muted">{{ apartment.slug }}</small>
-                        </td>
-                        <td>{{ apartment.address }}</td>
-                        <td>{{ apartment.capacity }}</td>
-                        <td>
-                            {% if apartment.pricing_type == 'GUEST' %}
-                                {% price apartment.get_display_price %} <small class="text-muted">(1 guest)</small>
-                            {% else %}
-                                {% price apartment.get_display_price %}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if apartment.is_active %}
-                                <span class="badge bg-success">Active</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Inactive</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <a href="{% url 'staff_apartment_edit' apartment.pk %}" class="btn btn-outline-primary" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a href="{% url 'staff_apartment_images' apartment.pk %}" class="btn btn-outline-secondary" title="Images">
-                                    <i class="bi bi-images"></i>
-                                </a>
-                                <a href="{% url 'staff_calendar' apartment.pk %}" class="btn btn-outline-success" title="Calendar">
-                                    <i class="bi bi-calendar3"></i>
-                                </a>
-                                <a href="{% url 'staff_availability' apartment.pk %}" class="btn btn-outline-info" title="Availability">
-                                    <i class="bi bi-calendar-x"></i>
-                                </a>
-                                <a href="{% url 'staff_pricing_rules' apartment.pk %}" class="btn btn-outline-warning" title="Pricing">
-                                    <i class="bi bi-currency-euro"></i>
-                                </a>
-                                <a href="{% url 'staff_apartment_delete' apartment.pk %}" class="btn btn-outline-danger" title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                            </div>
-                        </td>
+                        <th>{% trans "Image" %}</th>
+                        <th>{% trans "Title" %}</th>
+                        <th>{% trans "Location" %}</th>
+                        <th>{% trans "Capacity" %}</th>
+                        <th>{% trans "Price/Night" %}</th>
+                        <th>{% trans "Status" %}</th>
+                        <th>{% trans "Actions" %}</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for apartment in apartments %}
+                        <tr>
+                            <td>
+                                {% if apartment.get_main_image %}
+                                    <img src="{{ apartment.get_main_image.image.url }}" 
+                                         width="60" height="40" style="object-fit: cover;" 
+                                         class="rounded" alt="{{ apartment.title }}">
+                                {% else %}
+                                    <div class="bg-secondary rounded" style="width: 60px; height: 40px;"></div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ apartment.title }}</strong>
+                                <br>
+                                <small class="text-muted">{{ apartment.slug }}</small>
+                            </td>
+                            <td>{{ apartment.address }}</td>
+                            <td>{{ apartment.capacity }}</td>
+                            <td>
+                                {% if apartment.pricing_type == 'GUEST' %}
+                                    {% price apartment.get_display_price %} <small class="text-muted">(1 guest)</small>
+                                {% else %}
+                                    {% price apartment.get_display_price %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if apartment.is_active %}
+                                    <span class="badge bg-success">{% trans "Active" %}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{% trans "Inactive" %}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'staff_apartment_edit' apartment.pk %}" class="btn btn-outline-primary" title="{% trans 'Edit' %}">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'staff_apartment_images' apartment.pk %}" class="btn btn-outline-secondary" title="{% trans 'Images' %}">
+                                        <i class="bi bi-images"></i>
+                                    </a>
+                                    <a href="{% url 'staff_calendar' apartment.pk %}" class="btn btn-outline-success" title="{% trans 'Calendar' %}">
+                                        <i class="bi bi-calendar3"></i>
+                                    </a>
+                                    <a href="{% url 'staff_availability' apartment.pk %}" class="btn btn-outline-info" title="{% trans 'Availability' %}">
+                                        <i class="bi bi-calendar-x"></i>
+                                    </a>
+                                    <a href="{% url 'staff_pricing_rules' apartment.pk %}" class="btn btn-outline-warning" title="{% trans 'Pricing' %}">
+                                        <i class="bi bi-currency-euro"></i>
+                                    </a>
+                                    <a href="{% url 'staff_apartment_delete' apartment.pk %}" class="btn btn-outline-danger" title="{% trans 'Delete' %}">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Mobile Card View -->
+    <div class="d-lg-none">
+        <div class="row g-3">
+            {% for apartment in apartments %}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="row g-0">
+                            <div class="col-4">
+                                {% if apartment.get_main_image %}
+                                    <img src="{{ apartment.get_main_image.image.url }}" 
+                                         class="img-fluid rounded-start h-100" style="object-fit: cover;"
+                                         alt="{{ apartment.title }}">
+                                {% else %}
+                                    <div class="bg-secondary h-100 rounded-start"></div>
+                                {% endif %}
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body py-2 px-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <h6 class="card-title mb-1">{{ apartment.title }}</h6>
+                                        {% if apartment.is_active %}
+                                            <span class="badge bg-success">{% trans "Active" %}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{% trans "Inactive" %}</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="card-text small text-muted mb-2">
+                                        <i class="bi bi-geo-alt"></i> {{ apartment.address|truncatechars:30 }}
+                                    </p>
+                                    <p class="card-text small mb-2">
+                                        <i class="bi bi-people"></i> {{ apartment.capacity }} |
+                                        <strong>{% price apartment.get_display_price %}</strong>/{% trans "night" %}
+                                    </p>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <a href="{% url 'staff_apartment_edit' apartment.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'staff_apartment_images' apartment.pk %}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-images"></i>
+                                        </a>
+                                        <a href="{% url 'staff_calendar' apartment.pk %}" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-calendar3"></i>
+                                        </a>
+                                        <a href="{% url 'staff_availability' apartment.pk %}" class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-calendar-x"></i>
+                                        </a>
+                                        <a href="{% url 'staff_apartment_delete' apartment.pk %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% else %}
     <div class="text-center py-5">
         <i class="bi bi-house display-1 text-muted"></i>
-        <h4 class="mt-3">No apartments yet</h4>
-        <p class="text-muted">Create your first apartment listing!</p>
+        <h4 class="mt-3">{% trans "No apartments yet" %}</h4>
+        <p class="text-muted">{% trans "Create your first apartment listing!" %}</p>
         <a href="{% url 'staff_apartment_create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Add Apartment
+            <i class="bi bi-plus-lg"></i> {% trans "Add Apartment" %}
         </a>
     </div>
 {% endif %}
