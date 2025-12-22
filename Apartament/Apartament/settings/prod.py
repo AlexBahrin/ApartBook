@@ -3,6 +3,9 @@ Production settings for Apartament project.
 Use this for Render.com deployment.
 """
 
+from dotenv import load_dotenv
+load_dotenv()  # Load .env file
+
 import os
 from .base import *
 
@@ -62,14 +65,21 @@ INSTALLED_APPS += ['storages']
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = 'apartbook'
-AWS_S3_ENDPOINT_URL = 'https://fb7ec4029568dc5fb2edc8b735100669.r2.cloudflarestorage.com'
+AWS_S3_ENDPOINT_URL = 'https://fb7ec4029568dc5fb2edc8b735100669.eu.r2.cloudflarestorage.com'
 AWS_S3_REGION_NAME = 'auto'
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = False  # Public URLs without query string authentication
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_SIGNATURE_VERSION = 's3v4'
-AWS_S3_CUSTOM_DOMAIN = None  # Set this if you have a custom domain for R2
+AWS_S3_CUSTOM_DOMAIN = 'media.itchoice.store'
 
-# Use S3-compatible storage for media files
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/'
+# Use S3-compatible storage for media files (Django 5.x format)
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
