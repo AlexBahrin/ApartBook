@@ -293,10 +293,37 @@ class Apartment(models.Model):
         return '\r\n'.join(lines)
 
 
+def apartment_image_path(instance, filename):
+    """
+    Generate a clean, incremental filename for apartment images.
+    Format: apartments/{apartment_id}/{next_id}.{extension}
+    """
+    import os
+    from django.utils import timezone
+    
+    # Get file extension
+    ext = os.path.splitext(filename)[1].lower()
+    if not ext:
+        ext = '.jpg'
+    
+    # Generate a unique ID based on timestamp and random suffix
+    timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+    import random
+    random_suffix = random.randint(100, 999)
+    
+    # If apartment exists, use its ID; otherwise use 'new'
+    if instance.apartment_id:
+        apt_id = instance.apartment_id
+    else:
+        apt_id = 'new'
+    
+    return f'apartments/{apt_id}/{timestamp}_{random_suffix}{ext}'
+
+
 class ApartmentImage(models.Model):
     """Images for an apartment listing."""
     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='apartments/')
+    image = models.ImageField(upload_to=apartment_image_path)
     is_main = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
 
