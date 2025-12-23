@@ -41,7 +41,6 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 
 # Cloudflare R2 Storage for media files (same as production)
-INSTALLED_APPS += ['storages']
 
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
