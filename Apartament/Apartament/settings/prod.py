@@ -70,7 +70,7 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_CUSTOM_DOMAIN = 'media.iasicazare.com'
 
-# Use S3-compatible storage for media files (Django 5.x formatt)
+# Use S3-compatible storage for media files (Django 5.x format)
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
