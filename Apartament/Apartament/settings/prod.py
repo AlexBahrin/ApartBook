@@ -13,7 +13,7 @@ from .base import *
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', 'iasicazare.com', 'www.iasicazare.com']
 
@@ -22,11 +22,11 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', 'iasicazare.com', 'w
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get('DB_NAME', 'ap_db_yuqw'),
-        "USER": os.environ.get('DB_USER', 'postgress'),
-        "PASSWORD": os.environ.get('DB_PASSWORD', 'dG1hWcTzn5b7XAcfuqvjRKuDQ6HHladS'),
-        "HOST": os.environ.get('DB_HOST', 'dpg-d50ht03uibrs73dtb97g-a.oregon-postgres.render.com'),
-        "PORT": os.environ.get('DB_PORT', '5432'),
+        "NAME": os.environ.get('DB_NAME'),
+        "USER": os.environ.get('DB_USER'),
+        "PASSWORD": os.environ.get('DB_PASSWORD'),
+        "HOST": os.environ.get('DB_HOST'),
+        "PORT": os.environ.get('DB_PORT'),
         "OPTIONS": {
             "sslmode": "require",  # important on Render
         },
