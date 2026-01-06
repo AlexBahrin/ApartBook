@@ -61,14 +61,14 @@ CSRF_COOKIE_SECURE = True
 
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = 'apartbook'
-AWS_S3_ENDPOINT_URL = 'https://fb7ec4029568dc5fb2edc8b735100669.eu.r2.cloudflarestorage.com'
+AWS_STORAGE_BUCKET_NAME = 'iasicazare'
+AWS_S3_ENDPOINT_URL = 'https://320927796294bb05a5ebbc8b51bd8d6f.eu.r2.cloudflarestorage.com'
 AWS_S3_REGION_NAME = 'auto'
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = False  # Public URLs without query string authentication
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_SIGNATURE_VERSION = 's3v4'
-AWS_S3_CUSTOM_DOMAIN = 'media.itchoice.store'
+AWS_S3_CUSTOM_DOMAIN = 'media.iasicazare.com'
 
 # Use S3-compatible storage for media files (Django 5.x formatt)
 STORAGES = {
