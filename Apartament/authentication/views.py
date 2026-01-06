@@ -31,6 +31,13 @@ def register(request):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
+            
+            # Save phone number to user profile
+            from authentication.models import UserProfile
+            profile, created = UserProfile.objects.get_or_create(user=user)
+            profile.phone_country_code = form.cleaned_data.get('phone_country_code', '+40')
+            profile.phone_number = form.cleaned_data.get('phone_number', '')
+            profile.save()
 
             # email user with activation link
             current_site = get_current_site(request)

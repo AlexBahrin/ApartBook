@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import User
-from django.forms import forms
+from django import forms
 
 
 # uncomment this if you want to change the class/design of the login form
@@ -25,9 +25,27 @@ class UserLoginForm(AuthenticationForm):
 
 # Customizing Registration Form from UserCreationForm
 class UserRegistrationForm(UserCreationForm):
+    from authentication.models import UserProfile
+    
+    phone_country_code = forms.ChoiceField(
+        choices=UserProfile.COUNTRY_CODES,
+        initial='+40',
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+        })
+    )
+    phone_number = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '712 345 678',
+        })
+    )
+    
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'username', 'email', 'phone_country_code', 'phone_number', 'password1', 'password2']
 
     # uncomment this if you want to change the class/design of the registration form inputs
     def __init__(self, *args, **kwargs):
