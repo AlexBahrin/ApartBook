@@ -68,7 +68,7 @@
             <div class="form-group">
                 <label class="form-label">{% trans "Phone number" %}</label>
                 <div class="row g-2">
-                    <div class="col-5 col-md-4">
+                    <div class="col-6 col-md-5">
                         {{ form.phone_country_code }}
                         {% if form.phone_country_code.errors %}
                         <ul class="errorlist">
@@ -76,7 +76,7 @@
                         </ul>
                         {% endif %}
                     </div>
-                    <div class="col-7 col-md-8">
+                    <div class="col-6 col-md-7">
                         <input type="tel" name="phone_number" id="id_phone_number" class="form-control"
                             value="{{ form.phone_number.value|default:'' }}" placeholder="712 345 678">
                         {% if form.phone_number.errors %}
@@ -86,7 +86,6 @@
                         {% endif %}
                     </div>
                 </div>
-                <small class="text-muted">{% trans "Optional - for booking confirmations" %}</small>
             </div>
 
             <div class="form-group">
