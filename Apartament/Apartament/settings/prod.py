@@ -80,3 +80,10 @@ STORAGES = {
     },
 }
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
+
+# Cron secret key for external cron services (cron-job.org)
+CRON_SECRET_KEY = os.environ.get('CRON_SECRET_KEY')
+
+# iCal domain for stable UIDs in exported calendars
+ICAL_DOMAIN = 'iasicazare.com'

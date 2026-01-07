@@ -63,4 +63,11 @@ urlpatterns = [
     
     # Settings
     path('set-currency/', views.set_currency, name='set_currency'),
+    
+    # ==========================================================================
+    # CRON ENDPOINTS (for cron-job.org or similar services)
+    # ==========================================================================
+    path('api/cron/sync-ical/', views.cron_sync_ical, name='cron_sync_ical'),
+    path('api/cron/auto-complete/', views.cron_auto_complete_bookings, name='cron_auto_complete'),
+    path('api/cron/cleanup/', views.cron_cleanup_old_events, name='cron_cleanup'),
 ]

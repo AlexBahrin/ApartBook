@@ -1124,3 +1124,162 @@ def set_currency(request):
         return response
     
     return redirect(next_url)
+
+
+# =============================================================================
+# CRON ENDPOINTS (for external cron services like cron-job.org)
+# =============================================================================
+
+def cron_sync_ical(request):
+    """
+    Cron endpoint to sync all due iCal feeds.
+    Call this from cron-job.org every 15 minutes.
+    
+    URL: /api/cron/sync-ical/?key=YOUR_SECRET_KEY
+    """
+    from django.conf import settings
+    from app.models import ICalFeed
+    from django.utils import timezone
+    from datetime import timedelta
+    import time
+    
+    # Verify cron secret key
+    provided_key = request.GET.get('key', '')
+    expected_key = getattr(settings, 'CRON_SECRET_KEY', None)
+    
+    if not expected_key:
+        return JsonResponse({
+            'success': False, 
+            'error': 'CRON_SECRET_KEY not configured in settings'
+        }, status=500)
+    
+    if provided_key != expected_key:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Invalid key'
+        }, status=403)
+    
+    start_time = time.time()
+    now = timezone.now()
+    results = []
+    
+    # Get feeds that are due for sync
+    feeds = ICalFeed.objects.filter(
+        is_active=True,
+        is_circuit_open=False
+    ).filter(
+        Q(next_sync_at__isnull=True) | Q(next_sync_at__lte=now)
+    ).order_by('priority', 'next_sync_at')[:10]  # Limit to 10 per cron run
+    
+    # Also try half-open circuits (retry after 1 hour)
+    half_open = ICalFeed.objects.filter(
+        is_active=True,
+        is_circuit_open=True,
+        circuit_opened_at__lte=now - timedelta(hours=1)
+    )[:2]
+    
+    all_feeds = list(feeds) + list(half_open)
+    
+    for feed in all_feeds:
+        try:
+            success, message = feed.sync()
+            results.append({
+                'feed': f"{feed.apartment.title} - {feed.name}",
+                'success': success,
+                'message': message
+            })
+        except Exception as e:
+            results.append({
+                'feed': f"{feed.apartment.title} - {feed.name}",
+                'success': False,
+                'message': str(e)
+            })
+    
+    duration = round(time.time() - start_time, 2)
+    
+    return JsonResponse({
+        'success': True,
+        'synced': len(results),
+        'duration_seconds': duration,
+        'results': results
+    })
+
+
+def cron_auto_complete_bookings(request):
+    """
+    Cron endpoint to auto-complete bookings.
+    Call this from cron-job.org once per day.
+    
+    URL: /api/cron/auto-complete/?key=YOUR_SECRET_KEY
+    """
+    from django.conf import settings
+    from app.models import Booking
+    
+    # Verify cron secret key
+    provided_key = request.GET.get('key', '')
+    expected_key = getattr(settings, 'CRON_SECRET_KEY', None)
+    
+    if not expected_key:
+        return JsonResponse({
+            'success': False, 
+            'error': 'CRON_SECRET_KEY not configured in settings'
+        }, status=500)
+    
+    if provided_key != expected_key:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Invalid key'
+        }, status=403)
+    
+    today = date.today()
+    
+    # Find confirmed bookings where check-out has passed
+    bookings_to_complete = Booking.objects.filter(
+        status='CONFIRMED',
+        check_out__lt=today
+    )
+    
+    count = bookings_to_complete.count()
+    if count > 0:
+        bookings_to_complete.update(status='COMPLETED')
+    
+    return JsonResponse({
+        'success': True,
+        'completed': count
+    })
+
+
+def cron_cleanup_old_events(request):
+    """
+    Cron endpoint to clean up old iCal events.
+    Call this from cron-job.org once per day.
+    
+    URL: /api/cron/cleanup/?key=YOUR_SECRET_KEY
+    """
+    from django.conf import settings
+    from app.models import ICalEvent
+    
+    # Verify cron secret key
+    provided_key = request.GET.get('key', '')
+    expected_key = getattr(settings, 'CRON_SECRET_KEY', None)
+    
+    if not expected_key:
+        return JsonResponse({
+            'success': False, 
+            'error': 'CRON_SECRET_KEY not configured in settings'
+        }, status=500)
+    
+    if provided_key != expected_key:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Invalid key'
+        }, status=403)
+    
+    # Delete events that ended more than 90 days ago
+    cutoff = date.today() - timedelta(days=90)
+    deleted_count, _ = ICalEvent.objects.filter(dtend__lt=cutoff).delete()
+    
+    return JsonResponse({
+        'success': True,
+        'deleted': deleted_count
+    })
