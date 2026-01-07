@@ -217,9 +217,23 @@ class Apartment(models.Model):
         }
     
     def generate_ical(self):
-        """Generate iCal content for this apartment's bookings and blocked dates."""
+        """
+        Generate iCal content for this apartment's bookings and blocked dates.
+        
+        Export improvements:
+        - Stable UID values (based on apartment + date, not just incrementing index)
+        - No sensitive information (no guest names, emails, counts)
+        - Generic summaries ("Reserved", "Unavailable")
+        - Proper DTSTAMP in UTC
+        - TRANSP:OPAQUE for blocked dates
+        """
         from datetime import datetime, timedelta
         from django.utils import timezone
+        from django.conf import settings
+        
+        # Get domain for stable UIDs
+        domain = getattr(settings, 'ICAL_DOMAIN', 'apartbook.local')
+        now_utc = timezone.now().strftime('%Y%m%dT%H%M%SZ')
         
         lines = [
             'BEGIN:VCALENDAR',
@@ -230,15 +244,16 @@ class Apartment(models.Model):
             f'X-WR-CALNAME:{self.title}',
         ]
         
-        # Add confirmed bookings as events
+        # Add confirmed/pending bookings as events
         bookings = self.bookings.filter(status__in=['CONFIRMED', 'PENDING'])
         for booking in bookings:
-            uid = f"booking-{booking.pk}@apartbook"
+            # Stable UID based on apartment + dates (survives database restores)
+            uid = f"apt{self.pk}-{booking.check_in.strftime('%Y%m%d')}-{booking.check_out.strftime('%Y%m%d')}@{domain}"
             start = booking.check_in.strftime('%Y%m%d')
             end = booking.check_out.strftime('%Y%m%d')
-            summary = f"Booked - {booking.guests_count} guests"
+            # Generic summary - no guest details leaked
+            summary = "Reserved"
             status = "CONFIRMED" if booking.status == 'CONFIRMED' else "TENTATIVE"
-            created = booking.created_at.strftime('%Y%m%dT%H%M%SZ')
             
             lines.extend([
                 'BEGIN:VEVENT',
@@ -247,7 +262,8 @@ class Apartment(models.Model):
                 f'DTEND;VALUE=DATE:{end}',
                 f'SUMMARY:{summary}',
                 f'STATUS:{status}',
-                f'DTSTAMP:{created}',
+                f'DTSTAMP:{now_utc}',
+                'TRANSP:OPAQUE',  # Blocks time
                 'END:VEVENT',
             ])
         
@@ -270,12 +286,14 @@ class Apartment(models.Model):
                     current_group = {'start': date_val, 'end': date_val, 'note': note}
             groups.append(current_group)
             
-            for i, group in enumerate(groups):
-                uid = f"blocked-{self.pk}-{i}@apartbook"
+            for group in groups:
+                # Stable UID based on apartment + start date
+                uid = f"apt{self.pk}-blocked-{group['start'].strftime('%Y%m%d')}@{domain}"
                 start = group['start'].strftime('%Y%m%d')
                 # End date is exclusive in iCal, so add 1 day
                 end = (group['end'] + timedelta(days=1)).strftime('%Y%m%d')
-                summary = group['note'] or 'Blocked'
+                # Generic summary - don't expose internal notes
+                summary = "Unavailable"
                 
                 lines.extend([
                     'BEGIN:VEVENT',
@@ -284,7 +302,8 @@ class Apartment(models.Model):
                     f'DTEND;VALUE=DATE:{end}',
                     f'SUMMARY:{summary}',
                     'STATUS:CONFIRMED',
-                    f'DTSTAMP:{timezone.now().strftime("%Y%m%dT%H%M%SZ")}',
+                    f'DTSTAMP:{now_utc}',
+                    'TRANSP:OPAQUE',
                     'END:VEVENT',
                 ])
         
@@ -363,6 +382,14 @@ class Availability(models.Model):
         related_name='blocked_dates',
         help_text=_("The iCal feed this block came from")
     )
+    ical_event = models.ForeignKey(
+        'ICalEvent',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='blocked_dates',
+        help_text=_("The specific iCal event this block came from")
+    )
 
     class Meta:
         ordering = ['date']
@@ -380,11 +407,38 @@ class ICalFeed(models.Model):
     name = models.CharField(max_length=100, help_text=_("e.g., Airbnb, Booking.com"))
     url = models.URLField(max_length=500, help_text=_("iCal feed URL"))
     is_active = models.BooleanField(default=True)
+    
+    # Sync tracking (existing)
     last_synced = models.DateTimeField(null=True, blank=True)
     last_sync_status = models.CharField(max_length=50, blank=True)
     sync_error = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Conditional GET fields (Phase 1)
+    last_etag = models.CharField(max_length=255, blank=True, help_text=_("ETag from last response"))
+    last_modified_header = models.CharField(max_length=100, blank=True, help_text=_("Last-Modified header"))
+    last_content_hash = models.CharField(max_length=64, blank=True, help_text=_("SHA256 of last content"))
+    
+    # Circuit breaker fields (Phase 1)
+    consecutive_failures = models.PositiveIntegerField(default=0)
+    is_circuit_open = models.BooleanField(default=False, help_text=_("If true, sync is paused"))
+    circuit_opened_at = models.DateTimeField(null=True, blank=True)
+    
+    # Scheduling fields (Phase 1)
+    sync_interval_minutes = models.PositiveIntegerField(default=15, help_text=_("Minutes between syncs"))
+    next_sync_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    priority = models.PositiveIntegerField(default=5, help_text=_("1=highest, 10=lowest"))
+    
+    # Metrics fields (Phase 1)
+    total_syncs = models.PositiveIntegerField(default=0)
+    successful_syncs = models.PositiveIntegerField(default=0)
+    last_sync_duration_ms = models.PositiveIntegerField(null=True, blank=True)
+    last_fetch_bytes = models.PositiveIntegerField(null=True, blank=True)
+    last_events_parsed = models.PositiveIntegerField(default=0)
+    last_events_created = models.PositiveIntegerField(default=0)
+    last_events_updated = models.PositiveIntegerField(default=0)
+    last_events_removed = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['name']
@@ -394,41 +448,192 @@ class ICalFeed(models.Model):
     def __str__(self):
         return f"{self.apartment.title} - {self.name}"
     
+    def calculate_priority(self):
+        """Calculate sync priority based on upcoming bookings."""
+        from datetime import timedelta
+        from django.utils import timezone
+        
+        # Higher priority if apartment has bookings in next 7 days
+        upcoming = self.apartment.bookings.filter(
+            check_in__lte=timezone.now().date() + timedelta(days=7),
+            check_in__gte=timezone.now().date()
+        ).exists()
+        return 1 if upcoming else 5
+    
+    def should_sync(self):
+        """Check if this feed should be synced now."""
+        from django.utils import timezone
+        
+        if not self.is_active:
+            return False
+        
+        # Check circuit breaker
+        if self.is_circuit_open:
+            if self.circuit_opened_at:
+                # Half-open after 1 hour
+                if timezone.now() - self.circuit_opened_at < timedelta(hours=1):
+                    return False
+        
+        # Check if due
+        if self.next_sync_at and timezone.now() < self.next_sync_at:
+            return False
+        
+        return True
+    
+    def record_success(self, duration_ms, events_parsed, created, updated, removed):
+        """Record a successful sync."""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        self.last_synced = timezone.now()
+        self.last_sync_status = 'SUCCESS'
+        self.sync_error = ''
+        self.consecutive_failures = 0
+        self.is_circuit_open = False
+        self.circuit_opened_at = None
+        self.total_syncs += 1
+        self.successful_syncs += 1
+        self.last_sync_duration_ms = duration_ms
+        self.last_events_parsed = events_parsed
+        self.last_events_created = created
+        self.last_events_updated = updated
+        self.last_events_removed = removed
+        self.next_sync_at = timezone.now() + timedelta(minutes=self.sync_interval_minutes)
+        self.save()
+    
+    def record_failure(self, error_message):
+        """Record a failed sync with circuit breaker logic."""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        self.consecutive_failures += 1
+        self.last_synced = timezone.now()
+        self.last_sync_status = 'ERROR'
+        self.sync_error = str(error_message)[:1000]
+        self.total_syncs += 1
+        
+        # Open circuit after 5 consecutive failures
+        if self.consecutive_failures >= 5:
+            self.is_circuit_open = True
+            self.circuit_opened_at = timezone.now()
+        
+        # Exponential backoff for next sync (max 24 hours)
+        backoff_minutes = min(self.sync_interval_minutes * (2 ** self.consecutive_failures), 1440)
+        self.next_sync_at = timezone.now() + timedelta(minutes=backoff_minutes)
+        self.save()
+    
     def sync(self):
-        """Sync this iCal feed and update blocked dates."""
+        """Sync this iCal feed and update blocked dates (legacy method for compatibility)."""
         import requests
+        import hashlib
+        import time
         from datetime import datetime, timedelta
         from django.utils import timezone
         
+        start_time = time.time()
+        
         try:
-            response = requests.get(self.url, timeout=30)
+            # Build headers for conditional GET
+            headers = {'User-Agent': 'ApartBook/1.0'}
+            if self.last_etag:
+                headers['If-None-Match'] = self.last_etag
+            if self.last_modified_header:
+                headers['If-Modified-Since'] = self.last_modified_header
+            
+            response = requests.get(self.url, headers=headers, timeout=30)
+            
+            # Handle 304 Not Modified
+            if response.status_code == 304:
+                self.last_synced = timezone.now()
+                self.last_sync_status = 'NOT_MODIFIED'
+                self.total_syncs += 1
+                self.successful_syncs += 1
+                self.consecutive_failures = 0
+                self.next_sync_at = timezone.now() + timedelta(minutes=self.sync_interval_minutes)
+                self.save()
+                return True, "Not modified (304)"
+            
             response.raise_for_status()
+            
+            # Store conditional GET headers
+            self.last_etag = response.headers.get('ETag', '')
+            self.last_modified_header = response.headers.get('Last-Modified', '')
+            self.last_fetch_bytes = len(response.content)
+            
+            # Check content hash
+            content_hash = hashlib.sha256(response.content).hexdigest()
+            if content_hash == self.last_content_hash:
+                self.last_synced = timezone.now()
+                self.last_sync_status = 'HASH_MATCH'
+                self.total_syncs += 1
+                self.successful_syncs += 1
+                self.consecutive_failures = 0
+                self.next_sync_at = timezone.now() + timedelta(minutes=self.sync_interval_minutes)
+                self.save()
+                return True, "Content unchanged (hash match)"
+            
+            self.last_content_hash = content_hash
             
             # Parse iCal content
             events = self._parse_ical(response.text)
+            seen_uids = set()
+            created_count = 0
+            updated_count = 0
             
-            # Remove old entries from this feed (using FK relationship)
-            Availability.objects.filter(ical_feed=self).delete()
-            
-            # Create new blocked dates from events
             today = datetime.now().date()
-            dates_created = 0
             for event in events:
                 start_date = event.get('start')
                 end_date = event.get('end')
                 uid = event.get('uid', '')
                 summary = event.get('summary', 'External Booking')
+                status = event.get('status', 'CONFIRMED')
                 
-                if start_date and end_date and start_date >= today:
-                    # Block each night in the event range
+                if not start_date or not end_date:
+                    continue
+                
+                # Skip events in the past
+                if end_date < today:
+                    continue
+                
+                seen_uids.add(uid)
+                
+                # Upsert ICalEvent
+                ical_event, was_created = ICalEvent.objects.update_or_create(
+                    feed=self,
+                    uid=uid,
+                    defaults={
+                        'dtstart': start_date,
+                        'dtend': end_date,
+                        'summary': summary[:500] if summary else '',
+                        'status': status,
+                        'missing_since': None,
+                        'is_deleted': False,
+                    }
+                )
+                
+                if was_created:
+                    created_count += 1
+                else:
+                    updated_count += 1
+                
+                # Create Availability blocks (skip if cancelled or manual block exists)
+                if status != 'CANCELLED':
                     current = start_date
                     while current < end_date:
-                        # Skip if there's already a manual block
-                        if not Availability.objects.filter(
+                        # Skip if there's already a manual block or internal booking
+                        has_manual = Availability.objects.filter(
                             apartment=self.apartment,
                             date=current,
                             source='MANUAL'
-                        ).exists():
+                        ).exists()
+                        
+                        has_booking = self.apartment.bookings.filter(
+                            status__in=['CONFIRMED', 'PENDING'],
+                            check_in__lte=current,
+                            check_out__gt=current
+                        ).exists()
+                        
+                        if not has_manual and not has_booking:
                             Availability.objects.update_or_create(
                                 apartment=self.apartment,
                                 date=current,
@@ -437,24 +642,44 @@ class ICalFeed(models.Model):
                                     'is_available': False,
                                     'note': f"{self.name}: {summary}",
                                     'source': 'ICAL',
-                                    'external_uid': uid
+                                    'external_uid': uid,
+                                    'ical_event': ical_event,
                                 }
                             )
-                            dates_created += 1
                         current += timedelta(days=1)
             
-            self.last_synced = timezone.now()
-            self.last_sync_status = 'SUCCESS'
-            self.sync_error = ''
-            self.save()
+            # Reconciliation: mark events not seen as potentially deleted
+            removed_count = 0
+            missing_events = ICalEvent.objects.filter(
+                feed=self,
+                is_deleted=False,
+            ).exclude(uid__in=seen_uids)
             
-            return True, f"Synced {len(events)} events, {dates_created} nights blocked"
+            for event in missing_events:
+                if event.missing_since is None:
+                    event.missing_since = timezone.now()
+                    event.save()
+                elif timezone.now() - event.missing_since > timedelta(hours=48):
+                    # Actually delete after 48 hours
+                    event.is_deleted = True
+                    event.save()
+                    Availability.objects.filter(ical_event=event).delete()
+                    removed_count += 1
+            
+            # Reset missing_since for events that reappeared
+            ICalEvent.objects.filter(
+                feed=self,
+                uid__in=seen_uids,
+                missing_since__isnull=False
+            ).update(missing_since=None)
+            
+            duration_ms = int((time.time() - start_time) * 1000)
+            self.record_success(duration_ms, len(events), created_count, updated_count, removed_count)
+            
+            return True, f"Synced {len(events)} events: {created_count} created, {updated_count} updated, {removed_count} removed"
             
         except Exception as e:
-            self.last_synced = timezone.now()
-            self.last_sync_status = 'ERROR'
-            self.sync_error = str(e)
-            self.save()
+            self.record_failure(str(e))
             return False, str(e)
     
     def _parse_ical(self, ical_content):
@@ -488,6 +713,8 @@ class ICalFeed(models.Model):
                     current_event['uid'] = line[4:]
                 elif line.startswith('SUMMARY:'):
                     current_event['summary'] = line[8:]
+                elif line.startswith('STATUS:'):
+                    current_event['status'] = line[7:]
         
         return events
     
@@ -496,19 +723,6 @@ class ICalFeed(models.Model):
         from datetime import datetime, date
         
         date_str = date_str.strip()
-        
-        # Try different formats
-        formats = [
-            '%Y%m%d',           # 20251215
-            '%Y%m%dT%H%M%S',    # 20251215T120000
-            '%Y%m%dT%H%M%SZ',   # 20251215T120000Z
-        ]
-        
-        for fmt in formats:
-            try:
-                dt = datetime.strptime(date_str[:len(fmt.replace('%', ''))], fmt.replace('%', '').replace('Y', '1111').replace('m', '11').replace('d', '11').replace('T', 'T').replace('H', '11').replace('M', '11').replace('S', '11').replace('Z', 'Z'))
-            except:
-                pass
         
         # Simple parsing
         try:
@@ -523,6 +737,71 @@ class ICalFeed(models.Model):
             return date(year, month, day)
         except:
             return None
+
+
+class ICalEvent(models.Model):
+    """Stores imported iCal events for idempotent sync and reconciliation."""
+    
+    feed = models.ForeignKey(ICalFeed, on_delete=models.CASCADE, related_name='events')
+    
+    # iCal identity fields
+    uid = models.CharField(max_length=500, help_text=_("VEVENT UID"))
+    recurrence_id = models.CharField(max_length=100, blank=True, help_text=_("For recurring event instances"))
+    
+    # Event data
+    dtstart = models.DateField(help_text=_("Event start date"))
+    dtend = models.DateField(help_text=_("Event end date (exclusive)"))
+    summary = models.CharField(max_length=500, blank=True)
+    status = models.CharField(max_length=50, default='CONFIRMED', help_text=_("CONFIRMED/TENTATIVE/CANCELLED"))
+    
+    # Version tracking
+    sequence = models.PositiveIntegerField(default=0, help_text=_("iCal SEQUENCE"))
+    dtstamp = models.DateTimeField(null=True, blank=True, help_text=_("iCal DTSTAMP"))
+    
+    # Sync tracking
+    first_seen_at = models.DateTimeField(auto_now_add=True)
+    last_seen_at = models.DateTimeField(auto_now=True)
+    missing_since = models.DateTimeField(null=True, blank=True, help_text=_("When event stopped appearing in feed"))
+    is_deleted = models.BooleanField(default=False)
+    
+    # Raw data for debugging
+    raw_vevent = models.TextField(blank=True, help_text=_("Original VEVENT content"))
+
+    class Meta:
+        ordering = ['dtstart']
+        verbose_name = _('iCal Event')
+        verbose_name_plural = _('iCal Events')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['feed', 'uid', 'recurrence_id'],
+                name='unique_ical_event_per_feed'
+            )
+        ]
+        indexes = [
+            models.Index(fields=['feed', 'dtstart']),
+            models.Index(fields=['missing_since']),
+        ]
+
+    def __str__(self):
+        return f"{self.feed.name}: {self.summary or self.uid} ({self.dtstart} - {self.dtend})"
+
+
+# Signal to auto-initialize ICalFeed scheduling
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=ICalFeed)
+def initialize_ical_feed_schedule(sender, instance, created, **kwargs):
+    """Set next_sync_at when a new ICalFeed is created."""
+    if created and instance.next_sync_at is None:
+        from django.utils import timezone
+        import random
+        from datetime import timedelta
+        # Add random jitter (0-60 seconds) to avoid thundering herd
+        jitter = random.randint(0, 60)
+        instance.next_sync_at = timezone.now() + timedelta(seconds=jitter)
+        instance.priority = instance.calculate_priority()
+        instance.save(update_fields=['next_sync_at', 'priority'])
 
 
 class PricingRule(models.Model):

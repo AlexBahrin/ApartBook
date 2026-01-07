@@ -148,12 +148,24 @@ CELERY_TIMEZONE = 'UTC'
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    'sync-ical-feeds-every-minute': {
-        'task': 'app.tasks.sync_all_ical_feeds',
+    # iCal sync scheduler - runs every minute, queues only due feeds
+    'schedule-ical-feeds': {
+        'task': 'app.tasks.schedule_due_ical_feeds',
         'schedule': 60.0,  # every 60 seconds
     },
+    # Auto-complete bookings - daily at 09:00 UTC
     'auto-complete-bookings-daily': {
         'task': 'app.tasks.auto_complete_bookings',
-        'schedule': crontab(hour=9, minute=0),  # 09:00 UTC = 11:00 GMT+2
+        'schedule': crontab(hour=9, minute=0),
+    },
+    # Clean up old iCal events - daily at 03:00 UTC
+    'cleanup-old-ical-events': {
+        'task': 'app.tasks.cleanup_old_ical_events',
+        'schedule': crontab(hour=3, minute=0),
+    },
+    # Update feed priorities - hourly
+    'update-feed-priorities': {
+        'task': 'app.tasks.update_feed_priorities',
+        'schedule': crontab(minute=30),  # every hour at :30
     },
 }
