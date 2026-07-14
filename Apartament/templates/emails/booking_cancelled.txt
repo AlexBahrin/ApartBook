@@ -17,4 +17,4 @@ If you have any questions, please contact us.
 {% endif %}
 
 ---
-This is an automated notification from ApartBook.
+This is an automated notification from Iași Cazare.

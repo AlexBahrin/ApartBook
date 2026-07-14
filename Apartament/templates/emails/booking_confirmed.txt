@@ -17,4 +17,4 @@ Total Price: €{{ booking.total_price }}
 We look forward to hosting you!
 
 ---
-This is an automated notification from ApartBook.
+This is an automated notification from Iași Cazare.

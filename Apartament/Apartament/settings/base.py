@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'storages',  # S3/R2 storage backend
+    'rest_framework_simplejwt.token_blacklist',  # JWT refresh token blacklist
     'app',
     'authentication',
     'api',
@@ -90,16 +91,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'ro'
 
 LANGUAGES = [
-    ('en', _('English')),
     ('ro', _('Romanian')),
-    ('ru', _('Russian')),
+    ('en', _('English')),
     ('uk', _('Ukrainian')),
     ('de', _('German')),
     ('fr', _('French')),
     ('es', _('Spanish')),
+    ('ru', _('Russian')),
 ]
 
 LOCALE_PATHS = [
@@ -145,11 +146,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = "login"
-LOGOUT_REDIRECT_URL = "login"
-LOGIN_REDIRECT_URL = "landing"
+LOGIN_URL = "/login"
+LOGOUT_REDIRECT_URL = "/login"
+LOGIN_REDIRECT_URL = "/"
 
-DEFAULT_FROM_EMAIL = 'ApartBook <noreply@apartbook.com>'
+DEFAULT_FROM_EMAIL = 'Iași Cazare <noreply@apartbook.com>'
 
 # Celery Configuration
 CELERY_ACCEPT_CONTENT = ['json']
@@ -203,16 +204,61 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.ScopedRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'login': '10/min',
+        'register': '5/min',
+        'password_reset': '5/min',
+    },
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 # Frontend URL used to build activation / password-reset links in emails
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+
+
+# =============================================================================
+# Logging
+# =============================================================================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'apartbook': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
 

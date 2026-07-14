@@ -1,16 +1,22 @@
 import { createI18n } from 'vue-i18n'
 import en from './en'
 import ro from './ro'
+import de from './de'
+import fr from './fr'
+import es from './es'
+import ru from './ru'
+import uk from './uk'
 
-// Other languages (ru, uk, de, fr, es) fall back to English until translated.
-const messages = { en, ro }
+// Core chrome is translated for all locales; untranslated keys fall back to English.
+const messages = { en, ro, de, fr, es, ru, uk }
 
-const saved = localStorage.getItem('locale') || 'en'
+// Romanian is the default language for first-time visitors.
+const saved = localStorage.getItem('locale') || 'ro'
 
 const i18n = createI18n({
   legacy: false,
   globalInjection: true,
-  locale: messages[saved] ? saved : 'en',
+  locale: messages[saved] ? saved : 'ro',
   fallbackLocale: 'en',
   messages,
 })

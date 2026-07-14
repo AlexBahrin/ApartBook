@@ -13,6 +13,11 @@ const { locale } = useI18n()
 
 const languages = computed(() => config.languages)
 
+const FLAGS = { ro: '🇷🇴', en: '🇬🇧', ru: '🇷🇺', uk: '🇺🇦', de: '🇩🇪', fr: '🇫🇷', es: '🇪🇸' }
+function flag(code) {
+  return FLAGS[code] || ''
+}
+
 function changeLanguage(code) {
   setLocale(code)
 }
@@ -27,7 +32,7 @@ function logout() {
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
     <div class="container">
       <RouterLink class="navbar-brand" :to="{ name: 'landing' }">
-        <i class="bi bi-house-heart-fill"></i> ApartBook
+        <i class="bi bi-house-heart-fill"></i> Iași Cazare
       </RouterLink>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -45,12 +50,12 @@ function logout() {
           <!-- Language selector -->
           <li class="nav-item dropdown me-lg-2">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              <i class="bi bi-globe"></i> {{ locale.toUpperCase() }}
+              <span class="flag">{{ flag(locale) }}</span> {{ locale.toUpperCase() }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li v-for="lang in languages" :key="lang.code">
                 <button class="dropdown-item" :class="{ active: locale === lang.code }" @click="changeLanguage(lang.code)">
-                  {{ lang.name }}
+                  <span class="flag">{{ flag(lang.code) }}</span> {{ lang.name }}
                 </button>
               </li>
             </ul>
@@ -121,3 +126,10 @@ function logout() {
     </div>
   </nav>
 </template>
+
+<style scoped>
+.flag {
+  font-size: 1.1em;
+  line-height: 1;
+}
+</style>

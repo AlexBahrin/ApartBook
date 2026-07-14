@@ -251,8 +251,8 @@ msgstr "Înapoi la pagina principală"
 msgid "Hello %(username)s,"
 msgstr "Bună %(username)s,"
 
-msgid "Thank you for registering with ApartBook!"
-msgstr "Vă mulțumim că v-ați înregistrat la ApartBook!"
+msgid "Thank you for registering with Iași Cazare!"
+msgstr "Vă mulțumim că v-ați înregistrat la Iași Cazare!"
 
 msgid "Please click the link below to verify your email address and activate your account:"
 msgstr "Vă rugăm să faceți clic pe link-ul de mai jos pentru a verifica adresa de e-mail și să activați contul:"
@@ -260,14 +260,14 @@ msgstr "Vă rugăm să faceți clic pe link-ul de mai jos pentru a verifica adre
 msgid "This link will expire in 24 hours."
 msgstr "Acest link va expira în 24 de ore."
 
-msgid "If you didn't create an account with ApartBook, please ignore this email."
-msgstr "Dacă nu ați creat un cont cu ApartBook, vă rugăm să ignorați acest e-mail."
+msgid "If you didn't create an account with Iași Cazare, please ignore this email."
+msgstr "Dacă nu ați creat un cont cu Iași Cazare, vă rugăm să ignorați acest e-mail."
 
 msgid "Best regards,"
 msgstr "Cu stimă,"
 
-msgid "The ApartBook Team"
-msgstr "Echipa ApartBook"
+msgid "The Iași Cazare Team"
+msgstr "Echipa Iași Cazare"
 
 msgid "This is an automated message. Please do not reply to this email."
 msgstr "Acesta este un mesaj automat. Vă rugăm să nu răspundeți la acest email."

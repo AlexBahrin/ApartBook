@@ -1,17 +1,26 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api, { extractError } from '@/api/client'
 import ApartmentCard from '@/components/ApartmentCard.vue'
+import PaginationNav from '@/components/PaginationNav.vue'
 import { useToastStore } from '@/stores/toast'
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToastStore()
 
+const PAGE_SIZE = 12
 const apartments = ref([])
 const loading = ref(true)
 const count = ref(0)
+const page = ref(1)
+const hasNext = ref(false)
+const hasPrev = ref(false)
+
+const totalPages = computed(() =>
+  count.value ? Math.max(1, Math.ceil(count.value / PAGE_SIZE)) : 1
+)
 
 const filters = reactive({
   check_in: route.query.check_in || '',
@@ -21,7 +30,7 @@ const filters = reactive({
 
 async function load() {
   loading.value = true
-  const params = {}
+  const params = { page: page.value, page_size: PAGE_SIZE }
   for (const [k, v] of Object.entries(filters)) {
     if (v) params[k] = v
   }
@@ -29,6 +38,8 @@ async function load() {
     const { data } = await api.get('/apartments/', { params })
     apartments.value = data.results
     count.value = data.count
+    hasNext.value = !!data.next
+    hasPrev.value = !!data.previous
   } catch (e) {
     toast.error(extractError(e))
   } finally {
@@ -37,6 +48,7 @@ async function load() {
 }
 
 function applyFilters() {
+  page.value = 1
   const query = {}
   for (const [k, v] of Object.entries(filters)) {
     if (v) query[k] = v
@@ -47,8 +59,23 @@ function applyFilters() {
 
 function resetFilters() {
   for (const k of Object.keys(filters)) filters[k] = ''
+  page.value = 1
   router.replace({ query: {} })
   load()
+}
+
+function nextPage() {
+  if (hasNext.value) {
+    page.value += 1
+    load()
+  }
+}
+
+function prevPage() {
+  if (hasPrev.value && page.value > 1) {
+    page.value -= 1
+    load()
+  }
 }
 
 onMounted(load)
@@ -95,6 +122,16 @@ onMounted(load)
             <ApartmentCard :apartment="apartment" />
           </div>
         </div>
+
+        <PaginationNav
+          :page="page"
+          :total-pages="totalPages"
+          :has-next="hasNext"
+          :has-prev="hasPrev"
+          :loading="loading"
+          @prev="prevPage"
+          @next="nextPage"
+        />
       </div>
     </div>
   </div>

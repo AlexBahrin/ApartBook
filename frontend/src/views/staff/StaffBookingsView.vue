@@ -1,14 +1,12 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import api, { extractError } from '@/api/client'
+import api from '@/api/client'
 import { useConfigStore } from '@/stores/config'
-import { useToastStore } from '@/stores/toast'
+import { usePaginatedList } from '@/composables/usePaginatedList'
+import PaginationNav from '@/components/PaginationNav.vue'
 
 const config = useConfigStore()
-const toast = useToastStore()
-const bookings = ref([])
 const apartments = ref([])
-const loading = ref(true)
 const filters = reactive({ status: '', apartment: '' })
 
 const statuses = ['PENDING', 'CONFIRMED', 'CANCELLED_BY_USER', 'CANCELLED_BY_ADMIN', 'COMPLETED']
@@ -22,27 +20,38 @@ function guestName(user) {
   return name || user.username
 }
 
-async function load() {
-  loading.value = true
+const {
+  items: bookings,
+  loading,
+  page,
+  totalPages,
+  hasNext,
+  hasPrev,
+  load,
+  goToPage,
+  nextPage,
+  prevPage,
+  reset,
+} = usePaginatedList((params) => api.get('/staff/bookings/', { params }))
+
+function activeFilters() {
   const params = {}
   if (filters.status) params.status = filters.status
   if (filters.apartment) params.apartment = filters.apartment
-  try {
-    const { data } = await api.get('/staff/bookings/', { params })
-    bookings.value = data.results || data
-  } catch (e) {
-    toast.error(extractError(e))
-  } finally {
-    loading.value = false
-  }
+  return params
+}
+
+function applyFilters() {
+  reset()
+  load(activeFilters())
 }
 
 onMounted(async () => {
   try {
-    const { data } = await api.get('/staff/apartments/')
+    const { data } = await api.get('/staff/apartments/', { params: { page_size: 100 } })
     apartments.value = data.results || data
   } catch (e) { /* ignore */ }
-  load()
+  load(activeFilters())
 })
 </script>
 
@@ -52,13 +61,13 @@ onMounted(async () => {
 
     <div class="row g-2 mb-4">
       <div class="col-md-4">
-        <select class="form-select" v-model="filters.status" @change="load">
+        <select class="form-select" v-model="filters.status" @change="applyFilters">
           <option value="">{{ $t('staff.allStatuses') }}</option>
           <option v-for="s in statuses" :key="s" :value="s">{{ $t('status.' + s) }}</option>
         </select>
       </div>
       <div class="col-md-4">
-        <select class="form-select" v-model="filters.apartment" @change="load">
+        <select class="form-select" v-model="filters.apartment" @change="applyFilters">
           <option value="">{{ $t('staff.allApartments') }}</option>
           <option v-for="a in apartments" :key="a.id" :value="a.id">{{ a.title }}</option>
         </select>
@@ -84,6 +93,16 @@ onMounted(async () => {
           <tr v-if="!bookings.length"><td colspan="7" class="text-center text-muted">—</td></tr>
         </tbody>
       </table>
+
+      <PaginationNav
+        :page="page"
+        :total-pages="totalPages"
+        :has-next="hasNext"
+        :has-prev="hasPrev"
+        :loading="loading"
+        @prev="prevPage(activeFilters())"
+        @next="nextPage(activeFilters())"
+      />
     </div>
   </div>
 </template>

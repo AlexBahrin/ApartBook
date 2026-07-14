@@ -1,58 +1,39 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmed</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f5f5f5; font-family:Arial, Helvetica, sans-serif; color:#212529;">
+    <div style="max-width:600px; margin:0 auto; padding:24px;">
+        <div style="background:#ffffff; border-radius:8px; overflow:hidden; border:1px solid #e0e0e0;">
+            <div style="background:#198754; color:#ffffff; padding:16px 24px;">
+                <h2 style="margin:0; font-size:20px;">Booking Confirmed!</h2>
+            </div>
+            <div style="padding:24px;">
+                <p>Dear {{ user.username }},</p>
+                <p>Great news! Your booking has been confirmed:</p>
 
-{% block title %}Booking Confirmed{% endblock %}
+                <div style="background:#f8f9fa; padding:16px; border-radius:6px; margin:16px 0;">
+                    <h3 style="margin:0 0 4px; font-size:18px;">{{ apartment.title }}</h3>
+                    <p style="margin:0; color:#6c757d;">{{ apartment.address }}, {{ apartment.city }}, {{ apartment.country }}</p>
+                </div>
 
-{% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="bi bi-check-circle"></i> Booking Confirmed!</h4>
-                </div>
-                <div class="card-body">
-                    <p>Dear {{ user.username }},</p>
-                    <p>Great news! Your booking has been confirmed:</p>
-                    
-                    <div class="bg-light p-4 rounded mb-4">
-                        <h5>{{ apartment.title }}</h5>
-                        <p class="text-muted mb-0">{{ apartment.address }}, {{ apartment.city }}, {{ apartment.country }}</p>
-                    </div>
-                    
-                    <table class="table table-bordered">
-                        <tr>
-                            <th>Check-in</th>
-                            <td>{{ booking.check_in|date:"l, F d, Y" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Check-out</th>
-                            <td>{{ booking.check_out|date:"l, F d, Y" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Nights</th>
-                            <td>{{ booking.get_nights }}</td>
-                        </tr>
-                        <tr>
-                            <th>Guests</th>
-                            <td>{{ booking.guests_count }}</td>
-                        </tr>
-                        <tr>
-                            <th>Total Price</th>
-                            <td><strong>€{{ booking.total_price }}</strong></td>
-                        </tr>
-                    </table>
-                    
-                    <p>We look forward to hosting you!</p>
-                    
-                    <p>
-                        <a href="#" class="btn btn-success">View Booking Details</a>
-                    </p>
-                    
-                    <hr>
-                    <p class="text-muted small">This is an automated notification from ApartBook.</p>
-                </div>
+                <table style="width:100%; border-collapse:collapse;" cellpadding="8">
+                    <tr><th align="left" style="border:1px solid #dee2e6;">Check-in</th><td style="border:1px solid #dee2e6;">{{ booking.check_in|date:"l, F d, Y" }}</td></tr>
+                    <tr><th align="left" style="border:1px solid #dee2e6;">Check-out</th><td style="border:1px solid #dee2e6;">{{ booking.check_out|date:"l, F d, Y" }}</td></tr>
+                    <tr><th align="left" style="border:1px solid #dee2e6;">Nights</th><td style="border:1px solid #dee2e6;">{{ booking.get_nights }}</td></tr>
+                    <tr><th align="left" style="border:1px solid #dee2e6;">Guests</th><td style="border:1px solid #dee2e6;">{{ booking.guests_count }}</td></tr>
+                    <tr><th align="left" style="border:1px solid #dee2e6;">Total Price</th><td style="border:1px solid #dee2e6;"><strong>€{{ booking.total_price }}</strong></td></tr>
+                </table>
+
+                <p style="margin-top:16px;">We look forward to hosting you!</p>
+
+                <hr style="border:none; border-top:1px solid #e0e0e0; margin:24px 0;">
+                <p style="color:#6c757d; font-size:12px;">This is an automated notification from Iași Cazare.</p>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

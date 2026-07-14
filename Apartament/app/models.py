@@ -238,7 +238,7 @@ class Apartment(models.Model):
         lines = [
             'BEGIN:VCALENDAR',
             'VERSION:2.0',
-            'PRODID:-//ApartBook//Apartment Calendar//EN',
+            'PRODID:-//Iași Cazare//Apartment Calendar//EN',
             'CALSCALE:GREGORIAN',
             'METHOD:PUBLISH',
             f'X-WR-CALNAME:{self.title}',
@@ -848,6 +848,11 @@ class Booking(models.Model):
         ('REFUNDED', _('Refunded')),
     ]
 
+    # Statuses from which a guest is allowed to cancel their own booking.
+    USER_CANCELLABLE_STATUSES = ['PENDING', 'CONFIRMED']
+    # Statuses from which staff/admin is allowed to cancel a booking.
+    ADMIN_CANCELLABLE_STATUSES = ['PENDING', 'CONFIRMED']
+
     apartment = models.ForeignKey(Apartment, on_delete=models.CASCADE, related_name='bookings')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
     check_in = models.DateField()
@@ -867,6 +872,14 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking #{self.pk} - {self.apartment.title} by {self.user.username}"
+
+    def can_be_cancelled_by_user(self):
+        """Whether the guest is allowed to cancel this booking."""
+        return self.status in self.USER_CANCELLABLE_STATUSES
+
+    def can_be_cancelled_by_admin(self):
+        """Whether staff/admin is allowed to cancel this booking."""
+        return self.status in self.ADMIN_CANCELLABLE_STATUSES
 
     def get_nights(self):
         """Returns the number of nights for this booking."""

@@ -9,11 +9,19 @@ load_dotenv()  # Load .env file
 import os
 from .base import *
 
+
+def _env_bool(name, default=False):
+    return os.environ.get(name, str(default)).strip().lower() in ('1', 'true', 'yes', 'on')
+
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production')
+# Must be provided via environment in production. No insecure fallback.
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise RuntimeError('SECRET_KEY environment variable is required in production.')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _env_bool('DEBUG', False)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', 'iasicazare.com', 'www.iasicazare.com']
 
@@ -55,6 +63,24 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+# HTTP Strict Transport Security
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Additional hardening headers
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SESSION_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_REFERRER_POLICY = 'same-origin'
+
+# CSRF trusted origins for cross-site POSTs from the deployed domains
+CSRF_TRUSTED_ORIGINS = [
+    'https://iasicazare.com',
+    'https://www.iasicazare.com',
+    'https://*.onrender.com',
+]
 
 
 # Cloudflare R2 Storage for media files

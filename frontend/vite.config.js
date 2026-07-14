@@ -26,4 +26,9 @@ export default defineConfig(({ command }) => ({
     manifest: true,
     emptyOutDir: true,
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./vitest.setup.js'],
+  },
 }))

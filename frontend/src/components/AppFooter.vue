@@ -7,11 +7,11 @@ const year = new Date().getFullYear()
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <h5><i class="bi bi-house-heart-fill"></i> ApartBook</h5>
+          <h5><i class="bi bi-house-heart-fill"></i> Iași Cazare</h5>
           <p class="text-muted">{{ $t('footer.tagline') }}</p>
         </div>
         <div class="col-md-6 text-md-end">
-          <p class="text-muted">&copy; {{ year }} ApartBook. {{ $t('footer.rights') }}</p>
+          <p class="text-muted">&copy; {{ year }} Iași Cazare. {{ $t('footer.rights') }}</p>
         </div>
       </div>
     </div>

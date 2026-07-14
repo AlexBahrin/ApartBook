@@ -1,25 +1,22 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import api, { extractError } from '@/api/client'
-import { useToastStore } from '@/stores/toast'
+import { onMounted } from 'vue'
+import api from '@/api/client'
+import { usePaginatedList } from '@/composables/usePaginatedList'
+import PaginationNav from '@/components/PaginationNav.vue'
 
-const toast = useToastStore()
-const apartments = ref([])
-const loading = ref(true)
+const {
+  items: apartments,
+  loading,
+  page,
+  totalPages,
+  hasNext,
+  hasPrev,
+  load,
+  nextPage,
+  prevPage,
+} = usePaginatedList((params) => api.get('/staff/apartments/', { params }))
 
-async function load() {
-  loading.value = true
-  try {
-    const { data } = await api.get('/staff/apartments/')
-    apartments.value = data.results || data
-  } catch (e) {
-    toast.error(extractError(e))
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(load)
+onMounted(() => load())
 </script>
 
 <template>
@@ -70,6 +67,16 @@ onMounted(load)
           </tr>
         </tbody>
       </table>
+
+      <PaginationNav
+        :page="page"
+        :total-pages="totalPages"
+        :has-next="hasNext"
+        :has-prev="hasPrev"
+        :loading="loading"
+        @prev="prevPage()"
+        @next="nextPage()"
+      />
     </div>
   </div>
 </template>

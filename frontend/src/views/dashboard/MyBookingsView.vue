@@ -1,13 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import api, { extractError } from '@/api/client'
+import { onMounted } from 'vue'
+import api from '@/api/client'
 import { useConfigStore } from '@/stores/config'
-import { useToastStore } from '@/stores/toast'
+import { usePaginatedList } from '@/composables/usePaginatedList'
+import PaginationNav from '@/components/PaginationNav.vue'
 
 const config = useConfigStore()
-const toast = useToastStore()
-const bookings = ref([])
-const loading = ref(true)
 
 const badgeClass = {
   PENDING: 'badge-pending',
@@ -17,16 +15,19 @@ const badgeClass = {
   COMPLETED: 'badge-completed',
 }
 
-onMounted(async () => {
-  try {
-    const { data } = await api.get('/my/bookings/')
-    bookings.value = data.results || data
-  } catch (e) {
-    toast.error(extractError(e))
-  } finally {
-    loading.value = false
-  }
-})
+const {
+  items: bookings,
+  loading,
+  page,
+  totalPages,
+  hasNext,
+  hasPrev,
+  load,
+  nextPage,
+  prevPage,
+} = usePaginatedList((params) => api.get('/my/bookings/', { params }))
+
+onMounted(() => load())
 </script>
 
 <template>
@@ -65,5 +66,15 @@ onMounted(async () => {
         </RouterLink>
       </div>
     </div>
+
+    <PaginationNav
+      :page="page"
+      :total-pages="totalPages"
+      :has-next="hasNext"
+      :has-prev="hasPrev"
+      :loading="loading"
+      @prev="prevPage()"
+      @next="nextPage()"
+    />
   </div>
 </template>

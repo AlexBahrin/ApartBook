@@ -32,5 +32,10 @@ urlpatterns = [
     # iCal export (public)
     path('apartments/<int:pk>/calendar.ics', views.apartment_ical_export, name='api_ical_export'),
 
+    # Cron endpoints (external services like cron-job.org)
+    path('cron/sync-ical/', views.cron_sync_ical, name='api_cron_sync_ical'),
+    path('cron/auto-complete/', views.cron_auto_complete_bookings, name='api_cron_auto_complete'),
+    path('cron/cleanup/', views.cron_cleanup_old_events, name='api_cron_cleanup'),
+
     path('', include(router.urls)),
 ]

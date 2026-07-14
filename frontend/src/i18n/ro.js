@@ -1,4 +1,11 @@
 export default {
+  seo: {
+    landing: 'Cazare în apartamente în Iași',
+    apartments: 'Vezi apartamente',
+    apartmentDetail: 'Detalii apartament',
+    login: 'Autentificare',
+    register: 'Creare cont',
+  },
   nav: {
     browse: 'Vezi apartamente',
     myBookings: 'Rezervările mele',
@@ -38,6 +45,9 @@ export default {
     submit: 'Trimite',
     send: 'Trimite',
     required: 'Acest câmp este obligatoriu.',
+    prev: 'Anterior',
+    next: 'Următor',
+    pageOf: 'Pagina {page} din {total}',
   },
   landing: {
     heroTitle: 'Găsește cazarea perfectă',
@@ -53,7 +63,7 @@ export default {
     searchWherePlaceholder: 'Oraș sau destinație',
     searchButton: 'Caută',
     viewAll: 'Vezi tot',
-    featuresTitle: 'De ce să rezervi cu ApartBook',
+    featuresTitle: 'De ce să rezervi cu Iași Cazare',
     featuresSubtitle: 'Tot ce ai nevoie pentru un sejur fără griji.',
     feature1Title: 'Cereri instant',
     feature1Text: 'Trimite o cerere de rezervare în câteva secunde și primești rapid un răspuns.',

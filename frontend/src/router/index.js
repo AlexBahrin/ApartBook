@@ -1,14 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import i18n from '@/i18n'
 
 const routes = [
-  { path: '/', name: 'landing', component: () => import('@/views/public/LandingView.vue') },
-  { path: '/apartments', name: 'apartments', component: () => import('@/views/public/ApartmentListView.vue') },
-  { path: '/apartments/:slug', name: 'apartment-detail', component: () => import('@/views/public/ApartmentDetailView.vue') },
+  { path: '/', name: 'landing', component: () => import('@/views/public/LandingView.vue'), meta: { titleKey: 'seo.landing' } },
+  { path: '/apartments', name: 'apartments', component: () => import('@/views/public/ApartmentListView.vue'), meta: { titleKey: 'seo.apartments' } },
+  { path: '/apartments/:slug', name: 'apartment-detail', component: () => import('@/views/public/ApartmentDetailView.vue'), meta: { titleKey: 'seo.apartmentDetail' } },
 
   // Auth
-  { path: '/login', name: 'login', component: () => import('@/views/auth/LoginView.vue'), meta: { guestOnly: true } },
-  { path: '/register', name: 'register', component: () => import('@/views/auth/RegisterView.vue'), meta: { guestOnly: true } },
+  { path: '/login', name: 'login', component: () => import('@/views/auth/LoginView.vue'), meta: { guestOnly: true, titleKey: 'seo.login' } },
+  { path: '/register', name: 'register', component: () => import('@/views/auth/RegisterView.vue'), meta: { guestOnly: true, titleKey: 'seo.register' } },
   { path: '/activate/:uid/:token', name: 'activate', component: () => import('@/views/auth/ActivateView.vue') },
   { path: '/password-reset', name: 'password-reset', component: () => import('@/views/auth/PasswordResetView.vue') },
   { path: '/password-reset/:uid/:token', name: 'password-reset-confirm', component: () => import('@/views/auth/PasswordResetConfirmView.vue') },
@@ -66,6 +67,14 @@ router.beforeEach(async (to) => {
     return { name: 'staff-bookings' }
   }
   return true
+})
+
+const BASE_TITLE = 'Iași Cazare'
+
+router.afterEach((to) => {
+  const t = i18n.global.t
+  const titleKey = to.meta.titleKey
+  document.title = titleKey ? `${t(titleKey)} — ${BASE_TITLE}` : BASE_TITLE
 })
 
 export default router

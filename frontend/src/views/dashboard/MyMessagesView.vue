@@ -1,22 +1,22 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import api, { extractError } from '@/api/client'
-import { useToastStore } from '@/stores/toast'
+import { onMounted } from 'vue'
+import api from '@/api/client'
+import { usePaginatedList } from '@/composables/usePaginatedList'
+import PaginationNav from '@/components/PaginationNav.vue'
 
-const toast = useToastStore()
-const conversations = ref([])
-const loading = ref(true)
+const {
+  items: conversations,
+  loading,
+  page,
+  totalPages,
+  hasNext,
+  hasPrev,
+  load,
+  nextPage,
+  prevPage,
+} = usePaginatedList((params) => api.get('/my/conversations/', { params }))
 
-onMounted(async () => {
-  try {
-    const { data } = await api.get('/my/conversations/')
-    conversations.value = data.results || data
-  } catch (e) {
-    toast.error(extractError(e))
-  } finally {
-    loading.value = false
-  }
-})
+onMounted(() => load())
 </script>
 
 <template>
@@ -45,5 +45,15 @@ onMounted(async () => {
         </p>
       </RouterLink>
     </div>
+
+    <PaginationNav
+      :page="page"
+      :total-pages="totalPages"
+      :has-next="hasNext"
+      :has-prev="hasPrev"
+      :loading="loading"
+      @prev="prevPage()"
+      @next="nextPage()"
+    />
   </div>
 </template>

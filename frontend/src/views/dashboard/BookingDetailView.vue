@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import api, { extractError } from '@/api/client'
 import { useConfigStore } from '@/stores/config'
 import { useToastStore } from '@/stores/toast'
@@ -9,10 +10,17 @@ const route = useRoute()
 const router = useRouter()
 const config = useConfigStore()
 const toast = useToastStore()
+const { t } = useI18n()
 
 const booking = ref(null)
 const loading = ref(true)
 const acting = ref(false)
+
+const CANCELLABLE_STATUSES = ['PENDING', 'CONFIRMED']
+
+function canCancel(status) {
+  return CANCELLABLE_STATUSES.includes(status)
+}
 
 async function load() {
   loading.value = true
@@ -27,12 +35,12 @@ async function load() {
 }
 
 async function cancel() {
-  if (!confirm('Are you sure you want to cancel this booking?')) return
+  if (!confirm(t('dashboard.cancelConfirm'))) return
   acting.value = true
   try {
     const { data } = await api.post(`/my/bookings/${route.params.id}/cancel/`)
     booking.value = data
-    toast.success('Your booking has been cancelled.')
+    toast.success(t('dashboard.cancelled'))
   } catch (e) {
     toast.error(extractError(e))
   } finally {
@@ -83,7 +91,7 @@ onMounted(load)
             <button class="btn btn-outline-primary" @click="contactOwner">
               <i class="bi bi-chat-dots"></i> {{ $t('dashboard.contactOwner') }}
             </button>
-            <button v-if="booking.status === 'PENDING'" class="btn btn-outline-danger" :disabled="acting" @click="cancel">
+            <button v-if="canCancel(booking.status)" class="btn btn-outline-danger" :disabled="acting" @click="cancel">
               <i class="bi bi-x-circle"></i> {{ $t('dashboard.cancelBooking') }}
             </button>
           </div>

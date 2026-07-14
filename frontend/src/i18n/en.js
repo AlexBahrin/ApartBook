@@ -1,4 +1,11 @@
 export default {
+  seo: {
+    landing: 'Apartment rentals in Iași',
+    apartments: 'Browse apartments',
+    apartmentDetail: 'Apartment details',
+    login: 'Log in',
+    register: 'Create account',
+  },
   nav: {
     browse: 'Browse Apartments',
     myBookings: 'My Bookings',
@@ -38,6 +45,9 @@ export default {
     submit: 'Submit',
     send: 'Send',
     required: 'This field is required.',
+    prev: 'Previous',
+    next: 'Next',
+    pageOf: 'Page {page} of {total}',
   },
   landing: {
     heroTitle: 'Find your perfect stay',
@@ -53,7 +63,7 @@ export default {
     searchWherePlaceholder: 'City or destination',
     searchButton: 'Search',
     viewAll: 'View all',
-    featuresTitle: 'Why book with ApartBook',
+    featuresTitle: 'Why book with Iași Cazare',
     featuresSubtitle: 'Everything you need for a stress-free stay.',
     feature1Title: 'Instant requests',
     feature1Text: 'Send a booking request in seconds and get a quick reply from the owner.',

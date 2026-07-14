@@ -19,4 +19,4 @@ Guest Notes: {{ booking.notes }}
 Please review and confirm or decline this booking.
 
 ---
-This is an automated notification from ApartBook.
+This is an automated notification from Iași Cazare.

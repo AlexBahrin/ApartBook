@@ -1,6 +1,8 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import flatpickr from 'flatpickr'
+import 'flatpickr/dist/flatpickr.min.css'
 import api, { extractError } from '@/api/client'
 import ApartmentCard from '@/components/ApartmentCard.vue'
 import { useToastStore } from '@/stores/toast'
@@ -11,6 +13,62 @@ const toast = useToastStore()
 const router = useRouter()
 
 const search = reactive({ check_in: '', check_out: '', guests: '' })
+
+function addDays(dateStr, n) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const dt = new Date(Date.UTC(y, m - 1, d))
+  dt.setUTCDate(dt.getUTCDate() + n)
+  return dt.toISOString().slice(0, 10)
+}
+
+// --- Interactive date pickers (flatpickr) ---
+const checkInInput = ref(null)
+const checkOutInput = ref(null)
+let fpCheckIn = null
+let fpCheckOut = null
+
+function syncCheckoutBounds() {
+  if (!fpCheckOut) return
+  if (search.check_in) {
+    fpCheckOut.set('minDate', addDays(search.check_in, 1))
+    if (search.check_out && search.check_out <= search.check_in) {
+      fpCheckOut.clear()
+      search.check_out = ''
+    }
+  } else {
+    fpCheckOut.set('minDate', 'today')
+  }
+}
+
+function destroyPickers() {
+  if (fpCheckIn) { fpCheckIn.destroy(); fpCheckIn = null }
+  if (fpCheckOut) { fpCheckOut.destroy(); fpCheckOut = null }
+}
+
+function initPickers() {
+  destroyPickers()
+  if (!checkInInput.value || !checkOutInput.value) return
+  const common = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'M j, Y' }
+
+  fpCheckIn = flatpickr(checkInInput.value, {
+    ...common,
+    minDate: 'today',
+    onChange(_, dateStr) {
+      search.check_in = dateStr
+      syncCheckoutBounds()
+    },
+  })
+
+  fpCheckOut = flatpickr(checkOutInput.value, {
+    ...common,
+    minDate: 'today',
+    onChange(_, dateStr) {
+      search.check_out = dateStr
+    },
+  })
+
+  syncCheckoutBounds()
+}
 
 function submitSearch() {
   const query = {}
@@ -28,6 +86,8 @@ const features = [
 ]
 
 onMounted(async () => {
+  await nextTick()
+  initPickers()
   try {
     const { data } = await api.get('/apartments/featured/')
     apartments.value = data
@@ -37,6 +97,8 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+onBeforeUnmount(destroyPickers)
 </script>
 
 <template>
@@ -58,11 +120,11 @@ onMounted(async () => {
             <div class="row g-2 align-items-end">
               <div class="col-6 col-md">
                 <label class="form-label small fw-semibold text-muted mb-1">{{ $t('apartments.checkIn') }}</label>
-                <input type="date" class="form-control form-control-lg" v-model="search.check_in" />
+                <input ref="checkInInput" type="text" class="form-control form-control-lg" :placeholder="$t('apartments.checkIn')" readonly />
               </div>
               <div class="col-6 col-md">
                 <label class="form-label small fw-semibold text-muted mb-1">{{ $t('apartments.checkOut') }}</label>
-                <input type="date" class="form-control form-control-lg" v-model="search.check_out" />
+                <input ref="checkOutInput" type="text" class="form-control form-control-lg" :placeholder="$t('apartments.checkOut')" readonly />
               </div>
               <div class="col-6 col-md-2">
                 <label class="form-label small fw-semibold text-muted mb-1">

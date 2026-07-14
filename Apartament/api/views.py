@@ -1,3 +1,4 @@
+import logging
 from datetime import date, datetime, timedelta
 
 from django.conf import settings
@@ -11,9 +12,10 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 from rest_framework import viewsets, status, filters
-from rest_framework.decorators import api_view, action, permission_classes
+from rest_framework.decorators import api_view, action, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -37,6 +39,13 @@ from .serializers import (
 )
 
 
+logger = logging.getLogger('apartbook')
+
+
+class PasswordResetThrottle(ScopedRateThrottle):
+    scope = 'password_reset'
+
+
 # =============================================================================
 # AUTH
 # =============================================================================
@@ -44,10 +53,12 @@ from .serializers import (
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     permission_classes = [AllowAny]
+    throttle_scope = 'login'
 
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = 'register'
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -70,9 +81,9 @@ class RegisterView(APIView):
             })
             from django.core.mail import EmailMessage
             email = EmailMessage('Activate your account.', message, to=[user.email])
-            email.send(fail_silently=True)
+            email.send(fail_silently=False)
         except Exception:
-            pass
+            logger.exception('Failed to send activation email to user id=%s', user.pk)
 
         return Response(
             {'detail': 'Account created successfully. Please check your email to activate your account.'},
@@ -103,6 +114,7 @@ def activate_account(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([PasswordResetThrottle])
 def password_reset_request(request):
     email = request.data.get('email', '')
     form = PasswordResetForm(data={'email': email})
@@ -119,9 +131,9 @@ def password_reset_request(request):
                 }) if _template_exists('authentication/password_reset_email.html') else (
                     f"Use the following link to reset your password:\n{reset_link}"
                 )
-                EmailMessage('Password reset', body, to=[user.email]).send(fail_silently=True)
+                EmailMessage('Password reset', body, to=[user.email]).send(fail_silently=False)
             except Exception:
-                pass
+                logger.exception('Failed to send password reset email to user id=%s', user.pk)
     # Always return success to avoid user enumeration
     return Response({'detail': 'If an account exists for that email, a reset link has been sent.'})
 
@@ -348,8 +360,11 @@ class MyBookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
         booking = self.get_object()
-        if booking.status != 'PENDING':
-            return Response({'detail': 'Only pending bookings can be cancelled.'}, status=400)
+        if not booking.can_be_cancelled_by_user():
+            return Response(
+                {'detail': 'Only pending or confirmed bookings can be cancelled.'},
+                status=400,
+            )
         booking.status = 'CANCELLED_BY_USER'
         booking.save()
         send_booking_cancelled_notification(booking, cancelled_by='user')
@@ -746,3 +761,91 @@ def unread_counts(request):
             conversation__user=request.user, is_read=False, sender__is_staff=True,
         ).count()
     return Response({'unread_messages': count})
+
+
+# =============================================================================
+# CRON ENDPOINTS (for external cron services like cron-job.org)
+# =============================================================================
+
+def _check_cron_key(request):
+    """Validate the cron secret key. Returns an error Response or None if valid."""
+    provided_key = request.GET.get('key', '')
+    expected_key = getattr(settings, 'CRON_SECRET_KEY', None)
+    if not expected_key:
+        return Response({'success': False, 'error': 'CRON_SECRET_KEY not configured'}, status=500)
+    if provided_key != expected_key:
+        return Response({'success': False, 'error': 'Invalid key'}, status=403)
+    return None
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def cron_sync_ical(request):
+    """Cron endpoint to sync all due iCal feeds. URL: /api/cron/sync-ical/?key=SECRET"""
+    import time
+    from django.utils import timezone
+
+    error = _check_cron_key(request)
+    if error:
+        return error
+
+    start_time = time.time()
+    now = timezone.now()
+    results = []
+
+    feeds = ICalFeed.objects.filter(
+        is_active=True, is_circuit_open=False,
+    ).filter(
+        Q(next_sync_at__isnull=True) | Q(next_sync_at__lte=now)
+    ).order_by('priority', 'next_sync_at')[:10]
+
+    half_open = ICalFeed.objects.filter(
+        is_active=True, is_circuit_open=True,
+        circuit_opened_at__lte=now - timedelta(hours=1),
+    )[:2]
+
+    for feed in list(feeds) + list(half_open):
+        try:
+            success, message = feed.sync()
+            results.append({'feed': f"{feed.apartment.title} - {feed.name}", 'success': success, 'message': message})
+        except Exception as e:
+            logger.exception('iCal sync failed for feed id=%s', feed.pk)
+            results.append({'feed': f"{feed.apartment.title} - {feed.name}", 'success': False, 'message': str(e)})
+
+    return Response({
+        'success': True,
+        'synced': len(results),
+        'duration_seconds': round(time.time() - start_time, 2),
+        'results': results,
+    })
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def cron_auto_complete_bookings(request):
+    """Cron endpoint to auto-complete past bookings. URL: /api/cron/auto-complete/?key=SECRET"""
+    error = _check_cron_key(request)
+    if error:
+        return error
+
+    today = date.today()
+    bookings_to_complete = Booking.objects.filter(status='CONFIRMED', check_out__lt=today)
+    count = bookings_to_complete.count()
+    if count:
+        bookings_to_complete.update(status='COMPLETED')
+    return Response({'success': True, 'completed': count})
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def cron_cleanup_old_events(request):
+    """Cron endpoint to clean up old iCal events. URL: /api/cron/cleanup/?key=SECRET"""
+    from app.models import ICalEvent
+
+    error = _check_cron_key(request)
+    if error:
+        return error
+
+    cutoff = date.today() - timedelta(days=90)
+    deleted_count, _ = ICalEvent.objects.filter(dtend__lt=cutoff).delete()
+    return Response({'success': True, 'deleted': deleted_count})
