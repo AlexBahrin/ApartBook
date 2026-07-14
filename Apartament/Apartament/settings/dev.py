@@ -17,6 +17,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
+# CORS - allow the Vite dev server to call the API
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+]
+CORS_ALLOW_CREDENTIALS = True
+
+# Frontend base URL for links inside emails (activation, password reset)
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+
 
 # Database - Local PostgreSQL
 DATABASES = {

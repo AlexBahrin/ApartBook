@@ -33,3 +33,7 @@ wcwidth==0.2.14
 django-storages==1.14.6
 boto3==1.42.13
 python-dotenv==1.2.1
+djangorestframework==3.16.1
+djangorestframework-simplejwt==5.5.1
+PyJWT==2.10.1
+django-cors-headers==4.9.0

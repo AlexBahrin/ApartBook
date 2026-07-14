@@ -3,6 +3,7 @@ Django base settings for Apartament project.
 Common settings shared between development and production.
 """
 
+import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 
@@ -19,12 +20,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # Required for activation email domain
+    'rest_framework',
+    'corsheaders',
     'storages',  # S3/R2 storage backend
     'app',
     'authentication',
+    'api',
 ]
 
+SITE_ID = 1
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Must be as high as possible
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',  # Must be after SessionMiddleware and before CommonMiddleware
@@ -125,6 +133,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 _static_dir = BASE_DIR / 'static'
 STATICFILES_DIRS = [_static_dir] if _static_dir.exists() else []
 
+# Serve the built Vue SPA assets under /static/spa/ in production
+FRONTEND_DIST = BASE_DIR.parent / 'frontend' / 'dist'
+if FRONTEND_DIST.exists():
+    STATICFILES_DIRS.append(('spa', FRONTEND_DIST))
+
 # Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -169,3 +182,37 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute=30),  # every hour at :30
     },
 }
+
+
+# =============================================================================
+# Django REST Framework + JWT (Vue SPA frontend)
+# =============================================================================
+from datetime import timedelta
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 12,
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# Frontend URL used to build activation / password-reset links in emails
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+

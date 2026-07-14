@@ -1,0 +1,112 @@
+:root {
+  --primary-color: #ff385c;
+  --secondary-color: #00a699;
+}
+
+body {
+  background-color: #fff;
+}
+
+a {
+  text-decoration: none;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  color: var(--primary-color) !important;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #e31c5f;
+  border-color: #e31c5f;
+}
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.apartment-card {
+  transition: all 0.3s ease;
+  height: 100%;
+}
+.apartment-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.price-tag {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.footer {
+  background-color: #f7f7f7;
+  padding: 2rem 0;
+  margin-top: 3rem;
+}
+
+.badge-pending { background-color: #ffc107; color: #000; }
+.badge-confirmed { background-color: #28a745; }
+.badge-cancelled { background-color: #dc3545; }
+.badge-completed { background-color: #6c757d; }
+
+.hero {
+  background: linear-gradient(135deg, #ff385c 0%, #e31c5f 100%);
+  color: #fff;
+  padding: 5rem 0;
+}
+
+.image-thumb {
+  height: 90px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.gallery-main {
+  height: 420px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.toast-container {
+  z-index: 1090;
+}
+
+.upload-zone {
+  border: 2px dashed #ced4da;
+  border-radius: 0.5rem;
+  padding: 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--primary-color);
+}
+
+@media (max-width: 767.98px) {
+  .gallery-main { height: 260px; }
+  .card-img-top { height: 160px; }
+}
