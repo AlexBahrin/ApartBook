@@ -73,6 +73,35 @@ async function makeMain(img) {
   }
 }
 
+// ---- Drag & drop reordering ----
+const dragIndex = ref(null)
+
+function onDragStart(index) {
+  dragIndex.value = index
+}
+
+function onDragEnter(index) {
+  if (dragIndex.value === null || dragIndex.value === index) return
+  const arr = images.value
+  const [moved] = arr.splice(dragIndex.value, 1)
+  arr.splice(index, 0, moved)
+  dragIndex.value = index
+}
+
+async function onDragEnd() {
+  if (dragIndex.value === null) return
+  dragIndex.value = null
+  const ids = images.value.map((i) => i.id)
+  try {
+    await api.post(`/staff/apartments/${route.params.id}/images/reorder/`, { order: ids })
+    images.value.forEach((im, idx) => { im.is_main = idx === 0 })
+    toast.success('Order updated!')
+  } catch (e) {
+    toast.error(extractError(e))
+    await load()
+  }
+}
+
 onMounted(load)
 </script>
 
@@ -100,16 +129,28 @@ onMounted(load)
     </div>
 
     <div v-if="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
-    <div v-else class="row g-3">
-      <div v-for="img in images" :key="img.id" class="col-6 col-md-3">
-        <div class="card">
-          <img :src="img.image" class="card-img-top" style="height: 160px; object-fit: cover" />
-          <span v-if="img.is_main" class="badge bg-primary position-absolute top-0 start-0 m-2">Main</span>
-          <div class="card-body p-2 d-flex gap-1">
-            <button class="btn btn-sm btn-outline-primary flex-grow-1" @click="makeMain(img)" :disabled="img.is_main">
-              <i class="bi bi-star"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger" @click="remove(img)"><i class="bi bi-trash"></i></button>
+    <div v-else>
+      <p class="text-muted small mb-2"><i class="bi bi-arrows-move"></i> {{ $t('staff.dragToReorder') }}</p>
+      <div class="row g-3">
+        <div
+          v-for="(img, index) in images"
+          :key="img.id"
+          class="col-6 col-md-3"
+          draggable="true"
+          @dragstart="onDragStart(index)"
+          @dragenter.prevent="onDragEnter(index)"
+          @dragover.prevent
+          @dragend="onDragEnd"
+        >
+          <div class="card h-100" :class="{ 'opacity-50': dragIndex === index }" style="cursor: move">
+            <img :src="img.image" class="card-img-top" style="height: 160px; object-fit: cover" draggable="false" />
+            <span v-if="img.is_main" class="badge bg-primary position-absolute top-0 start-0 m-2">Main</span>
+            <div class="card-body p-2 d-flex gap-1">
+              <button class="btn btn-sm btn-outline-primary flex-grow-1" @click="makeMain(img)" :disabled="img.is_main">
+                <i class="bi bi-star"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" @click="remove(img)"><i class="bi bi-trash"></i></button>
+            </div>
           </div>
         </div>
       </div>

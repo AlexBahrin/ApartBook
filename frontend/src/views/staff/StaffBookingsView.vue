@@ -17,6 +17,11 @@ const badgeClass = {
   CANCELLED_BY_USER: 'badge-cancelled', CANCELLED_BY_ADMIN: 'badge-cancelled', COMPLETED: 'badge-completed',
 }
 
+function guestName(user) {
+  const name = `${user.last_name || ''} ${user.first_name || ''}`.trim()
+  return name || user.username
+}
+
 async function load() {
   loading.value = true
   const params = {}
@@ -64,13 +69,13 @@ onMounted(async () => {
     <div v-else class="table-responsive">
       <table class="table align-middle shadow-sm bg-white">
         <thead class="table-light">
-          <tr><th>#</th><th>{{ $t('staff.title') }}</th><th>{{ $t('staff.guest') }}</th><th>{{ $t('booking.checkIn') }}</th><th>{{ $t('booking.checkOut') }}</th><th>{{ $t('common.total') }}</th><th>{{ $t('common.status') }}</th></tr>
+          <tr><th>#</th><th>{{ $t('staff.title') }}</th><th>{{ $t('staff.guestName') }}</th><th>{{ $t('booking.checkIn') }}</th><th>{{ $t('booking.checkOut') }}</th><th>{{ $t('common.total') }}</th><th>{{ $t('common.status') }}</th></tr>
         </thead>
         <tbody>
           <tr v-for="b in bookings" :key="b.id" style="cursor: pointer" @click="$router.push({ name: 'staff-booking-detail', params: { id: b.id } })">
             <td>{{ b.id }}</td>
             <td>{{ b.apartment.title }}</td>
-            <td>{{ b.user.username }}</td>
+            <td>{{ guestName(b.user) }}</td>
             <td>{{ b.check_in }}</td>
             <td>{{ b.check_out }}</td>
             <td>{{ b.total_price }} {{ config.currencySymbol }}</td>

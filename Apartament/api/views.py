@@ -340,10 +340,6 @@ class MyBookingViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         booking = serializer.save(apartment=apartment, user=request.user)
-        total_price, price_breakdown = booking.calculate_total_price()
-        booking.total_price = total_price
-        booking.price_breakdown = price_breakdown
-        booking.save()
 
         send_new_booking_notification(booking)
         return Response(BookingSerializer(booking, context={'request': request}).data,
@@ -474,7 +470,7 @@ class StaffApartmentViewSet(viewsets.ModelViewSet):
                 img.save()
         return Response({'success': True})
 
-    @action(detail=True, methods=['delete'], url_path='images/(?P<image_id>[^/.]+)')
+    @action(detail=True, methods=['delete'], url_path='images/(?P<image_id>[0-9]+)')
     def delete_image(self, request, pk=None, image_id=None):
         apartment = self.get_object()
         img = ApartmentImage.objects.filter(pk=image_id, apartment=apartment).first()
@@ -525,7 +521,7 @@ class StaffApartmentViewSet(viewsets.ModelViewSet):
             current += timedelta(days=1)
         return Response({'success': True, 'blocked': count})
 
-    @action(detail=True, methods=['delete'], url_path='availability/(?P<availability_id>[^/.]+)')
+    @action(detail=True, methods=['delete'], url_path='availability/(?P<availability_id>[0-9]+)')
     def unblock_date(self, request, pk=None, availability_id=None):
         apartment = self.get_object()
         entry = Availability.objects.filter(pk=availability_id, apartment=apartment).first()
@@ -557,7 +553,7 @@ class StaffApartmentViewSet(viewsets.ModelViewSet):
         export_url = request.build_absolute_uri(f'/api/apartments/{apartment.pk}/calendar.ics')
         return Response({'feeds': ICalFeedSerializer(feeds, many=True).data, 'export_url': export_url})
 
-    @action(detail=True, methods=['post'], url_path='ical-feeds/(?P<feed_id>[^/.]+)/sync')
+    @action(detail=True, methods=['post'], url_path='ical-feeds/(?P<feed_id>[0-9]+)/sync')
     def sync_feed(self, request, pk=None, feed_id=None):
         apartment = self.get_object()
         feed = ICalFeed.objects.filter(pk=feed_id, apartment=apartment).first()
@@ -566,7 +562,7 @@ class StaffApartmentViewSet(viewsets.ModelViewSet):
         success, message = feed.sync()
         return Response({'success': success, 'message': message})
 
-    @action(detail=True, methods=['delete'], url_path='ical-feeds/(?P<feed_id>[^/.]+)')
+    @action(detail=True, methods=['delete'], url_path='ical-feeds/(?P<feed_id>[0-9]+)')
     def delete_feed(self, request, pk=None, feed_id=None):
         apartment = self.get_object()
         feed = ICalFeed.objects.filter(pk=feed_id, apartment=apartment).first()
@@ -576,6 +572,12 @@ class StaffApartmentViewSet(viewsets.ModelViewSet):
         return Response(status=204)
 
 
+def _guest_display_name(user):
+    """Return "Last Name First Name" for calendar labels, falling back to username."""
+    name = f"{user.last_name} {user.first_name}".strip()
+    return name or user.username
+
+
 def _apartment_calendar_events(apartment):
     events = []
     bookings = Booking.objects.filter(apartment=apartment, status__in=['PENDING', 'CONFIRMED'])
@@ -583,9 +585,10 @@ def _apartment_calendar_events(apartment):
         color = '#198754' if booking.status == 'CONFIRMED' else '#ffc107'
         events.append({
             'id': f'booking-{booking.pk}',
-            'title': f'{booking.user.username} ({booking.guests_count} guests)',
+            'title': f'{_guest_display_name(booking.user)} ({booking.guests_count} guests)',
             'start': booking.check_in.isoformat(),
-            'end': booking.check_out.isoformat(),
+            # Add one day so checkout morning can be rendered as a short tail.
+            'end': (booking.check_out + timedelta(days=1)).isoformat(),
             'color': color,
             'url': f'/staff/bookings/{booking.pk}',
             'extendedProps': {'type': 'booking', 'status': booking.status},
@@ -611,23 +614,22 @@ def staff_global_calendar_events(request):
     bookings = Booking.objects.filter(status__in=['PENDING', 'CONFIRMED']).select_related('apartment', 'user')
     for booking in bookings:
         color = '#198754' if booking.status == 'CONFIRMED' else '#ffc107'
-        title = f'{booking.apartment.title} - {booking.user.username} ({booking.guests_count} guests)'
-        current_date = booking.check_in
-        while current_date < booking.check_out:
-            events.append({
-                'id': f'booking-{booking.pk}-{current_date.isoformat()}',
-                'title': title,
-                'start': current_date.isoformat(),
-                'end': current_date.isoformat(),
-                'color': color,
-                'url': f'/staff/bookings/{booking.pk}',
-                'allDay': True,
-                'extendedProps': {
-                    'type': 'booking', 'status': booking.status,
-                    'apartment': booking.apartment.title, 'apartmentId': booking.apartment.pk,
-                },
-            })
-            current_date += timedelta(days=1)
+        title = f'{booking.apartment.title} - {_guest_display_name(booking.user)} ({booking.guests_count} guests)'
+        events.append({
+            'id': f'booking-{booking.pk}',
+            'title': title,
+            'start': booking.check_in.isoformat(),
+            # Add one day so checkout morning can be rendered as a short tail.
+            'end': (booking.check_out + timedelta(days=1)).isoformat(),
+            'color': color,
+            'url': f'/staff/bookings/{booking.pk}',
+            'extendedProps': {
+                'type': 'booking',
+                'status': booking.status,
+                'apartment': booking.apartment.title,
+                'apartmentId': booking.apartment.pk,
+            },
+        })
     blocked_dates = Availability.objects.filter(is_available=False).select_related('apartment')
     for blocked in blocked_dates:
         events.append({

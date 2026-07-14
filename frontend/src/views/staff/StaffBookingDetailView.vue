@@ -14,6 +14,17 @@ const loading = ref(true)
 const acting = ref(false)
 const edit = reactive({ check_in: '', check_out: '', guests_count: 1 })
 
+function guestName(user) {
+  const name = `${user.last_name || ''} ${user.first_name || ''}`.trim()
+  return name || user.username
+}
+
+function guestPhone(user) {
+  const p = user.profile
+  if (!p || !p.phone_number) return '—'
+  return `${p.phone_country_code || ''} ${p.phone_number}`.trim()
+}
+
 async function load() {
   loading.value = true
   try {
@@ -71,8 +82,9 @@ onMounted(load)
             <h3>{{ booking.apartment.title }} <span class="badge bg-secondary align-middle">{{ $t('status.' + booking.status) }}</span></h3>
             <table class="table mt-3">
               <tbody>
-                <tr><th>{{ $t('staff.guest') }}</th><td>{{ booking.user.username }} ({{ booking.user.email }})</td></tr>
-                <tr v-if="booking.user.profile?.phone_number"><th>{{ $t('auth.phone') }}</th><td>{{ booking.user.profile.phone_country_code }} {{ booking.user.profile.phone_number }}</td></tr>
+                <tr><th>{{ $t('staff.guestName') }}</th><td>{{ guestName(booking.user) }}</td></tr>
+                <tr><th>{{ $t('staff.guestEmail') }}</th><td>{{ booking.user.email || '—' }}</td></tr>
+                <tr><th>{{ $t('staff.guestPhone') }}</th><td>{{ guestPhone(booking.user) }}</td></tr>
                 <tr><th>{{ $t('booking.checkIn') }}</th><td>{{ booking.check_in }}</td></tr>
                 <tr><th>{{ $t('booking.checkOut') }}</th><td>{{ booking.check_out }}</td></tr>
                 <tr><th>{{ $t('dashboard.nights') }}</th><td>{{ booking.nights }}</td></tr>

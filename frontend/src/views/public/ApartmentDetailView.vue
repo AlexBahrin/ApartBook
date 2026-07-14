@@ -1,6 +1,8 @@
 <script setup>
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import flatpickr from 'flatpickr'
+import 'flatpickr/dist/flatpickr.min.css'
 import api, { extractError } from '@/api/client'
 import { useAuthStore } from '@/stores/auth'
 import { useConfigStore } from '@/stores/config'
@@ -26,6 +28,77 @@ const canBook = computed(() => auth.isAuthenticated && !auth.isStaff)
 const unavailableCheckin = computed(() => new Set(apartment.value?.calendar?.unavailable_for_checkin || []))
 const unavailableCheckout = computed(() => new Set(apartment.value?.calendar?.unavailable_for_checkout || []))
 
+// --- Interactive date pickers (flatpickr) ---
+const checkInInput = ref(null)
+const checkOutInput = ref(null)
+let fpCheckIn = null
+let fpCheckOut = null
+
+function addDays(dateStr, n) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const dt = new Date(Date.UTC(y, m - 1, d))
+  dt.setUTCDate(dt.getUTCDate() + n)
+  return dt.toISOString().slice(0, 10)
+}
+
+function firstUnavailableOnOrAfter(dateStr) {
+  const nights = Array.from(unavailableCheckin.value).sort()
+  for (const d of nights) {
+    if (d >= dateStr) return d
+  }
+  return null
+}
+
+function syncCheckoutBounds() {
+  if (!fpCheckOut) return
+  if (form.check_in) {
+    // Check-out must be strictly after check-in and cannot cross an unavailable night.
+    fpCheckOut.set('minDate', addDays(form.check_in, 1))
+    const maxNight = firstUnavailableOnOrAfter(form.check_in)
+    fpCheckOut.set('maxDate', maxNight || null)
+    if (form.check_out && (form.check_out <= form.check_in || (maxNight && form.check_out > maxNight))) {
+      fpCheckOut.clear()
+      form.check_out = ''
+    }
+  } else {
+    fpCheckOut.set('minDate', 'today')
+    fpCheckOut.set('maxDate', null)
+  }
+}
+
+function destroyPickers() {
+  if (fpCheckIn) { fpCheckIn.destroy(); fpCheckIn = null }
+  if (fpCheckOut) { fpCheckOut.destroy(); fpCheckOut = null }
+}
+
+function initPickers() {
+  destroyPickers()
+  if (!checkInInput.value || !checkOutInput.value) return
+
+  const common = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'M j, Y' }
+
+  fpCheckIn = flatpickr(checkInInput.value, {
+    ...common,
+    minDate: 'today',
+    disable: Array.from(unavailableCheckin.value),
+    onChange(_, dateStr) {
+      form.check_in = dateStr
+      syncCheckoutBounds()
+    },
+  })
+
+  fpCheckOut = flatpickr(checkOutInput.value, {
+    ...common,
+    minDate: 'today',
+    disable: Array.from(unavailableCheckout.value),
+    onChange(_, dateStr) {
+      form.check_out = dateStr
+    },
+  })
+
+  syncCheckoutBounds()
+}
+
 async function load() {
   loading.value = true
   try {
@@ -38,6 +111,9 @@ async function load() {
   } finally {
     loading.value = false
   }
+  // Initialize the pickers only after the booking card is rendered (loading=false).
+  await nextTick()
+  if (apartment.value) initPickers()
 }
 
 function datesValid() {
@@ -95,6 +171,7 @@ const { t } = useI18n()
 const bookingSuccess = computed(() => t('booking.success'))
 
 onMounted(load)
+onBeforeUnmount(destroyPickers)
 </script>
 
 <template>
@@ -156,11 +233,11 @@ onMounted(load)
             <h5 class="card-title">{{ $t('booking.title') }}</h5>
             <div class="mb-2">
               <label class="form-label small">{{ $t('booking.checkIn') }}</label>
-              <input type="date" class="form-control" v-model="form.check_in" />
+              <input ref="checkInInput" type="text" class="form-control" :placeholder="$t('booking.selectDates')" readonly />
             </div>
             <div class="mb-2">
               <label class="form-label small">{{ $t('booking.checkOut') }}</label>
-              <input type="date" class="form-control" v-model="form.check_out" />
+              <input ref="checkOutInput" type="text" class="form-control" :placeholder="$t('booking.selectDates')" readonly />
             </div>
             <div class="mb-2">
               <label class="form-label small">{{ $t('booking.guests') }}</label>

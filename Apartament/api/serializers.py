@@ -292,6 +292,21 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['check_in', 'check_out', 'guests_count', 'notes']
 
+    def create(self, validated_data):
+        apartment = validated_data.get('apartment') or self.context.get('apartment')
+        if apartment is None:
+            raise serializers.ValidationError({'apartment': 'Apartment is required.'})
+
+        # Compute totals before insert because Booking.total_price is NOT NULL.
+        booking = Booking(**validated_data)
+        if not getattr(booking, 'apartment_id', None):
+            booking.apartment = apartment
+        total_price, price_breakdown = booking.calculate_total_price()
+
+        validated_data['total_price'] = total_price
+        validated_data['price_breakdown'] = price_breakdown
+        return Booking.objects.create(**validated_data)
+
     def validate(self, attrs):
         apartment = self.context['apartment']
         check_in = attrs['check_in']
