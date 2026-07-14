@@ -2,6 +2,7 @@
 import { ref, onMounted, nextTick, watch } from 'vue'
 import api, { extractError } from '@/api/client'
 import { useToastStore } from '@/stores/toast'
+import { useConfigStore } from '@/stores/config'
 
 const props = defineProps({
   // API base for this conversation, e.g. '/my/conversations' or '/staff/conversations'
@@ -11,6 +12,7 @@ const props = defineProps({
 })
 
 const toast = useToastStore()
+const config = useConfigStore()
 const conversation = ref(null)
 const loading = ref(true)
 const body = ref('')
@@ -22,6 +24,9 @@ async function load() {
   try {
     const { data } = await api.get(`${props.basePath}/${props.conversationId}/`)
     conversation.value = data
+    // Opening a thread marks incoming messages as read server-side.
+    // Refresh the topbar badge immediately so it reflects the latest unread count.
+    await config.fetchUnread()
     await scrollToBottom()
   } catch (e) {
     toast.error(extractError(e))
@@ -42,6 +47,7 @@ async function send() {
   try {
     const { data } = await api.post(`${props.basePath}/${props.conversationId}/send/`, { body: text })
     conversation.value.messages.push(data)
+    await config.fetchUnread()
     body.value = ''
     await scrollToBottom()
   } catch (e) {

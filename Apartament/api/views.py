@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
@@ -407,6 +407,24 @@ class StaffApartmentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsStaffUser]
     queryset = Apartment.objects.all().order_by('-created_at')
 
+    def get_queryset(self):
+        today = date.today()
+        active_booking_subquery = Booking.objects.filter(
+            apartment=OuterRef('pk'),
+            status='CONFIRMED',
+            check_in__lte=today,
+            check_out__gt=today,
+        )
+        blocked_today_subquery = Availability.objects.filter(
+            apartment=OuterRef('pk'),
+            date=today,
+            is_available=False,
+        )
+        return Apartment.objects.all().order_by('-created_at').annotate(
+            has_active_booking_today=Exists(active_booking_subquery),
+            is_blocked_today=Exists(blocked_today_subquery),
+        )
+
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
             return ApartmentDetailSerializer
@@ -595,7 +613,7 @@ def staff_global_calendar_events(request):
         color = '#198754' if booking.status == 'CONFIRMED' else '#ffc107'
         title = f'{booking.apartment.title} - {booking.user.username} ({booking.guests_count} guests)'
         current_date = booking.check_in
-        while current_date <= booking.check_out:
+        while current_date < booking.check_out:
             events.append({
                 'id': f'booking-{booking.pk}-{current_date.isoformat()}',
                 'title': title,

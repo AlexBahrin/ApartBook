@@ -24,7 +24,7 @@ onMounted(async () => {
 
 <template>
   <div class="container py-4">
-    <RouterLink :to="{ name: 'staff-apartments' }" class="btn btn-link ps-0 mb-2"><i class="bi bi-arrow-left"></i> {{ $t('common.back') }}</RouterLink>
+    <RouterLink :to="{ name: 'staff-apartment-manage', params: { id: route.params.id } }" class="btn btn-link ps-0 mb-2"><i class="bi bi-arrow-left"></i> {{ $t('common.back') }}</RouterLink>
     <h1 class="mb-4">{{ $t('staff.calendar') }}</h1>
     <div v-if="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
     <div v-else class="card shadow-sm"><div class="card-body"><CalendarBoard :events="events" /></div></div>

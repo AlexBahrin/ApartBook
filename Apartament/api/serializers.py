@@ -140,6 +140,7 @@ class ApartmentListSerializer(serializers.ModelSerializer):
 class ApartmentDetailSerializer(serializers.ModelSerializer):
     images = ApartmentImageSerializer(many=True, read_only=True)
     calendar = serializers.SerializerMethodField()
+    occupied_today = serializers.SerializerMethodField()
 
     class Meta:
         model = Apartment
@@ -147,13 +148,26 @@ class ApartmentDetailSerializer(serializers.ModelSerializer):
             'id', 'title', 'slug', 'description', 'address', 'city', 'country',
             'latitude', 'longitude', 'capacity', 'bedrooms', 'bathrooms',
             'amenities', 'pricing_type', 'base_price_per_night', 'price_per_guest',
-            'is_active', 'images', 'calendar',
+            'is_active', 'images', 'calendar', 'occupied_today',
         ]
 
     def get_calendar(self, obj):
         today = date.today()
         end = today + timedelta(days=90)
         return obj.get_calendar_data(today, end)
+
+    def get_occupied_today(self, obj):
+        # Prefer queryset annotations when available to avoid extra DB calls per row.
+        has_booking = getattr(obj, 'has_active_booking_today', None)
+        is_blocked = getattr(obj, 'is_blocked_today', None)
+        if has_booking is not None and is_blocked is not None:
+            return bool(has_booking or is_blocked)
+
+        today = date.today()
+        return (
+            obj.bookings.filter(status='CONFIRMED', check_in__lte=today, check_out__gt=today).exists()
+            or obj.availability.filter(date=today, is_available=False).exists()
+        )
 
 
 class ApartmentWriteSerializer(serializers.ModelSerializer):

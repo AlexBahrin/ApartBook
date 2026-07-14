@@ -16,11 +16,7 @@ const count = ref(0)
 const filters = reactive({
   check_in: route.query.check_in || '',
   check_out: route.query.check_out || '',
-  city: route.query.city || '',
-  country: route.query.country || '',
   guests: route.query.guests || '',
-  min_price: route.query.min_price || '',
-  max_price: route.query.max_price || '',
 })
 
 async function load() {
@@ -77,22 +73,8 @@ onMounted(load)
               <input type="date" class="form-control" v-model="filters.check_out" />
             </div>
             <div class="mb-2">
-              <label class="form-label small">{{ $t('apartments.city') }}</label>
-              <input type="text" class="form-control" v-model="filters.city" />
-            </div>
-            <div class="mb-2">
               <label class="form-label small">{{ $t('apartments.guests') }}</label>
               <input type="number" min="1" class="form-control" v-model="filters.guests" />
-            </div>
-            <div class="row g-2 mb-3">
-              <div class="col">
-                <label class="form-label small">{{ $t('apartments.minPrice') }}</label>
-                <input type="number" min="0" class="form-control" v-model="filters.min_price" />
-              </div>
-              <div class="col">
-                <label class="form-label small">{{ $t('apartments.maxPrice') }}</label>
-                <input type="number" min="0" class="form-control" v-model="filters.max_price" />
-              </div>
             </div>
             <button class="btn btn-primary w-100 mb-2" @click="applyFilters">{{ $t('apartments.apply') }}</button>
             <button class="btn btn-outline-secondary w-100" @click="resetFilters">{{ $t('apartments.reset') }}</button>

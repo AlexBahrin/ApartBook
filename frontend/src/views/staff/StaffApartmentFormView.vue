@@ -9,6 +9,9 @@ const router = useRouter()
 const toast = useToastStore()
 
 const isEdit = computed(() => !!route.params.id)
+const backRoute = computed(() => (isEdit.value
+  ? { name: 'staff-apartment-manage', params: { id: route.params.id } }
+  : { name: 'staff-apartments' }))
 const loading = ref(false)
 const saving = ref(false)
 const errors = ref({})
@@ -111,7 +114,7 @@ onMounted(load)
 
 <template>
   <div class="container py-4">
-    <RouterLink :to="{ name: 'staff-apartments' }" class="btn btn-link ps-0 mb-2"><i class="bi bi-arrow-left"></i> {{ $t('common.back') }}</RouterLink>
+    <RouterLink :to="backRoute" class="btn btn-link ps-0 mb-2"><i class="bi bi-arrow-left"></i> {{ $t('common.back') }}</RouterLink>
     <h1 class="mb-4">{{ isEdit ? $t('staff.editApartment') : $t('staff.newApartment') }}</h1>
 
     <div v-if="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>

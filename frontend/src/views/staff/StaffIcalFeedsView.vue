@@ -72,7 +72,7 @@ onMounted(load)
 
 <template>
   <div class="container py-4">
-    <RouterLink :to="{ name: 'staff-apartments' }" class="btn btn-link ps-0 mb-2"><i class="bi bi-arrow-left"></i> {{ $t('common.back') }}</RouterLink>
+    <RouterLink :to="{ name: 'staff-apartment-manage', params: { id: route.params.id } }" class="btn btn-link ps-0 mb-2"><i class="bi bi-arrow-left"></i> {{ $t('common.back') }}</RouterLink>
     <h1 class="mb-4">{{ $t('staff.icalFeeds') }}</h1>
 
     <div class="card shadow-sm mb-4">

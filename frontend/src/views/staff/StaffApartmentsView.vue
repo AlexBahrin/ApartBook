@@ -1,10 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api, { extractError } from '@/api/client'
-import { useConfigStore } from '@/stores/config'
 import { useToastStore } from '@/stores/toast'
 
-const config = useConfigStore()
 const toast = useToastStore()
 const apartments = ref([])
 const loading = ref(true)
@@ -18,17 +16,6 @@ async function load() {
     toast.error(extractError(e))
   } finally {
     loading.value = false
-  }
-}
-
-async function remove(apartment) {
-  if (!confirm('Are you sure you want to delete this apartment?')) return
-  try {
-    await api.delete(`/staff/apartments/${apartment.id}/`)
-    apartments.value = apartments.value.filter((a) => a.id !== apartment.id)
-    toast.success('Deleted successfully!')
-  } catch (e) {
-    toast.error(extractError(e))
   }
 }
 
@@ -53,7 +40,7 @@ onMounted(load)
             <th></th>
             <th>{{ $t('staff.title') }}</th>
             <th>{{ $t('staff.capacity') }}</th>
-            <th>{{ $t('staff.basePrice') }}</th>
+            <th>{{ $t('staff.occupancyToday') }}</th>
             <th>{{ $t('staff.isActive') }}</th>
             <th class="text-end">{{ $t('common.actions') }}</th>
           </tr>
@@ -65,21 +52,20 @@ onMounted(load)
             </td>
             <td>{{ a.title }}</td>
             <td>{{ a.capacity }}</td>
-            <td>{{ a.base_price_per_night }} {{ config.currencySymbol }}</td>
+            <td>
+              <span class="badge" :class="a.occupied_today ? 'bg-danger' : 'bg-success'">
+                {{ a.occupied_today ? $t('staff.occupied') : $t('staff.free') }}
+              </span>
+            </td>
             <td>
               <span class="badge" :class="a.is_active ? 'bg-success' : 'bg-secondary'">
                 {{ a.is_active ? $t('common.yes') : $t('common.no') }}
               </span>
             </td>
             <td class="text-end">
-              <div class="btn-group btn-group-sm">
-                <RouterLink :to="{ name: 'staff-apartment-edit', params: { id: a.id } }" class="btn btn-outline-secondary" :title="$t('common.edit')"><i class="bi bi-pencil"></i></RouterLink>
-                <RouterLink :to="{ name: 'staff-apartment-images', params: { id: a.id } }" class="btn btn-outline-secondary" :title="$t('staff.manageImages')"><i class="bi bi-images"></i></RouterLink>
-                <RouterLink :to="{ name: 'staff-availability', params: { id: a.id } }" class="btn btn-outline-secondary" :title="$t('staff.availability')"><i class="bi bi-calendar-week"></i></RouterLink>
-                <RouterLink :to="{ name: 'staff-calendar', params: { id: a.id } }" class="btn btn-outline-secondary" :title="$t('staff.calendar')"><i class="bi bi-calendar3"></i></RouterLink>
-                <RouterLink :to="{ name: 'staff-ical', params: { id: a.id } }" class="btn btn-outline-secondary" :title="$t('staff.icalFeeds')"><i class="bi bi-rss"></i></RouterLink>
-                <button class="btn btn-outline-danger" @click="remove(a)" :title="$t('common.delete')"><i class="bi bi-trash"></i></button>
-              </div>
+              <RouterLink :to="{ name: 'staff-apartment-manage', params: { id: a.id } }" class="btn btn-sm btn-outline-primary">
+                {{ $t('common.edit') }}
+              </RouterLink>
             </td>
           </tr>
         </tbody>
